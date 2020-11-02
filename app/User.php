@@ -105,4 +105,12 @@ class User extends Authenticatable implements JWTSubject  //MustVerifyEmail
     {
         return [];
     }
+
+    /**
+     * Role relationship
+     */
+    public function roles()
+    {
+        return $this->belongsToMany('App\Role');
+    }
 }
