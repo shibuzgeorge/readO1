@@ -11,7 +11,9 @@ export default [
   { path: '/password/reset/:token', name: 'password.reset', component: page('auth/password/reset.vue') },
   { path: '/email/verify/:id', name: 'verification.verify', component: page('auth/verification/verify.vue') },
   { path: '/email/resend', name: 'verification.resend', component: page('auth/verification/resend.vue') },
-
+    { path: '/admin/users', name: 'admin.users', component: page('admin/users.vue') },
+    { path: '/admin/users/edit/:id', name: 'admin.users.edit', component: page('admin/edit.vue') },
+    { path: '/admin/users/destroy/:id', name: 'admin.users.destroy', component: page('admin/delete.vue') },
   { path: '/home', name: 'home', component: page('home.vue') },
   { path: '/settings',
     component: page('settings/index.vue'),

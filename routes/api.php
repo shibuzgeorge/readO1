@@ -22,6 +22,9 @@ Route::group(['middleware' => 'auth:api'], function () {
         return App\User::all();
     });
 
+    Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function(){
+        Route::resource('/users', 'UsersController', ['except' => ['show', 'create', 'store']]);
+    });
 
     Route::patch('settings/profile', 'Settings\ProfileController@update');
     Route::patch('settings/password', 'Settings\PasswordController@update');
