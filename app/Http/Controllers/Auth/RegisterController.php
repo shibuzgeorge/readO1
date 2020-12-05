@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\User;
+use App\Role;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
@@ -38,6 +39,7 @@ class RegisterController extends Controller
             return response()->json(['status' => trans('verification.sent')]);
         }
 
+        $user->roles()->attach(Role::where('name', 'user')->first());
         return response()->json($user);
     }
 
@@ -64,6 +66,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],

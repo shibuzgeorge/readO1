@@ -15,6 +15,11 @@ class UserController extends Controller
      */
     public function current(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user();
+        return response()->json($user);
+    }
+
+    public function checkRole(Request $request){
+        return response()->json($request->user()->roles()->first()->name);
     }
 }
