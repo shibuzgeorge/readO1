@@ -1,11 +1,13 @@
 <template>
     <div>
         <table class="table">
+
             <thead>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Email</th>
+                <th scope="col">Role</th>
                 <th scope="col">Action</th>
             </tr>
             </thead>
@@ -15,6 +17,7 @@
                 <th scope="row">{{ user.id}}</th>
                 <td>{{ user.name}}</td>
                 <td>{{ user.email}}</td>
+                <td>{{ user.roles[0].name}}</td>
 
                 <td>
                     <router-link :to="{ name: 'admin.users.edit', params: {id: user.id} }">
@@ -23,10 +26,14 @@
                     </router-link>
                 </td>
                 <td>
-                    <router-link :to="{ name: 'admin.users.destroy', params: {id: user.id} }">
-                        <button type="button" class="btn btn-warning">Delete</button>
+                    <form @submit.prevent="del(user.id)">
 
-                    </router-link>
+                        <v-button class="btn btn-warning" type="success">
+                            {{ $t('Delete') }}
+                        </v-button>
+
+
+                    </form>
 
                 </td>
             </tr>
@@ -40,20 +47,32 @@
 import axios from 'axios'
 
     export default {
-        data: function (){
-            return {
-                users: []
-            }
-        },
+        data: () => ({
+            users: [],
+
+        }),
         name: "FetchUsers",
         created() {
             axios.get('/api/users')
                 .then(response => {
                     this.users = response.data;
 
+                }).catch(function (response) {
+                //handle error
+                console.log(response);
+            });
+
+        },
+        methods: {
+            async del(data) {
+                // Submit the form.
+                axios.delete(`/api/admin/users/${data}`).then(response => {
+                    window.location.reload();
                 })
 
+            }
         }
+
     }
 </script>
 

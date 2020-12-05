@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,19 +13,20 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::get('/users', 'Admin\UsersController@index');
 
+    Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::resource('/users', 'UsersController', ['except' => ['show', 'create', 'store']]);
+    });
+});
 Route::group(['middleware' => 'auth:api'], function () {
     Route::post('logout', 'Auth\LoginController@logout');
 
     Route::get('/user', 'Auth\UserController@current');
+    Route::get('/user/role', 'Auth\UserController@checkRole');
 
-    Route::get('/users', function(){
-        return App\User::all();
-    });
 
-    Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function(){
-        Route::resource('/users', 'UsersController', ['except' => ['show', 'create', 'store']]);
-    });
 
     Route::patch('settings/profile', 'Settings\ProfileController@update');
     Route::patch('settings/password', 'Settings\PasswordController@update');

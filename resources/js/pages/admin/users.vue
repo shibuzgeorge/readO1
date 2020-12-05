@@ -1,5 +1,5 @@
 <template>
-    <card :title="$t('Admin, User Management')">
+    <card title="Admin User Management">
 
         <div class="wrapper">
         <fetch-users/>
@@ -10,7 +10,7 @@
 <script>
     import FetchUsers from "../../components/FetchUsers";
     export default {
-        middleware: 'auth',
+        middleware: 'admin',
         name: "users",
         components: {FetchUsers}
     }

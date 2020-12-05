@@ -3,24 +3,34 @@
     <!-- Sidebar -->
     <div class="bg-light border-right" id="sidebar-wrapper">
         <div class="sidebar-heading">
-            Read(0)1 <span style="float: right">
+            ReadO(1) <span style="float: right">
             <a v-on:click="toggleMenu" href="#" id="menu-toggle">
                 <span >X</span></a></span>
         </div>
 
         <div class="list-group list-group-flush">
-            <a href="#" class="list-group-item list-group-item-action bg-light">Dashboard</a>
-            <a href="#" class="list-group-item list-group-item-action bg-light">Shortcuts</a>
-            <a href="#" class="list-group-item list-group-item-action bg-light">Overview</a>
-            <a href="#" class="list-group-item list-group-item-action bg-light">Events</a>
-            <a href="#" class="list-group-item list-group-item-action bg-light">Profile</a>
-            <a href="#" class="list-group-item list-group-item-action bg-light">Status</a>
+            <router-link v-if="role!=='User'" :to="{ name: 'admin.upload' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                Upload Textbook
+            </router-link>
+            <router-link v-if="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                Admin User Management
+            </router-link>
+            <router-link v-if="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-dark" active-class="active-class">
+                Dashboard
+            </router-link>
+            <router-link v-if="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-dark" active-class="active-class">
+                Library
+            </router-link>
+            <router-link v-if="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-dark" active-class="active-class">
+                My Modules
+            </router-link>
         </div>
     </div>
 </template>
 
 <script>
     import MainContainer from "./container-layout";
+    import { mapGetters } from 'vuex'
     import 'jquery/dist/jquery.min.js';
     import 'popper.js/dist/umd/popper.min.js'
     import $ from 'jquery';
@@ -28,6 +38,10 @@
 
         name: "sidebar-layout",
         components: {MainContainer},
+        computed: mapGetters({
+            user: 'auth/user',
+            role: 'auth/role'
+        }),
         methods: {
 
             toggleMenu : function(event){
@@ -37,6 +51,7 @@
                 $("#menu-expand").toggle();
 
             },
+
 
     }}
 </script>

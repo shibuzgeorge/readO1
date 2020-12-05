@@ -41,9 +41,6 @@
               <v-button :loading="form.busy">
                 {{ $t('login') }}
               </v-button>
-
-              <!-- GitHub Login Button -->
-              <login-with-github />
             </div>
           </div>
         </form>
@@ -54,44 +51,42 @@
 
 <script>
 import Form from 'vform'
-import LoginWithGithub from '~/components/LoginWithGithub'
-
 export default {
-  middleware: 'guest',
+    middleware: 'guest',
+    metaInfo() {
+        return {title: this.$t('login')}
+    },
 
-  components: {
-    LoginWithGithub
-  },
-
-  metaInfo () {
-    return { title: this.$t('login') }
-  },
-
-  data: () => ({
-    form: new Form({
-      email: '',
-      password: ''
+    data: () => ({
+        form: new Form({
+            email: '',
+            password: ''
+        }),
+        remember: false
     }),
-    remember: false
-  }),
 
-  methods: {
-    async login () {
-      // Submit the form.
-      const { data } = await this.form.post('/api/login')
+    methods: {
+        async login() {
+            // Submit the form.
 
-      // Save the token.
-      this.$store.dispatch('auth/saveToken', {
-        token: data.token,
-        remember: this.remember
-      })
+            const {data} = await this.form.post('/api/login')
 
-      // Fetch the user.
-      await this.$store.dispatch('auth/fetchUser')
+            // Save the token.
+            this.$store.dispatch('auth/saveToken', {
+                token: data.token,
+                remember: this.remember
+            })
 
-      // Redirect home.
-      this.$router.push({ name: 'home' })
+            // Fetch the user.
+            await this.$store.dispatch('auth/fetchUser')
+
+            this.$router.push({name: 'home'})
+
+            // Fetch the role.
+            await this.$store.dispatch('auth/fetchRole')
+
+
+        }
     }
-  }
 }
 </script>
