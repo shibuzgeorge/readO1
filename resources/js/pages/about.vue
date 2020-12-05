@@ -8,6 +8,7 @@
             The speed reading techniques are backed up by scientific evidence.
             Admins/Module Tutors are able to upload PDFs or plain text of textbooks and students are able to
             time themselves and test knowledge by a simple quiz at the end of reading.
+
         </card>
     </div>
 </template>

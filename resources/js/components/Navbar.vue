@@ -39,7 +39,7 @@
                 {{ $t('settings') }}
               </router-link>
 
-              <router-link :to="{ name: 'admin.users' }" class="dropdown-item pl-3">
+              <router-link v-if="role==='Admin'" :to="{ name: 'admin.users' }" class="dropdown-item pl-3">
                 <fa icon="cog" fixed-width />
                User Management
               </router-link>
@@ -88,6 +88,7 @@ export default {
 
   computed: mapGetters({
     user: 'auth/user',
+    role: 'auth/role'
   }),
   methods: {
       toggleMenu : function(event){

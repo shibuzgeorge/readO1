@@ -10,6 +10,16 @@ use Illuminate\Http\Request;
 class UsersController extends Controller
 {
 
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('admin');
+    }
+
     public function index(){
         $users = User::with('roles')->get();
 
@@ -35,8 +45,11 @@ class UsersController extends Controller
     {
         $roles = Role::all();
 
+        $user_role = $user->roles()->first();
+
         return response()->json([
             'user' => $user,
+            'user_role' => $user_role,
             'roles' => $roles
         ]);
     }
@@ -50,7 +63,10 @@ class UsersController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        $user->roles()->sync($request->checked);
+
+        return response()->json($request->checked);
+
     }
 
     /**
@@ -61,6 +77,9 @@ class UsersController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->roles()->detach();
+        $user->delete();
+
+        return response()->json(User::with('roles')->get());
     }
 }

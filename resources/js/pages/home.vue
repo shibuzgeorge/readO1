@@ -16,12 +16,8 @@
 </template>
 
 <script>
-import FetchUsers from '~/components/FetchUsers'
 export default {
-        components: {
 
-            FetchUsers
-        },
   middleware: 'auth',
 
   metaInfo () {
