@@ -1,5 +1,5 @@
 <template>
-    <card :title="'Edit - '+user.name+'  as '+user_role.name">
+    <card :title="'Edit - '+user.name+'  as '+user_role.name" v-if="isLoaded">
         Choose which role you'd like to change permission<p></p>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
         <div class="form-check" v-for="role in roles">
@@ -24,6 +24,7 @@ export default {
         middleware: 'admin',
         name: "edit",
         data: () => ({
+            isLoaded: false,
             user: [],
             roles: [],
             user_role: [],
@@ -36,6 +37,7 @@ export default {
         created() {
             axios.get(`/api/admin/users/${this.$route.params.id}/edit`)
                 .then(response => {
+                    this.isLoaded = true;
                     this.user = response.data.user;
                     this.roles = response.data.roles;
                     this.user_role = response.data.user_role;

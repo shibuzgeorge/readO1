@@ -9,19 +9,21 @@
         </div>
 
         <div class="list-group list-group-flush">
-            <router-link v-if="role!=='User'" :to="{ name: 'admin.upload' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                Upload Textbook
+
+            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'admin.upload' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                Upload textbook
             </router-link>
-            <router-link v-if="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+            <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 Admin User Management
             </router-link>
-            <router-link v-if="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-dark" active-class="active-class">
+
+            <router-link v-show="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 Dashboard
             </router-link>
-            <router-link v-if="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-dark" active-class="active-class">
+            <router-link v-show="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 Library
             </router-link>
-            <router-link v-if="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-dark" active-class="active-class">
+            <router-link v-show="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 My Modules
             </router-link>
         </div>
