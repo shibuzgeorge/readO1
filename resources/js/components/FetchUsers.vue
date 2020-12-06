@@ -1,6 +1,6 @@
 <template>
     <div>
-        <table class="table">
+        <table class="table" v-if="isLoaded">
 
             <thead>
             <tr>
@@ -49,12 +49,14 @@ import axios from 'axios'
     export default {
         data: () => ({
             users: [],
+            isLoaded: false,
 
         }),
         name: "FetchUsers",
         created() {
-            axios.get('/api/users')
+           axios.get('/api/users')
                 .then(response => {
+                    this.isLoaded = true;
                     this.users = response.data;
 
                 }).catch(function (response) {
