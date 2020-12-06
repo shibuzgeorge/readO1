@@ -13,18 +13,24 @@
             </v-button>
         </form>
     </card>
+    <div v-else>
+        <clip-loader :color="loadingColor" style="text-align: center;"/>
+    </div>
 
 </template>
 
 <script>
 import axios from 'axios'
 import Form from 'vform'
+import ClipLoader from "vue-spinner/src/ClipLoader";
 
 export default {
-        middleware: 'admin',
+    components: {ClipLoader},
+    middleware: 'admin',
         name: "edit",
         data: () => ({
             isLoaded: false,
+            loadingColor: "black",
             user: [],
             roles: [],
             user_role: [],
