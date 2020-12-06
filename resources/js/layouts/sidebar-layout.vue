@@ -14,9 +14,14 @@
                 Upload textbook
             </router-link>
             <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                Admin User Management
+                User Management
             </router-link>
-
+            <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                Add modules
+            </router-link>
+            <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+               Assign modules to module tutors
+            </router-link>
             <router-link v-show="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 Dashboard
             </router-link>
