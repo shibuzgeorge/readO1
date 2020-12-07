@@ -41,6 +41,7 @@ export default {
 
         }),
         created() {
+            let self = this
             axios.get(`/api/admin/users/${this.$route.params.id}/edit`)
                 .then(response => {
                     this.isLoaded = true;
@@ -51,6 +52,8 @@ export default {
 
                 }).catch(function (response) {
                 //handle error
+                self.$router.push({name: 'admin.users'})
+
                 console.log(response);
             });
         },

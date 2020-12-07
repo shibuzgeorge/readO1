@@ -43,6 +43,7 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
+
         $roles = Role::all();
 
         $user_role = $user->roles()->first();
