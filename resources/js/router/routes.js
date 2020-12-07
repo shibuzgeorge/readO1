@@ -12,7 +12,7 @@ export default [
   { path: '/email/verify/:id', name: 'verification.verify', component: page('auth/verification/verify.vue') },
   { path: '/email/resend', name: 'verification.resend', component: page('auth/verification/resend.vue') },
     { path: '/admin/users', name: 'admin.users', component: page('admin/users.vue') },
-    { path: '/admin/upload', name: 'admin.upload', component: page('admin/upload.vue') },
+    { path: '/upload', name: 'upload', component: page('upload.vue') },
     { path: '/admin/users/edit/:id', name: 'admin.users.edit', component: page('admin/edit.vue') },
     { path: '/admin/users/update/:id', name: 'admin.users.update', component: page('admin/edit.vue') },
   { path: '/home', name: 'home', component: page('home.vue') },

@@ -10,7 +10,7 @@
 
         <div class="list-group list-group-flush">
 
-            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'admin.upload' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'upload' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 Upload textbook
             </router-link>
             <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
