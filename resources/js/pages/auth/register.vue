@@ -98,9 +98,6 @@ export default {
         // Log in the user.
         const { data: { token } } = await this.form.post('/api/login')
 
-          // Fetch the role.
-          await this.$store.dispatch('auth/fetchRole')
-          
         // Save the token.
         this.$store.dispatch('auth/saveToken', { token })
 
@@ -109,6 +106,9 @@ export default {
 
         // Redirect home.
         this.$router.push({ name: 'home' })
+
+          // Fetch the role.
+          await this.$store.dispatch('auth/fetchRole')
       }
     }
   }
