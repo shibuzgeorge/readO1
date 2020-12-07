@@ -39,7 +39,7 @@ class RegisterController extends Controller
             return response()->json(['status' => trans('verification.sent')]);
         }
 
-        $user->roles()->attach(Role::where('name', 'user')->first());
+        $user->roles()->attach(Role::where('name', 'User')->first());
         return response()->json($user);
     }
 
