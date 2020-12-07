@@ -22,7 +22,7 @@
             <router-link v-show="role==='Admin'" :to="{ name: 'module.v.create' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 Add modules
             </router-link>
-            <router-link v-show="role==='Admin'" :to="{ name: 'module.v.edit' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+            <router-link v-show="role==='Admin'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                Assign modules to module tutors
             </router-link>
             <router-link v-show="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
