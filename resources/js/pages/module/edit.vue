@@ -9,7 +9,7 @@
             </div>
 
             <v-button class="form-control" :loading="form.busy" type="success">
-                Add
+                Edit
             </v-button>
         </form>
     </card>
