@@ -14,7 +14,7 @@
         </form>
     </card>
     <div v-else>
-        <clip-loader />
+        <clip-loader :color="loadingColor"/>
     </div>
 </template>
 
@@ -28,6 +28,7 @@
         middleware: 'admin_plus_module_tutor',
         data: () => ({
             isLoaded: false,
+            loadingColor: "black",
             form: new Form({
                 module_name: '',
                 module_code: '',
