@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use App\User;
 use App\Role;
+use App\Module;
 
 class UsersTableSeeder extends Seeder
 {
@@ -20,10 +21,15 @@ class UsersTableSeeder extends Seeder
         Schema::enableForeignKeyConstraints();
 
         DB::table('role_user')->truncate();
+        DB::table('module_user')->truncate();
 
         $adminRole = Role::where('name', 'Admin')->first();
         $moduleTutorRole = Role::where('name', 'Module Tutor')->first();
         $userRole = Role::where('name', 'User')->first();
+
+        $ci = Module::where('module_code', 'CS3960')->first();
+        $eat = Module::where('module_code', 'CS3160')->first();
+        $spm = Module::where('module_code', 'CS3360')->first();
 
         $admin = User::create([
             'name'=> 'Admin User',
@@ -46,5 +52,8 @@ class UsersTableSeeder extends Seeder
         $admin->roles()->attach($adminRole);
         $moduleTutor->roles()->attach($moduleTutorRole);
         $user->roles()->attach($userRole);
+        $user->modules()->attach($ci);
+        $user->modules()->attach($spm);
+        $user->modules()->attach($eat);
     }
 }
