@@ -6,8 +6,9 @@
                 <label>Description:     </label> <input class="form-control" v-model="form.description" type="text" value=""/><br/>
                 <label>Choose a module: </label>
                 <select  class="form-control" v-model="selected">
-                    <option v-for="module in modules" :value="module.val" :key="module.id">
-                        {{ module.val }}
+                    <option>Please select a module</option>
+                    <option v-for="module in modules" :value="module.name" :key="module.id">
+                        ({{ module.module_code }}) {{ module.name }} - {{ module.module_year }}
                     </option>
                 </select><br/>
                 <input class="form-control" type="file" id="file" ref="file" v-on:change="handleFileUpload()"/><br/>
@@ -29,18 +30,27 @@
         middleware: 'admin_plus_module_tutor',
         name: "edit",
         data: () => ({
+            isLoaded: false,
             form: new Form({
                 title: '',
                 description: ''
             }),
-            selected: 'item1',
-            modules: {
-                1: {id: 1, val: 'CS3160'},
-                2: {id: 2, val: 'CS2010'},
-                3: {id: 3, val: 'CS1020'},
-            }
+            selected: "Please select a module",
+            modules: []
 
         }),
+    created() {
+        axios.get('/api/upload')
+            .then(response => {
+                this.isLoaded = true;
+                this.modules = response.data;
+
+            }).catch(function (response) {
+            //handle error
+            console.log(response);
+        });
+
+    },
         methods: {
             async submit() {
                 // Submit the form.

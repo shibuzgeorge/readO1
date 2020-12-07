@@ -19,6 +19,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('/users', 'UsersController', ['except' => ['show', 'create', 'store']]);
     });
+
+    Route::get('/upload', 'Textbook\UploadController@index');
 });
 Route::group(['middleware' => 'auth:api'], function () {
     Route::post('logout', 'Auth\LoginController@logout');
