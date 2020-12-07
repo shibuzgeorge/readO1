@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 use App\Role;
 
 class RolesTableSeeder extends Seeder
@@ -12,7 +13,9 @@ class RolesTableSeeder extends Seeder
      */
     public function run()
     {
+        Schema::disableForeignKeyConstraints();
         Role::truncate();
+        Schema::enableForeignKeyConstraints();
 
         Role::create(['name' => 'Admin']);
         Role::create(['name' => 'Module Tutor']);
