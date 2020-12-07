@@ -1,5 +1,5 @@
 <template>
-    <card :title="'Upload textbook/document'">
+    <card title="Upload textbook/document">
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
             <div class="form-check">
                 <label>Title:           </label> <input class="form-control" v-model="form.title" type="text" value=""/><br/>

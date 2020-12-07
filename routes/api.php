@@ -16,11 +16,17 @@ use App\User;
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/users', 'Admin\UsersController@index');
 
+    Route::namespace('Module')->prefix('module')->name('module.')->group(function () {
+        Route::resource('/v', 'ViewController');
+    });
+
     Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('/users', 'UsersController', ['except' => ['show', 'create', 'store']]);
     });
 
     Route::get('/upload', 'Textbook\UploadController@index');
+
+
 });
 Route::group(['middleware' => 'auth:api'], function () {
     Route::post('logout', 'Auth\LoginController@logout');

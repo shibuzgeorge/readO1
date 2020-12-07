@@ -16,10 +16,13 @@
             <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 User Management
             </router-link>
-            <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+               All Modules
+            </router-link>
+            <router-link v-show="role==='Admin'" :to="{ name: 'module.v.create' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 Add modules
             </router-link>
-            <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+            <router-link v-show="role==='Admin'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                Assign modules to module tutors
             </router-link>
             <router-link v-show="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
@@ -28,7 +31,7 @@
             <router-link v-show="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 Library
             </router-link>
-            <router-link v-show="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+            <router-link v-show="role==='User'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 My Modules
             </router-link>
         </div>
