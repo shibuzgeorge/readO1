@@ -17,14 +17,8 @@ class CreateTextbooksTable extends Migration
             $table->bigIncrements('id');
             $table->string('title');
             $table->string('description');
-            $table->bigInteger('module_id')->unsigned();
             $table->binary('file')->nullable();
             $table->timestamps();
-
-            $table->foreign('module_id')
-                ->references('id')
-                ->on('modules')
-                ->onDelete('cascade');
         });
     }
 

@@ -60,7 +60,6 @@ class UploadController extends Controller
         $data = [
             'title' => $request->input('title'),
             'description' => $request->input('description'),
-            'module_id' => $request->input('module_id'),
             'file' => $file,
 
         ];
