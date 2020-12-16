@@ -9,7 +9,7 @@ use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
-class UploadController extends Controller
+class ViewController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,64 +20,32 @@ class UploadController extends Controller
     {
         $user = Auth::user();
         $user_role = $user->roles()->first();
-
         if($user_role->name === 'Admin'){
-            $modules = Module::all();
-            return response()->json($modules);
+            $textbooks = Textbook::all();
+            return response()->json($textbooks);
         }else  if($user_role->name === 'Module Tutor'){
-            $modules = Module::where('module_code', 'CS3360')->first();
-            return response()->json([$modules]);
+            $textbooks = Textbook::all();
+            return response()->json($textbooks);
+        }else  if($user_role->name === 'User'){
+            $textbooks = Textbook::all();
+            return response()->json($textbooks);
         }
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-
-        $file = null;
-
-        if ($request->file('file')) {
-            $file = base64_encode(file_get_contents($request->file('file')));
-        }
-
-
-        //data that will be inserted into new row in document table
-        $data = [
-            'title' => $request->input('title'),
-            'description' => $request->input('description'),
-            'module_id' => $request->input('module_id'),
-            'file' => $file,
-
-        ];
-
-        //create a document using the POST data
-        Textbook::create($data);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\User  $user
+     * @param
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show(int $textbook)
     {
-        //
+        $m = Textbook::find($textbook);
+        return response()->json([
+            'title' => $m->title,
+            'description' => $m->description,
+            'file' => $m->file,
+        ]);
     }
 
     /**

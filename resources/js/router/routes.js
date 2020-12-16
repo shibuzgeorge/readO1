@@ -16,6 +16,7 @@ export default [
     { path: '/module', name: 'module.v.index', component: page('module/index.vue') },
     { path: '/module/create', name: 'module.v.create', component: page('module/create.vue') },
     { path: '/module/edit/:id', name: 'module.v.edit', component: page('module/edit.vue') },
+    { path: '/textbook/view/:id', name: 'textbook.view.show', component: page('textbook/view.vue') },
     { path: '/admin/users/edit/:id', name: 'admin.users.edit', component: page('admin/edit.vue') },
     { path: '/admin/users/update/:id', name: 'admin.users.update', component: page('admin/edit.vue') },
   { path: '/home', name: 'home', component: page('home.vue') },

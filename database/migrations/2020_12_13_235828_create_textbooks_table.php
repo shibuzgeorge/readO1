@@ -14,10 +14,10 @@ class CreateTextbooksTable extends Migration
     public function up()
     {
         Schema::create('textbooks', function (Blueprint $table) {
-            $table->bigInteger('id');
+            $table->bigIncrements('id');
             $table->string('title');
             $table->string('description');
-            $table->bigInteger('module_id')->unsigned()->nullable();
+            $table->bigInteger('module_id')->unsigned();
             $table->binary('file')->nullable();
             $table->timestamps();
         });
