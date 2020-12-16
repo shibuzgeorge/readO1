@@ -4,9 +4,13 @@
         <h1 v-else>All Modules</h1>
         <div class="row">
     <div v-for="module in modules" class="card col-sm-4 ml-4 mt-4">
+
+
         <div class="card-body">
+            <router-link :to="{ name: 'module.v.show', params: {id: module.id} }">
             <h5 class="card-title">{{module.name}}</h5>
             <h6 class="card-subtitle mb-2 text-muted">{{module.module_code}} - {{module.module_year}}</h6>
+            </router-link>
             <router-link :to="{ name: 'module.v.edit', params: {id: module.id} }">
                 <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
             </router-link>

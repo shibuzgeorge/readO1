@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Module;
 
 use App\Http\Controllers\Controller;
 use App\Module;
+use App\Textbook;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -67,9 +68,16 @@ class ViewController extends Controller
      * @param  \App\Module  $module
      * @return \Illuminate\Http\Response
      */
-    public function show(Module $module)
+    public function show(int $module)
     {
-
+        $m = Module::find($module);
+        $textbook = $m->textbooks()->get();
+        return response()->json([
+            'name' => $m->name,
+            'code' => $m->module_code,
+            'year' => $m->module_year,
+            'textbooks' => $textbook
+        ]);
     }
 
     /**

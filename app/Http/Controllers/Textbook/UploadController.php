@@ -66,7 +66,10 @@ class UploadController extends Controller
         ];
 
         //create a document using the POST data
-        Textbook::create($data);
+       $textbook =  Textbook::create($data);
+       $module = Module::find($request->input('module_id'));
+       $textbook->modules()->attach($module);
+
     }
 
     /**
