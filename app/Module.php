@@ -13,4 +13,8 @@ class Module extends Model
     public function users(){
         return $this->belongsToMany('App\User');
     }
+
+    public function textbooks(){
+        return $this->belongsToMany('App\Textbook');
+    }
 }
