@@ -20,6 +20,12 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('/v', 'ViewController');
     });
 
+    Route::namespace('Textbook')->prefix('textbook')->name('textbook.')->group(function () {
+        Route::resource('/upload', 'UploadController');
+        Route::resource('/view', 'ViewController');
+    });
+
+
     Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('/users', 'UsersController', ['except' => ['show', 'create', 'store']]);
     });
