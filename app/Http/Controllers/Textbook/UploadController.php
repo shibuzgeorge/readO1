@@ -24,8 +24,8 @@ class UploadController extends Controller
         if($user_role->name === 'Admin'){
             $modules = Module::all();
             return response()->json($modules);
-        }else  if($user_role->name === 'Module Tutor'){
-            $modules = Module::where('module_code', 'CS3360')->first();
+        }else {
+            $modules = $user->modules()->get();
             return response()->json([$modules]);
         }
     }

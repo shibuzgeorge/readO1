@@ -40,6 +40,9 @@
                 <router-link v-show="role==='Admin'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     Assign modules to module tutors
                 </router-link>
+                <router-link v-show="role==='Admin'" :to="{ name: 'module.assignStudents' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                    Assign students to modules
+                </router-link>
             </div>
             <a v-show="role==='Admin'" class="btn collapsed list-group-item list-group-item-action bg-light" data-toggle="collapse" href="#UserManagement" role="button" aria-expanded="true" aria-controls="UserManagement">
                 User Management<span class="mr-3"></span>

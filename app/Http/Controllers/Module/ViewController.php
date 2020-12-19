@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Module;
 
 use App\Http\Controllers\Controller;
 use App\Module;
-use App\Textbook;
+use App\Role;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -62,6 +63,41 @@ class ViewController extends Controller
         return response()->json($modules);
     }
 
+    public function allModules()
+    {
+        $modules = Module::all();
+
+        return response()->json($modules);
+    }
+
+    public function getStudentsForModule(int $module_id)
+    {
+        $modules = Module::find($module_id);
+
+        $users = $modules->users()->get();
+
+        return response()->json($users);
+    }
+
+    public function getAllStudents(){
+        $users = Role::where('name', 'User')->first()->users()->get();
+        return response()->json($users);
+    }
+
+    public function assign(Request $request){
+        $users = Role::where('name', 'User')->first()->users()->get();
+        return response()->json($users);
+    }
+
+    public function getAllModuleTutors(){
+        $moduleTutors = User::where('id', 2)->get();
+        return response()->json($moduleTutors);
+    }
+
+    public function assignStudents(Request $request)
+    {
+
+    }
     /**
      * Display the specified resource.
      *
