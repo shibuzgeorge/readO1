@@ -16,7 +16,7 @@
                         <label class="form-check-label" for="exampleCheck1">{{user.name}}</label>
                     </div>
                 </div>
-                    <sweet-modal ref="modal" icon="success">
+                    <sweet-modal ref="success" icon="success">
                         {{successMessage}}
                     </sweet-modal>
                 <v-button class="form-control" type="success">
@@ -101,7 +101,7 @@
                 axios.post(`/api/module/assign/${this.selected}`, this.checked)
                     .then(response => {
                         this.successMessage = response.data.Success;
-                        this.$refs.modal.open();
+                        this.$refs.success.open();
                     }).catch(function (response) {
                     //handle error
                     console.log(response);
