@@ -42,11 +42,16 @@
 
             axios.get(`/api/module/v/${this.$route.params.id}`)
                 .then(response => {
-                    this.isLoaded = true;
-                    this.name = response.data.name;
-                    this.module_code = response.data.code;
-                    this.module_year = response.data.year;
-                    this.textbooks = response.data.textbooks
+                    let self = this;
+                    if(response.data === 'Error'){
+                        self.$router.push({name: 'module.v.index'})
+                    }else {
+                        this.isLoaded = true;
+                        this.name = response.data.name;
+                        this.module_code = response.data.code;
+                        this.module_year = response.data.year;
+                        this.textbooks = response.data.textbooks;
+                    }
 
                 }).catch(error => {
                 console.log(error.response)

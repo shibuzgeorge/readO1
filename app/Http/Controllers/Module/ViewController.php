@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Module;
 
 use App\Http\Controllers\Controller;
 use App\Module;
-use App\Textbook;
+use App\Role;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -62,6 +63,49 @@ class ViewController extends Controller
         return response()->json($modules);
     }
 
+    public function allModules()
+    {
+        $modules = Module::all();
+
+        return response()->json($modules);
+    }
+
+    public function getStudentsForModule(int $module_id)
+    {
+        $modules = Module::find($module_id);
+
+        $users = $modules->users()->get();
+
+        return response()->json($users);
+    }
+
+    public function getAllStudents(){
+        $users = Role::where('name', 'User')->first()->users()->get();
+        return response()->json($users);
+    }
+
+    public function assign(Request $request, int $module_id){
+
+        $modules = Module::find($module_id);
+        if(count($request->all()) === 0){
+            $modules->users()->detach();
+            return response()->json(['Success' => 'Successfully designed']);
+        }else {
+            $modules->users()->sync($request->all());
+            return response()->json(['Success' => 'Successfully assigned']);
+        }
+
+    }
+
+    public function getAllModuleTutors(){
+        $moduleTutors = User::where('id', 2)->get();
+        return response()->json($moduleTutors);
+    }
+
+    public function assignStudents(Request $request)
+    {
+
+    }
     /**
      * Display the specified resource.
      *
@@ -71,13 +115,36 @@ class ViewController extends Controller
     public function show(int $module)
     {
         $m = Module::find($module);
-        $textbook = $m->textbooks()->get();
-        return response()->json([
-            'name' => $m->name,
-            'code' => $m->module_code,
-            'year' => $m->module_year,
-            'textbooks' => $textbook
-        ]);
+        if(Auth::user()->roles()->first()->name != 'Admin'){
+            $checkIfUserHasPermissionToView = Auth::user()->modules()->find($module);
+            if($checkIfUserHasPermissionToView != null){
+                $textbook = $m->textbooks()->get();
+                return response()->json([
+                    'name' => $m->name,
+                    'code' => $m->module_code,
+                    'year' => $m->module_year,
+                    'textbooks' => $textbook
+                ]);
+            }else{
+                return response()->json('Error');
+            }
+        }else{
+
+            if($m != null){
+                $textbook = $m->textbooks()->get();
+                return response()->json([
+                    'name' => $m->name,
+                    'code' => $m->module_code,
+                    'year' => $m->module_year,
+                    'textbooks' => $textbook
+                ]);
+            }else{
+                return response()->json('Error');
+            }
+
+        }
+
+
     }
 
     /**
