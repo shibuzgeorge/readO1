@@ -7,16 +7,26 @@
             ({{ module.module_code }}) {{ module.name }} - {{ module.module_year }}
         </option>
     </select><br/>
-        Select the students:
-        <div v-for="user in users">
-            <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="exampleCheck1" :value="user.id" v-model="checked">
-            <label class="form-check-label" for="exampleCheck1">{{user.name}}</label>
+            <div v-if="showStudents">
+                <div v-if="selectUsersLoaded">
+                <h4>Select the students:</h4>
+                <div v-for="user in users">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1" :value="user.id" v-model="checked">
+                        <label class="form-check-label" for="exampleCheck1">{{user.name}}</label>
+                    </div>
+                </div>
+                    <div class="alert alert-success" role="alert" v-if="successMessage !== ''">
+                {{successMessage}}
+                    </div>
+                <v-button class="form-control" type="success">
+                    Update
+                </v-button>
+                </div>
+                <div v-else>
+                    <clip-loader :color="loadingColor"/>
+                </div>
             </div>
-        </div>
-        <v-button class="form-control" :loading="form.busy" type="success">
-            Assign
-        </v-button>
         </form>
     </card>
     <div v-else>
@@ -34,16 +44,15 @@
         name: "module.assignStudents",
         data: () => ({
             isLoaded: false,
+            selectUsersLoaded: true,
+            showStudents: false,
             loadingColor: "black",
-            form: new Form({
-
-            }),
-
             selected: "Please select a module",
             modules: [],
             moduleUsers: [],
             users: [],
             checked: [],
+            successMessage: '',
 
         }),
         created() {
@@ -69,31 +78,36 @@
         },
         methods: {
             getCurrentUser(){
-                let self = this;
-                axios.get(`/api/module/getStudentsForModule/${this.selected}`)
-                    .then(response => {
-                        this.moduleUsers = response.data;
-                        this.users.forEach(function (value,index)
-                        {
-                            if(response.data.find(x=>x.id === value.id)){
-                                self.checked.push(value.id);
-                            }else{
-                                self.checked.splice(index);
-                            }
-                        });
+                if(this.selected === 'Please select a module'){
+                    this.showStudents = false;
+                }else {
+                    this.showStudents = true;
+                    this.successMessage = '';
+                    this.selectUsersLoaded = false;
+                    let self = this;
 
+                    axios.get(`/api/module/getStudentsForModule/${this.selected}`)
+                        .then(response => {
+                            this.selectUsersLoaded = true;
+                            this.moduleUsers = response.data;
+                            this.users.forEach(function (value, index) {
+                                if (response.data.find(x => x.id === value.id)) {
+                                    self.checked.push(value.id);
+                                } else {
+                                    self.checked.splice(index);
+                                }
+                            });
 
-
-                    }).catch(function (response) {
-                    //handle error
-                    console.log(response);
-                });
+                        }).catch(function (response) {
+                        //handle error
+                        console.log(response);
+                    });
+                }
             },
             assign(){
-                console.log(this.checked);
-                axios.post(`/api/module/assign/${this.selected}/${this.checked}`)
+                axios.post(`/api/module/assign/${this.selected}`, this.checked)
                     .then(response => {
-
+                        this.successMessage = response.data.Success;
                     }).catch(function (response) {
                     //handle error
                     console.log(response);

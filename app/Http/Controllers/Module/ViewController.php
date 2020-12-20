@@ -84,9 +84,17 @@ class ViewController extends Controller
         return response()->json($users);
     }
 
-    public function assign(Request $request){
-        $users = Role::where('name', 'User')->first()->users()->get();
-        return response()->json($users);
+    public function assign(Request $request, int $module_id){
+
+        $modules = Module::find($module_id);
+        if(count($request->all()) === 0){
+            $modules->users()->detach();
+            return response()->json(['Success' => 'Successfully designed']);
+        }else {
+            $modules->users()->sync($request->all());
+            return response()->json(['Success' => 'Successfully assigned']);
+        }
+
     }
 
     public function getAllModuleTutors(){
@@ -107,13 +115,36 @@ class ViewController extends Controller
     public function show(int $module)
     {
         $m = Module::find($module);
-        $textbook = $m->textbooks()->get();
-        return response()->json([
-            'name' => $m->name,
-            'code' => $m->module_code,
-            'year' => $m->module_year,
-            'textbooks' => $textbook
-        ]);
+        if(Auth::user()->roles()->first()->name != 'Admin'){
+            $checkIfUserHasPermissionToView = Auth::user()->modules()->find($module);
+            if($checkIfUserHasPermissionToView != null){
+                $textbook = $m->textbooks()->get();
+                return response()->json([
+                    'name' => $m->name,
+                    'code' => $m->module_code,
+                    'year' => $m->module_year,
+                    'textbooks' => $textbook
+                ]);
+            }else{
+                return response()->json('Error');
+            }
+        }else{
+
+            if($m != null){
+                $textbook = $m->textbooks()->get();
+                return response()->json([
+                    'name' => $m->name,
+                    'code' => $m->module_code,
+                    'year' => $m->module_year,
+                    'textbooks' => $textbook
+                ]);
+            }else{
+                return response()->json('Error');
+            }
+
+        }
+
+
     }
 
     /**
