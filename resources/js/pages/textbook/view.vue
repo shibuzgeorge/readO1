@@ -7,19 +7,16 @@
 
     </card>
     <div v-else>
-        <clip-loader :color="loadingColor"/>
+        <clip-loader color="black"/>
     </div>
 </template>
 
 <script>
     import axios from 'axios'
-    import ClipLoader from "vue-spinner/src/ClipLoader";
     export default {
-        components: {ClipLoader},
         middleware: 'auth',
         data: () => ({
             isLoaded: false,
-            loadingColor: "black",
             title: '',
             description: '',
             file: '',

@@ -26,7 +26,7 @@
         </div>
 </div>
     <div v-else>
-        <clip-loader :color="loadingColor"/>
+        <clip-loader color="black"/>
     </div>
 
 </template>
@@ -34,14 +34,12 @@
 <script>
     import axios from 'axios'
     import { mapGetters } from 'vuex'
-    import ClipLoader from "vue-spinner/src/ClipLoader";
     export default {
         name: "module",
         middleware: 'auth',
         computed: mapGetters({
             role: 'auth/role'
         }),
-        components: {ClipLoader},
         data: () => ({
             modules: [],
             isLoaded: false,

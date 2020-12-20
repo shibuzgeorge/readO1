@@ -16,37 +16,34 @@
                         <label class="form-check-label" for="exampleCheck1">{{user.name}}</label>
                     </div>
                 </div>
-                    <div class="alert alert-success" role="alert" v-if="successMessage !== ''">
-                {{successMessage}}
-                    </div>
+                    <sweet-modal ref="modal" icon="success">
+                        {{successMessage}}
+                    </sweet-modal>
                 <v-button class="form-control" type="success">
                     Update
                 </v-button>
                 </div>
                 <div v-else>
-                    <clip-loader :color="loadingColor"/>
+                    <clip-loader color="black"/>
                 </div>
             </div>
         </form>
     </card>
     <div v-else>
-        <clip-loader :color="loadingColor"/>
+        <clip-loader color="black"/>
     </div>
 </template>
 
 <script>
     import axios from 'axios'
-    import Form from 'vform'
-    import ClipLoader from "vue-spinner/src/ClipLoader";
+
     export default {
         middleware: 'admin_plus_module_tutor',
-        components: {ClipLoader},
         name: "module.assignStudents",
         data: () => ({
             isLoaded: false,
-            selectUsersLoaded: true,
+            selectUsersLoaded: false,
             showStudents: false,
-            loadingColor: "black",
             selected: "Please select a module",
             modules: [],
             moduleUsers: [],
@@ -78,9 +75,6 @@
         },
         methods: {
             getCurrentUser(){
-                if(this.selected === 'Please select a module'){
-                    this.showStudents = false;
-                }else {
                     this.showStudents = true;
                     this.successMessage = '';
                     this.selectUsersLoaded = false;
@@ -102,12 +96,12 @@
                         //handle error
                         console.log(response);
                     });
-                }
             },
             assign(){
                 axios.post(`/api/module/assign/${this.selected}`, this.checked)
                     .then(response => {
                         this.successMessage = response.data.Success;
+                        this.$refs.modal.open();
                     }).catch(function (response) {
                     //handle error
                     console.log(response);
