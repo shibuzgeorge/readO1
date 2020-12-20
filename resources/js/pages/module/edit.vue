@@ -14,21 +14,18 @@
         </form>
     </card>
     <div v-else>
-        <clip-loader :color="loadingColor"/>
+        <clip-loader color="black"/>
     </div>
 </template>
 
 <script>
     import axios from 'axios'
     import Form from 'vform'
-    import ClipLoader from "vue-spinner/src/ClipLoader";
     export default {
         name: "edit",
-        components: {ClipLoader},
         middleware: 'admin_plus_module_tutor',
         data: () => ({
             isLoaded: false,
-            loadingColor: "black",
             form: new Form({
                 module_name: '',
                 module_code: '',

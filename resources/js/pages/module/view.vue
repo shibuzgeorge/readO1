@@ -16,16 +16,14 @@
         </div>
     </card>
     <div v-else style="text-align: center;">
-        <clip-loader :color="loadingColor"/>
+        <clip-loader color="black"/>
     </div>
 </template>
 
 <script>
     import axios from 'axios'
     import { mapGetters } from 'vuex'
-    import ClipLoader from "vue-spinner/src/ClipLoader";
     export default {
-        components: {ClipLoader},
         middleware: 'auth',
         computed: mapGetters({
             role: 'auth/role'
@@ -36,7 +34,6 @@
             module_code: '',
             module_year: '',
             textbooks: [],
-            loadingColor: "black"
         }),
         created() {
 
