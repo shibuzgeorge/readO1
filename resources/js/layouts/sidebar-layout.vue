@@ -37,10 +37,10 @@
                 <router-link v-show="role==='Admin'" :to="{ name: 'module.v.create' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     Create Module
                 </router-link>
-                <router-link v-show="role==='Admin'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                <router-link v-show="role==='Admin'" :to="{ name: 'module.assignModuleTutors' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     Assign Module Tutors
                 </router-link>
-                <router-link v-show="role==='Admin'" :to="{ name: 'module.assignStudents' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.assignStudents' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     Assign Students
                 </router-link>
             </div>

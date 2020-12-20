@@ -22,11 +22,11 @@ Route::group(['middleware' => 'auth:api'], function () {
     });
 
     Route::get('module/allModules', 'Module\ViewController@allModules');
-    Route::get('module/getStudentsForModule/{module_id}', 'Module\ViewController@getStudentsForModule');
+    Route::get('module/getUsersForModule/{module_id}', 'Module\ViewController@getUsersForModule');
     Route::get('module/getAllStudents', 'Module\ViewController@getAllStudents');
-    Route::post('module/assign/{module_id}', 'Module\ViewController@assign');
+    Route::post('module/assignStudents/{module_id}', 'Module\ViewController@assignStudents');
+    Route::post('module/assignModuleTutors/{module_id}', 'Module\ViewController@assignModuleTutors');
     Route::get('module/getAllModuleTutors', 'Module\ViewController@getAllModuleTutors');
-
     Route::namespace('Textbook')->prefix('textbook')->name('textbook.')->group(function () {
         Route::resource('/upload', 'UploadController');
         Route::resource('/view', 'ViewController');

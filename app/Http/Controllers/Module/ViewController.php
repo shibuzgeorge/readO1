@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Module;
 use App\Http\Controllers\Controller;
 use App\Module;
 use App\Role;
-use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ViewController extends Controller
 {
@@ -27,7 +27,7 @@ class ViewController extends Controller
     {
         $user = Auth::user();
         $user_role = $user->roles()->first();
-        if($user_role->name === 'Admin' || $user_role->name === 'Module Tutor'){
+        if($user_role->name === 'Admin'){
             $modules = Module::all();
         }else{
             $modules = $user->modules()->get();
@@ -63,14 +63,7 @@ class ViewController extends Controller
         return response()->json($modules);
     }
 
-    public function allModules()
-    {
-        $modules = Module::all();
-
-        return response()->json($modules);
-    }
-
-    public function getStudentsForModule(int $module_id)
+    public function getUsersForModule(int $module_id)
     {
         $modules = Module::find($module_id);
 
@@ -84,28 +77,55 @@ class ViewController extends Controller
         return response()->json($users);
     }
 
-    public function assign(Request $request, int $module_id){
+    public function assignStudents(Request $request, int $module_id){
 
         $modules = Module::find($module_id);
+
+        $module_tutors =  $modules->users()->whereHas(
+            'roles', function($q){
+            $q->where('name', 'Module Tutor');
+        })->pluck('users.id')
+            ->toArray();
+
         if(count($request->all()) === 0){
             $modules->users()->detach();
+            $modules->users()->attach($module_tutors);
             return response()->json(['Success' => 'Successfully designed']);
         }else {
             $modules->users()->sync($request->all());
+            $modules->users()->attach($module_tutors);
+            return response()->json(['Success' => 'Successfully assigned']);
+        }
+
+    }
+
+    public function assignModuleTutors(Request $request, int $module_id){
+
+        $modules = Module::find($module_id);
+
+        $students =  $modules->users()->whereHas(
+            'roles', function($q){
+            $q->where('name', 'User');
+        })->pluck('users.id')
+            ->toArray();
+
+        if(count($request->all()) === 0){
+            $modules->users()->detach();
+            $modules->users()->attach($students);
+            return response()->json(['Success' => 'Successfully designed']);
+        }else {
+            $modules->users()->sync($request->all());
+            $modules->users()->attach($students);
             return response()->json(['Success' => 'Successfully assigned']);
         }
 
     }
 
     public function getAllModuleTutors(){
-        $moduleTutors = User::where('id', 2)->get();
+        $moduleTutors = Role::where('name', 'Module Tutor')->first()->users()->get();
         return response()->json($moduleTutors);
     }
 
-    public function assignStudents(Request $request)
-    {
-
-    }
     /**
      * Display the specified resource.
      *
