@@ -26,7 +26,7 @@ class ViewController extends Controller
         }else  if($user_role->name === 'Module Tutor'){
             $textbooks = Textbook::all();
             return response()->json($textbooks);
-        }else  if($user_role->name === 'User'){
+        }else  if($user_role->name === 'Student'){
             $textbooks = Textbook::all();
             return response()->json($textbooks);
         }

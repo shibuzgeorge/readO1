@@ -1,5 +1,5 @@
 <template>
-    <card title="Assign students to modules" v-if="isLoaded">
+    <card title="Assign module tutors to modules" v-if="isLoaded">
         <form @submit.prevent="assign" @keydown="form.onKeydown($event)">
             Select a module: <select  class="form-control" v-model="selected" v-on:change="getCurrentModuleTutors()">
             <option>Please select a module</option>
@@ -38,7 +38,7 @@
     import axios from 'axios'
 
     export default {
-        middleware: 'admin_plus_module_tutor',
+        middleware: 'admin',
         name: "module.assignStudents",
         data: () => ({
             isLoaded: false,
@@ -53,7 +53,7 @@
 
         }),
         created() {
-            axios.get('/api/module/allModules')
+            axios.get('/api/module/v')
                 .then(response => {
                     this.isLoaded = true;
                     this.modules = response.data;
@@ -80,12 +80,12 @@
                 this.selectModuleTutorLoaded = false;
                 let self = this;
 
-                axios.get(`/api/module/getModuleTutorsForModule/${this.selected}`)
+                axios.get(`/api/module/getUsersForModule/${this.selected}`)
                     .then(response => {
                         this.selectModuleTutorLoaded = true;
                         this.moduleUsers = response.data;
                         this.users.forEach(function (value, index) {
-                            if (response.data.find(x => x.id === value.id)) {
+                            if (self.moduleUsers.find(x => x.id === value.id)) {
                                 self.checked.push(value.id);
                             } else {
                                 self.checked.splice(index);
@@ -98,7 +98,7 @@
                 });
             },
             assign(){
-                axios.post(`/api/module/assign/${this.selected}`, this.checked)
+                axios.post(`/api/module/assignModuleTutors/${this.selected}`, this.checked)
                     .then(response => {
                         this.successMessage = response.data.Success;
                         this.$refs.success.open();

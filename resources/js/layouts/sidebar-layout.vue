@@ -12,7 +12,7 @@
             <router-link :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 Dashboard
             </router-link>
-            <router-link v-show="role==='User'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+            <router-link v-show="role==='Student'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                 Library
             </router-link>
             <a v-show="role==='Admin' || role==='Module Tutor'" class="btn collapsed list-group-item list-group-item-action bg-light" data-toggle="collapse" href="#textbooks" role="button" aria-expanded="true" aria-controls="textbooks">
@@ -31,16 +31,16 @@
                 <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     All Modules
                 </router-link>
-                <router-link v-show="role==='User'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                <router-link v-show="role==='Student'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     My Modules
                 </router-link>
                 <router-link v-show="role==='Admin'" :to="{ name: 'module.v.create' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     Create Module
                 </router-link>
-                <router-link v-show="role==='Admin'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                <router-link v-show="role==='Admin'" :to="{ name: 'module.assignModuleTutors' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     Assign Module Tutors
                 </router-link>
-                <router-link v-show="role==='Admin'" :to="{ name: 'module.assignStudents' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.assignStudents' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     Assign Students
                 </router-link>
             </div>

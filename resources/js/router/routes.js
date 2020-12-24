@@ -16,6 +16,7 @@ export default [
     { path: '/module', name: 'module.v.index', component: page('module/index.vue') },
     { path: '/module/create', name: 'module.v.create', component: page('module/create.vue') },
     { path: '/module/assignStudents', name: 'module.assignStudents', component: page('module/assignStudents.vue') },
+    { path: '/module/assignModuleTutors', name: 'module.assignModuleTutors', component: page('module/assignModuleTutors.vue') },
     { path: '/module/edit/:id', name: 'module.v.edit', component: page('module/edit.vue') },
     { path: '/module/view/:id', name: 'module.v.show', component: page('module/view.vue') },
     { path: '/textbook/view/:id', name: 'textbook.view.show', component: page('textbook/view.vue') },

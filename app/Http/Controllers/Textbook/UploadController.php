@@ -26,7 +26,7 @@ class UploadController extends Controller
             return response()->json($modules);
         }else {
             $modules = $user->modules()->get();
-            return response()->json([$modules]);
+            return response()->json($modules);
         }
     }
 

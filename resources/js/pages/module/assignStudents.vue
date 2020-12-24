@@ -53,7 +53,7 @@
 
         }),
         created() {
-            axios.get('/api/module/allModules')
+            axios.get('/api/module/v')
                 .then(response => {
                     this.isLoaded = true;
                     this.modules = response.data;
@@ -80,7 +80,7 @@
                     this.selectUsersLoaded = false;
                     let self = this;
 
-                    axios.get(`/api/module/getStudentsForModule/${this.selected}`)
+                    axios.get(`/api/module/getUsersForModule/${this.selected}`)
                         .then(response => {
                             this.selectUsersLoaded = true;
                             this.moduleUsers = response.data;
@@ -98,13 +98,12 @@
                     });
             },
             assign(){
-                axios.post(`/api/module/assign/${this.selected}`, this.checked)
+                axios.post(`/api/module/assignStudents/${this.selected}`, this.checked)
                     .then(response => {
                         this.successMessage = response.data.Success;
                         this.$refs.success.open();
-                    }).catch(function (response) {
-                    //handle error
-                    console.log(response);
+                    }).catch(error => {
+                    console.log(error.response)
                 });
             }
         }
