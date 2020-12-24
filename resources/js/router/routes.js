@@ -20,6 +20,7 @@ export default [
     { path: '/module/edit/:id', name: 'module.v.edit', component: page('module/edit.vue') },
     { path: '/module/view/:id', name: 'module.v.show', component: page('module/view.vue') },
     { path: '/textbook/view/:id', name: 'textbook.view.show', component: page('textbook/view.vue') },
+    { path: '/textbook/view/edit/:id', name: 'textbook.view.edit', component: page('textbook/edit.vue') },
     { path: '/admin/users/edit/:id', name: 'admin.users.edit', component: page('admin/edit.vue') },
     { path: '/admin/users/update/:id', name: 'admin.users.update', component: page('admin/edit.vue') },
   { path: '/home', name: 'home', component: page('home.vue') },

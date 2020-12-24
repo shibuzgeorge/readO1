@@ -27,6 +27,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('module/assignStudents/{module_id}', 'Module\ViewController@assignStudents');
     Route::post('module/assignModuleTutors/{module_id}', 'Module\ViewController@assignModuleTutors');
     Route::get('module/getAllModuleTutors', 'Module\ViewController@getAllModuleTutors');
+    Route::get('module/getModuleById/{module_id}', 'Module\ViewController@getModuleById');
     Route::namespace('Textbook')->prefix('textbook')->name('textbook.')->group(function () {
         Route::resource('/upload', 'UploadController');
         Route::resource('/view', 'ViewController');

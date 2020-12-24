@@ -12,7 +12,9 @@
         <div class="card-body">
           <h5 class="card-title">{{textbook.title}}</h5>
           <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
+          <router-link :to="{ name: 'textbook.view.edit', params: {id: textbook.id} }">
             <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
+          </router-link>
           <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="delete" class="card-link">Delete</a><br/>
           <router-link :to="{ name: 'textbook.view.show', params: {id: textbook.id} }">
           <a href="#" class="card-link">View</a>

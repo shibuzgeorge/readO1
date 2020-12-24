@@ -54,9 +54,16 @@ class ViewController extends Controller
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function edit(User $user)
+    public function edit(int $textbook)
     {
-        //
+        $t = Textbook::find($textbook);
+        $module = $t->modules()->first();
+        return response()->json([
+            'title' => $t->title,
+            'description' => $t->description,
+            'file' => $t->file,
+            'module' => $module,
+        ]);
     }
 
     /**
