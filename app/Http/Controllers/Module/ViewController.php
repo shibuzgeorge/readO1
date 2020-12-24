@@ -71,6 +71,15 @@ class ViewController extends Controller
         return response()->json($users);
     }
 
+    public function getModuleById(int $module_id)
+    {
+        $modules = Module::find($module_id);
+
+
+
+        return response()->json($modules);
+    }
+
     public function getAllStudents(){
         $users = Role::where('name', 'Student')->first()->users()->get();
         return response()->json($users);
