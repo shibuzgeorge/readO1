@@ -25,7 +25,7 @@ class UsersTableSeeder extends Seeder
 
         $adminRole = Role::where('name', 'Admin')->first();
         $moduleTutorRole = Role::where('name', 'Module Tutor')->first();
-        $userRole = Role::where('name', 'User')->first();
+        $userRole = Role::where('name', 'Student')->first();
 
         $ci = Module::where('module_code', 'CS3960')->first();
         $eat = Module::where('module_code', 'CS3160')->first();
@@ -37,23 +37,56 @@ class UsersTableSeeder extends Seeder
             'password' => Hash::make('password')
         ]);
 
-        $moduleTutor = User::create([
-            'name'=> 'Module Tutor User',
-            'email' => 'ModuleTutor@ModuleTutor.com',
+        $moduleTutor1 = User::create([
+            'name'=> 'Module Tutor 1',
+            'email' => 'ModuleTutor1@ModuleTutor1.com',
             'password' => Hash::make('password')
         ]);
 
-        $user = User::create([
-            'name'=> 'Generic User',
-            'email' => 'user@user.com',
+        $moduleTutor2 = User::create([
+            'name'=> 'Module Tutor 2',
+            'email' => 'ModuleTutor2@ModuleTutor2.com',
+            'password' => Hash::make('password')
+        ]);
+
+        $moduleTutor3 = User::create([
+            'name'=> 'Module Tutor 3',
+            'email' => 'ModuleTutor3@ModuleTutor3.com',
+            'password' => Hash::make('password')
+        ]);
+
+        $student1 = User::create([
+            'name'=> 'Student 1',
+            'email' => 'student1@student1.com',
+            'password' => Hash::make('password')
+        ]);
+
+        $student2 = User::create([
+            'name'=> 'Student 2',
+            'email' => 'student2@student2.com',
+            'password' => Hash::make('password')
+        ]);
+
+        $student3 = User::create([
+            'name'=> 'Student 3',
+            'email' => 'student3@student3.com',
             'password' => Hash::make('password')
         ]);
 
         $admin->roles()->attach($adminRole);
-        $moduleTutor->roles()->attach($moduleTutorRole);
-        $user->roles()->attach($userRole);
-        $user->modules()->attach($ci);
-        $user->modules()->attach($spm);
-        $user->modules()->attach($eat);
+
+        $moduleTutor1->roles()->attach($moduleTutorRole);
+        $moduleTutor2->roles()->attach($moduleTutorRole);
+        $moduleTutor3->roles()->attach($moduleTutorRole);
+        $student1->roles()->attach($userRole);
+        $student2->roles()->attach($userRole);
+        $student3->roles()->attach($userRole);
+
+        $student1->modules()->attach($ci);
+        $student2->modules()->attach($spm);
+        $student3->modules()->attach($eat);
+        $moduleTutor1->modules()->attach($ci);
+        $moduleTutor2->modules()->attach($spm);
+        $moduleTutor3->modules()->attach($eat);
     }
 }

@@ -7,7 +7,6 @@ use App\Module;
 use App\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ViewController extends Controller
 {
@@ -73,7 +72,7 @@ class ViewController extends Controller
     }
 
     public function getAllStudents(){
-        $users = Role::where('name', 'User')->first()->users()->get();
+        $users = Role::where('name', 'Student')->first()->users()->get();
         return response()->json($users);
     }
 
@@ -105,7 +104,7 @@ class ViewController extends Controller
 
         $students =  $modules->users()->whereHas(
             'roles', function($q){
-            $q->where('name', 'User');
+            $q->where('name', 'Student');
         })->pluck('users.id')
             ->toArray();
 

@@ -15,7 +15,7 @@
                 <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
             </router-link>
             <router-link :to="{ name: 'module.v.index' }">
-            <a @click="del(module.id)" v-show="role==='Admin' || role==='Module Tutor'" href="delete" class="card-link">Delete</a><br/>
+            <a @click="del(module.id)" v-show="role==='Admin'" href="delete" class="card-link">Delete</a><br/>
             </router-link>
             <router-link :to="{ name: 'module.assignModuleTutors' }">
             <a v-show="role==='Admin'" href="#" class="card-link">Assign Module Tutor</a>
