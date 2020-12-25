@@ -8,19 +8,21 @@
       <label>Search textbook:</label>  <input type="text" class="" placeholder="Search title.."/><p></p>
     </div>
     <div class="wrapper">
-      <div v-for="textbook in textbooks" class="card col-sm-4 ml-4 mt-4">
+      <div class="row">
+      <div v-for="textbook in textbooks" class="card col-sm-3 ml-4 mt-4">
         <div class="card-body">
+          <router-link :to="{ name: 'textbook.view.show', params: {id: textbook.id} }">
           <h5 class="card-title">{{textbook.title}}</h5>
           <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
+          </router-link>
           <router-link :to="{ name: 'textbook.view.edit', params: {id: textbook.id} }">
             <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
           </router-link>
           <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="delete" class="card-link">Delete</a><br/>
-          <router-link :to="{ name: 'textbook.view.show', params: {id: textbook.id} }">
-          <a href="#" class="card-link">View</a>
-          </router-link>
+
         </div>
       </div>
+    </div>
     </div>
   </card>
   <div v-else style="text-align: center;">

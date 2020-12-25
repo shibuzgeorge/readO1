@@ -3,7 +3,7 @@
         <h1  v-if="role==='User'">My Modules</h1>
         <h1 v-else>All Modules</h1>
         <div class="row">
-    <div v-for="module in modules" class="card col-sm-4 ml-4 mt-4">
+    <div v-for="module in modules" class="card col-sm-3 ml-4 mt-4">
 
 
         <div class="card-body">
