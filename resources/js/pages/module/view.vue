@@ -13,7 +13,8 @@
                         <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
                     </router-link>
 
-                    <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="delete" class="card-link">Delete</a><br/>
+                    <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" class="card-link">Delete</a><br/>
+
                 </div>
             </div>
             </div>
@@ -30,6 +31,7 @@
 <script>
     import axios from 'axios'
     import { mapGetters } from 'vuex'
+    import Swal from 'sweetalert2'
     export default {
         middleware: 'auth',
         computed: mapGetters({
@@ -61,6 +63,31 @@
                 }).catch(error => {
                 console.log(error.response)
             });
+        },
+        methods: {
+            async del(data) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you really want to delete the textbook?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                }).then(function (result) {
+                    if (result.value) {
+                        Swal.fire(
+                            'Deleted!',
+                            'The textbook has been deleted.',
+                            'success'
+                        );
+                        axios.delete(`/api/textbook/view/${data}`).then(response => {
+                            window.location.reload();
+                        })
+                    }
+                });
+
+            }
         },
         metaInfo () {
             return { title: this.$t('home') }
