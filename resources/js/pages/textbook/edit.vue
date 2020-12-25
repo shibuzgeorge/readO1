@@ -8,7 +8,9 @@
                 <label>Module: <h3>{{module.name}} - {{module.module_code}} - {{module.module_year}}</h3></label>
                 <input class="form-control" type="file" id="file" ref="file" v-on:change="handleFileUpload()"/><br/>
             </div>
-
+            <sweet-modal ref="success" icon="success">
+                {{successMessage}}
+            </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">
                 Edit
             </v-button>
@@ -32,9 +34,10 @@
             form: new Form({
                 title: '',
                 description: '',
-                file: ''
             }),
-            module: ''
+            file: '',
+            module: '',
+            successMessage: ''
 
 
         }),
@@ -46,12 +49,11 @@
                     this.isLoaded = true;
                     this.form.title = response.data.title;
                     this.form.description = response.data.description;
-                    this.form.file = response.data.file;
                     this.module = response.data.module;
 
                 }).catch(function (response) {
                 //handle error
-                self.$router.push({name: 'module.v.index'})
+                self.$router.push({name: 'home'})
 
                 console.log(response);
             });
@@ -70,26 +72,19 @@
                 formData.append('file', this.file);
                 formData.append('title', this.form.title);
                 formData.append('description', this.form.description);
-                formData.append('module_id', this.module);
-
-                await axios.post(`/api/textbook/view/${this.$route.params.id}/edit`,formData,
+                formData.append('_method', 'PATCH');
+                await axios.post(`/api/textbook/view/${this.$route.params.id}`,formData,
                     {
-                        headers: {
-                            'Content-Type'
-                                :
-                                'multipart/form-data'
+                        headers: {'Content-Type': 'multipart/form-data'
                         }
                     })
                     .then(response => {
-                        console.log(response)
+                        this.successMessage = response.data.Success;
+                        this.$refs.success.open();
                     })
                     .catch(error => {
                         console.log(error.response)
                     });
-
-
-                this.$router.push({name: 'home'})
-
             }
         }
 
