@@ -20,6 +20,9 @@
         </div>
     </card>
     <div v-else style="text-align: center;">
+        <sweet-modal ref="error" v-on:close="$router.go(-1)" icon="error">
+            {{errorMessage}}
+        </sweet-modal>
         <clip-loader color="black"/>
     </div>
 </template>
@@ -38,14 +41,15 @@
             module_code: '',
             module_year: '',
             textbooks: [],
+            errorMessage: '',
         }),
         created() {
 
             axios.get(`/api/module/v/${this.$route.params.id}`)
                 .then(response => {
-                    let self = this;
-                    if(response.data === 'Error'){
-                        self.$router.push({name: 'module.v.index'})
+                    if(response.data.Error !== undefined){
+                        this.errorMessage = response.data.Error;
+                        this.$refs.error.open();
                     }else {
                         this.isLoaded = true;
                         this.name = response.data.name;
