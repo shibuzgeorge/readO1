@@ -22,14 +22,12 @@ class ViewController extends Controller
         $user_role = $user->roles()->first();
         if($user_role->name === 'Admin'){
             $textbooks = Textbook::all();
-            return response()->json($textbooks);
-        }else  if($user_role->name === 'Module Tutor'){
-            $textbooks = Textbook::all();
-            return response()->json($textbooks);
-        }else  if($user_role->name === 'Student'){
-            $textbooks = Textbook::all();
-            return response()->json($textbooks);
+        }else{
+            $textbooks = $user->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks')->toArray();
+            $textbooks = call_user_func_array('array_merge', $textbooks);
         }
+        return response()->json($textbooks);
     }
 
     /**

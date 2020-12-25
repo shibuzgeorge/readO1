@@ -8,7 +8,7 @@
                 <label>Module: <h3>{{module.name}} - {{module.module_code}} - {{module.module_year}}</h3></label>
                 <input class="form-control" type="file" id="file" ref="file" v-on:change="handleFileUpload()"/><br/>
             </div>
-            <sweet-modal ref="success" icon="success">
+            <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
                 {{successMessage}}
             </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">
@@ -79,6 +79,7 @@
                         }
                     })
                     .then(response => {
+                        this.form.busy = false;
                         this.successMessage = response.data.Success;
                         this.$refs.success.open();
                     })
