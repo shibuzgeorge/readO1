@@ -1,11 +1,10 @@
 <template>
     <div v-if="isLoaded" style="text-align: center;">
+
         <h1  v-if="role==='User'">My Modules</h1>
         <h1 v-else>All Modules</h1>
         <div class="row">
     <div v-for="module in modules" class="card col-sm-3 ml-4 mt-4">
-
-
         <div class="card-body">
             <router-link :to="{ name: 'module.v.show', params: {id: module.id} }">
             <h5 class="card-title">{{module.name}}</h5>
@@ -36,6 +35,7 @@
 <script>
     import axios from 'axios'
     import { mapGetters } from 'vuex'
+    import Swal from 'sweetalert2'
     export default {
         name: "module",
         middleware: 'auth',
@@ -62,12 +62,27 @@
         },
         methods: {
             async del(data) {
-                if(confirm("Do you really want to delete the module? If there is textbooks inside, that will get deleted")) {
-                    // Submit the form.
-                    axios.delete(`/api/module/v/${data}`).then(response => {
-                        window.location.reload();
-                    })
-                }
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you really want to delete the module?\n" +
+                    "      If there is textbooks inside, that will get deleted also",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                }).then(function (result) {
+                    if (result.value) {
+                        Swal.fire(
+                            'Deleted!',
+                            'The module has been deleted.',
+                            'success'
+                        );
+                        axios.delete(`/api/module/v/${data}`).then(response => {
+                            window.location.reload();
+                        })
+                    }
+                });
 
             }
         },

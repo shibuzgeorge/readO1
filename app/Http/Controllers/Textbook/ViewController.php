@@ -126,8 +126,11 @@ class ViewController extends Controller
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy(int $textbook)
     {
-        //
+        $t = Textbook::find($textbook);
+        $t->delete();
+
+        return response()->json($t);
     }
 }
