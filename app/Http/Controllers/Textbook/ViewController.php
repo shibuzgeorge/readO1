@@ -39,11 +39,38 @@ class ViewController extends Controller
     public function show(int $textbook)
     {
         $m = Textbook::find($textbook);
-        return response()->json([
-            'title' => $m->title,
-            'description' => $m->description,
-            'file' => $m->file,
-        ]);
+
+        $textbooks = Auth::user()->modules()->has('textbooks')->
+        with('textbooks')->get()->pluck('textbooks')->toArray();
+
+        $textbooks = call_user_func_array('array_merge', $textbooks);
+        $t = collect($textbooks);
+
+        if(Auth::user()->roles()->first()->name != 'Admin'){
+            $checkIfUserHasPermissionToView = $t->where('id',$textbook)->first();
+            if($checkIfUserHasPermissionToView != null){
+
+                return response()->json([
+                    'title' => $m->title,
+                    'description' => $m->description,
+                    'file' => $m->file,
+                ]);
+
+            }else{
+                return response()->json(['Error' => 'Permission not allowed to view']);
+            }
+        }else {
+
+            if ($m != null) {
+                return response()->json([
+                    'title' => $m->title,
+                    'description' => $m->description,
+                    'file' => $m->file,
+                ]);
+            } else {
+                return response()->json(['Error' => 'Textbook not found!']);
+            }
+        }
     }
 
     /**
@@ -55,13 +82,18 @@ class ViewController extends Controller
     public function edit(int $textbook)
     {
         $t = Textbook::find($textbook);
-        $module = $t->modules()->first();
-        return response()->json([
-            'title' => $t->title,
-            'description' => $t->description,
-            'file' => $t->file,
-            'module' => $module,
-        ]);
+        if($t != null) {
+            $module = $t->modules()->first();
+            return response()->json([
+                'title' => $t->title,
+                'description' => $t->description,
+                'file' => $t->file,
+                'module' => $module,
+            ]);
+        }
+        else{
+            return response()->json(['Error' => 'Textbook not found!']);
+        }
     }
 
     /**

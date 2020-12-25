@@ -74,9 +74,6 @@ class ViewController extends Controller
     public function getModuleById(int $module_id)
     {
         $modules = Module::find($module_id);
-
-
-
         return response()->json($modules);
     }
 
@@ -154,7 +151,7 @@ class ViewController extends Controller
                     'textbooks' => $textbook
                 ]);
             }else{
-                return response()->json('Error');
+                return response()->json(['Error' => 'Permission denied to view module!']);
             }
         }else{
 
@@ -167,7 +164,7 @@ class ViewController extends Controller
                     'textbooks' => $textbook
                 ]);
             }else{
-                return response()->json('Error');
+                return response()->json(['Error' => 'Module not found!']);
             }
 
         }
@@ -184,11 +181,15 @@ class ViewController extends Controller
     public function edit(int $module)
     {
        $m = Module::find($module);
-        return response()->json([
-            'name' => $m->name,
-            'code' => $m->module_code,
-            'year' => $m->module_year,
-        ]);
+        if($m != null) {
+            return response()->json([
+                'name' => $m->name,
+                'code' => $m->module_code,
+                'year' => $m->module_year
+            ]);
+        }else{
+            return response()->json(['Error' => 'Module not found!']);
+        }
     }
 
     /**
@@ -205,7 +206,7 @@ class ViewController extends Controller
         $m->module_code = $request->module_code;
         $m->module_year = $request->module_year;
         $m->save();
-        return response()->json($module);
+        return response()->json(['Success' => 'Successfully Updated!']);
     }
 
     /**
