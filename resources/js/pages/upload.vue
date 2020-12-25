@@ -14,7 +14,9 @@
 
                 <input class="form-control" type="file" id="file" ref="file" v-on:change="handleFileUpload()"/><br/>
             </div>
-
+            <sweet-modal ref="success" v-on:close="$router.push({name: 'home'})" icon="success">
+                Successfully Uploaded
+            </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">
                  Upload
             </v-button>
@@ -79,14 +81,13 @@
                     }
                 })
                     .then(response => {
-                        console.log(response)
+                        console.log(response);
+                        this.$refs.success.open();
                     })
                     .catch(error => {
                         console.log(error.response)
                     });
 
-
-                this.$router.push({name: 'home'})
 
             }
         }

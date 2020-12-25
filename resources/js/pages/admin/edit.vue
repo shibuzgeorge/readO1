@@ -7,7 +7,9 @@
            <label>{{role.name}}</label>
 
         </div>
-
+            <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
+                Successfully Updated
+            </sweet-modal>
             <v-button :loading="form.busy" type="success">
                 {{ $t('update') }}
             </v-button>
@@ -59,10 +61,9 @@ export default {
                 // Submit the form.
 
                 await this.form.patch(`/api/admin/users/${this.$route.params.id}`)
-
                 // Fetch the role.
                 await this.$store.dispatch('auth/fetchRole')
-                this.$router.push({name: 'admin.users'})
+                this.$refs.success.open();
             }
         }
 
