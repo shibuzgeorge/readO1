@@ -44,16 +44,9 @@
                     Assign Students
                 </router-link>
             </div>
-            <a v-show="role==='Admin'" class="btn collapsed list-group-item list-group-item-action bg-light" data-toggle="collapse" href="#UserManagement" role="button" aria-expanded="true" aria-controls="UserManagement">
-                User Management<span class="mr-3"></span>
-            </a>
-            <div class="collapse" id="UserManagement">
                 <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     User Management
                 </router-link>
-            </div>
-
-
         </div>
     </div>
 </template>
