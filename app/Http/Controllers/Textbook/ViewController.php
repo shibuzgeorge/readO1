@@ -70,12 +70,24 @@ class ViewController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, int $textbook_id)
     {
-        //
+        $file = null;
+        $t = Textbook::find($textbook_id);
+        if ($request->file('file')) {
+            $file = base64_encode(file_get_contents($request->file('file')));
+            $t->file = $file;
+        }
+
+        $t->title = $request->input('title');
+        $t->description = $request->input('description');
+
+        $t->save();
+        return response()->json([
+            'Success' => 'Successfully updated']
+        );
     }
 
     /**
