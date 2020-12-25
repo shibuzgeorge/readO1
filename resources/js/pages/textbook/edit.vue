@@ -18,6 +18,9 @@
     </card>
     </div>
 <div v-else>
+    <sweet-modal ref="error" v-on:close="$router.go(-1)" icon="error">
+        {{errorMessage}}
+    </sweet-modal>
     <clip-loader color="black"/>
 </div>
 </template>
@@ -37,8 +40,8 @@
             }),
             file: '',
             module: '',
-            successMessage: ''
-
+            successMessage: '',
+            errorMessage: '',
 
         }),
 
@@ -46,11 +49,15 @@
             let self = this
             axios.get(`/api/textbook/view/${this.$route.params.id}/edit`)
                 .then(response => {
-                    this.isLoaded = true;
-                    this.form.title = response.data.title;
-                    this.form.description = response.data.description;
-                    this.module = response.data.module;
-
+                    if(response.data.Error !== undefined){
+                        this.errorMessage = response.data.Error;
+                        this.$refs.error.open();
+                    }else {
+                        this.isLoaded = true;
+                        this.form.title = response.data.title;
+                        this.form.description = response.data.description;
+                        this.module = response.data.module;
+                    }
                 }).catch(function (response) {
                 //handle error
                 self.$router.push({name: 'home'})
