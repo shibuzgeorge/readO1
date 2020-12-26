@@ -13,7 +13,7 @@
                         <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
                     </router-link>
 
-                    <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" class="card-link">Delete</a><br/>
+                    <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
 
                 </div>
             </div>
