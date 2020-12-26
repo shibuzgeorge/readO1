@@ -73,16 +73,16 @@
                     confirmButtonText: 'Yes, delete it!',
                 }).then(function (result) {
                     if (result.value) {
+                        axios.delete(`/api/module/v/${data}`);
                         Swal.fire(
                             'Deleted!',
                             'The module has been deleted.',
                             'success'
-                        );
-                        axios.delete(`/api/module/v/${data}`).then(response => {
+                        ).then(function () {
                             window.location.reload();
-                        })
+                        });
                     }
-                });
+                })
 
             }
         },
