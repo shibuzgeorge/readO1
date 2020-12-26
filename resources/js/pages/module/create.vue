@@ -7,7 +7,9 @@
                 <label>Module Year Group:     </label> <input class="form-control" v-model="form.module_year" type="text" value="" required/><br/>
                 <br/>
             </div>
-
+            <sweet-modal ref="success" v-on:close="$router.push({name: 'module.v.index'})" icon="success">
+                {{successMessage}}
+            </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">
                 Add
             </v-button>
@@ -18,6 +20,7 @@
 <script>
     import axios from 'axios'
     import Form from 'vform'
+    import Swal from 'sweetalert2'
     export default {
         name: "create",
         middleware: 'admin_plus_module_tutor',
@@ -28,6 +31,7 @@
                 module_code: '',
                 module_year: ''
             }),
+            successMessage: '',
 
         }),
         methods:{
@@ -38,14 +42,12 @@
                     module_year: this.form.module_year,
                 })
                     .then(response => {
-                        console.log(response)
+                        this.successMessage = response.data.Success;
+                        this.$refs.success.open();
                     })
                     .catch(error => {
                         console.log(error.response)
                     });
-
-
-                this.$router.push({name: 'module.v.index'})
             }
         }
     }

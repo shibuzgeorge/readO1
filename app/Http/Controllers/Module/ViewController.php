@@ -57,9 +57,8 @@ class ViewController extends Controller
     {
 
         Module::create(['name' => $request->module_name, 'module_code' => $request->module_code, 'module_year' => $request->module_year]);
-        $modules = Module::all();
 
-        return response()->json($modules);
+        return response()->json(['Success' => 'Successfully Created!']);
     }
 
     public function getUsersForModule(int $module_id)
