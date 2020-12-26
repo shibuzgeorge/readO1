@@ -61,7 +61,7 @@
                     }
 
                 }).catch(error => {
-                console.log(error.response)
+                this.$router.go(-1)
             });
         },
         methods: {
