@@ -41,6 +41,9 @@
               <v-button :loading="form.busy">
                 {{ $t('login') }}
               </v-button>
+
+              <!-- GitHub Login Button -->
+              <login-with-github />
             </div>
           </div>
         </form>
@@ -51,8 +54,13 @@
 
 <script>
 import Form from 'vform'
+import LoginWithGithub from '~/components/LoginWithGithub'
+
 export default {
     middleware: 'guest',
+    components: {
+        LoginWithGithub
+    },
     metaInfo() {
         return {title: this.$t('login')}
     },
