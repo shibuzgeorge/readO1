@@ -6,6 +6,7 @@ use App\Exceptions\EmailTakenException;
 use App\Http\Controllers\Controller;
 use App\OAuthProvider;
 use App\User;
+use App\Role;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -106,7 +107,7 @@ class OAuthController extends Controller
             'access_token' => $sUser->token,
             'refresh_token' => $sUser->refreshToken,
         ]);
-
+        $user->roles()->attach(Role::where('name', 'Student')->first());
         return $user;
     }
 }
