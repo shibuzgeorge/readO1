@@ -85,11 +85,11 @@ export default {
                 remember: this.remember
             })
 
+
             // Fetch the user.
-            await this.$store.dispatch('auth/fetchUser')
-
-            this.$router.push({name: 'home'})
-
+            await this.$store.dispatch('auth/fetchUser').then(() =>
+                this.$router.push({name: 'home'})
+            )
             // Fetch the role.
             await this.$store.dispatch('auth/fetchRole')
 
