@@ -95,18 +95,30 @@ class OAuthController extends Controller
      */
     protected function createUser($provider, $sUser)
     {
-        $user = User::create([
-            'name' => $sUser->getName(),
-            'email' => $sUser->getEmail(),
-            'email_verified_at' => now(),
-        ]);
+        if($sUser->getName() === null){
+            $parts = explode('@', $sUser->getEmail());
+            $name = $parts[0];
+            $user = User::create([
+                'name' => $name,
+                'email' => $sUser->getEmail(),
+                'email_verified_at' => now(),
+            ]);
+        }else{
+            $user = User::create([
+                'name' => $sUser->getName(),
+                'email' => $sUser->getEmail(),
+                'email_verified_at' => now(),
+            ]);
 
+        }
         $user->oauthProviders()->create([
             'provider' => $provider,
             'provider_user_id' => $sUser->getId(),
             'access_token' => $sUser->token,
             'refresh_token' => $sUser->refreshToken,
         ]);
+
+
         $user->roles()->attach(Role::where('name', 'Student')->first());
         return $user;
     }
