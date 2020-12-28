@@ -6,11 +6,11 @@
       <a v-if="user" v-on:click="toggleMenu" href="#" id="menu-expand" style="display: none;">
 
         <span class="navbar-toggler-icon" />
+
       </a>
-      <router-link :to="{ name: user ? 'home' : 'welcome' }" class="navbar-brand">
+      <router-link :to="{ name: user ? 'home' : 'welcome' }" class="navbar-brand" style="transform: translateX(-50%); left: 50%; position: absolute;">
         {{ appName }}
       </router-link>
-
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false">
         <span class="navbar-toggler-icon" />
       </button>
