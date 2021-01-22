@@ -32,7 +32,11 @@ mix.webpackConfig({
   output: {
     chunkFilename: 'dist/js/[chunkhash].js',
     path: mix.config.hmr ? '/' : path.resolve(__dirname, './public/build')
-  }
+  },
+    node: {
+        child_process: "empty",
+        fs: "empty", // if unable to resolve "fs"
+    },
 })
 
 mix.then(() => {
