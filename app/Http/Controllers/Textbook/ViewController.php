@@ -8,6 +8,9 @@ use App\Textbook;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Spatie\PdfToText;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class ViewController extends Controller
 {
@@ -62,14 +65,23 @@ class ViewController extends Controller
         }else {
 
             if ($m != null) {
+
+                $decoded = base64_decode($m->file);
+                file_put_contents('file.pdf',$decoded);
+                $path = 'c:/Program Files/Git/mingw64/bin/pdftotext';
+                $text = base64_encode(PdfToText\Pdf::getText('file.pdf', $path));
+                File::delete('file.pdf');
                 return response()->json([
                     'title' => $m->title,
                     'description' => $m->description,
                     'file' => $m->file,
+                    'text' => $text,
                 ]);
+
             } else {
                 return response()->json(['Error' => 'Textbook not found!']);
             }
+
         }
     }
 
