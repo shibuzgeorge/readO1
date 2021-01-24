@@ -5,8 +5,14 @@
             <div class="d-flex justify-content-between align-items-center">
                 Title: {{title}}
                 <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-            </div><br/>
+            </div>
+            <br/>
+            <div class="d-flex justify-content-between align-items-center">
             Description: {{description}}
+                <router-link :to="{ name: 'textbook.view.edit', params: {id: $route.params.id} }">
+            <button class="btn btn-success" v-if="role==='Admin'|| role==='Module Tutor'">Edit</button>
+                </router-link>
+            </div>
         </h5>
 
         <br/>
@@ -41,13 +47,16 @@
     import axios from 'axios'
     import SpeedReader from '~/components/SpeedReader';
     import PDFViewer from '~/components/PDFViewer';
-
+    import { mapGetters } from 'vuex'
     export default {
         middleware: 'auth',
         components:{
             SpeedReader,
             PDFViewer,
         },
+        computed: mapGetters({
+            role: 'auth/role'
+        }),
         data: () => ({
             isLoaded: false,
             title: '',
