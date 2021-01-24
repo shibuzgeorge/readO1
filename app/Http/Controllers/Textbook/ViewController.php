@@ -52,11 +52,15 @@ class ViewController extends Controller
         if(Auth::user()->roles()->first()->name != 'Admin'){
             $checkIfUserHasPermissionToView = $t->where('id',$textbook)->first();
             if($checkIfUserHasPermissionToView != null){
-
+                $decoded = base64_decode($m->file);
+                file_put_contents('file.pdf',$decoded);
+                $path = 'c:/Program Files/Git/mingw64/bin/pdftotext';
+                $text = base64_encode(PdfToText\Pdf::getText('file.pdf', $path));
+                File::delete('file.pdf');
                 return response()->json([
                     'title' => $m->title,
                     'description' => $m->description,
-                    'file' => $m->file,
+                    'text' => $text,
                 ]);
 
             }else{
@@ -74,7 +78,6 @@ class ViewController extends Controller
                 return response()->json([
                     'title' => $m->title,
                     'description' => $m->description,
-                    'file' => $m->file,
                     'text' => $text,
                 ]);
 
@@ -83,6 +86,22 @@ class ViewController extends Controller
             }
 
         }
+    }
+
+    public function pdf($id)
+    {
+        //find textbook
+        $textbook = Textbook::find($id);
+
+        $file_contents = base64_decode($textbook->file);
+
+        return response($file_contents)
+            ->header('Cache-Control', 'no-cache private')
+            ->header('Content-Description', 'File Transfer')
+            ->header('Content-Type', 'application/x-pdf')
+            ->header('Content-Length', strlen($file_contents))
+            ->header('Content-Disposition', 'inline; filename="example.pdf"')
+            ->header('Content-Transfer-Encoding', 'binary');
     }
 
     /**

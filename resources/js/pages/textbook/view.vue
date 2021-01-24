@@ -8,8 +8,9 @@
         <label>Text view: <input type="radio" v-model="selection" value="text"></label>
         <label>Speed reading: <input type="radio" v-model="selection" value="speedreading"></label>
         </div>
-        <iframe v-show="selection === 'pdf'" :src="file" height="500px" width="100%"></iframe>
-        <div v-show="selection === 'text'">
+
+        <PDFViewer :fileName="fileName" :path="path" v-show="selection === 'pdf'"/>
+        <div v-show="selection === 'text'" style="font-family: sans-serif; font-size: 35px;">
             <pre>
                 {{text}}
             </pre>
@@ -32,24 +33,27 @@
 <script>
     import axios from 'axios'
     import SpeedReader from '~/components/SpeedReader';
-
+    import PDFViewer from '~/components/PDFViewer';
 
     export default {
         middleware: 'auth',
         components:{
             SpeedReader,
+            PDFViewer,
         },
         data: () => ({
             isLoaded: false,
             title: '',
             description: '',
-            file: '',
+            fileName: '',
             errorMessage: '',
             text: '',
             selection: 'pdf',
+            path: '/lib/pdf/web/viewer.html',
+
         }),
         created() {
-
+            this.fileName =`/api/textbook/view/${this.$route.params.id}/pdf`
             let self = this
             axios.get(`/api/textbook/view/${this.$route.params.id}`)
                 .then(response => {
@@ -60,23 +64,23 @@
                         this.isLoaded = true;
                         this.title = response.data.title;
                         this.description = response.data.description;
-                        this.file =  'data:application/pdf;base64,'+response.data.file;
-                        this.text =  atob(response.data.text);
-
+                        this.text = atob(response.data.text);
                     }
-
                 }).catch(function (response) {
                 //handle error
                 self.$router.push({name: 'module.v.index'})
                 console.log(response);
             });
-
-
         }
-
     }
 </script>
 
 <style scoped>
-
+    pre {
+        white-space: -moz-pre-wrap; /* Mozilla, supported since 1999 */
+        white-space: -pre-wrap; /* Opera */
+        white-space: -o-pre-wrap; /* Opera */
+        white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */
+        word-wrap: break-word; /* IE 5.5+ */
+    }
 </style>

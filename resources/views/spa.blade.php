@@ -15,6 +15,7 @@ $config = [
   <title>{{ config('app.name') }}</title>
 
   <link rel="stylesheet" href="{{ mix('dist/css/app.css') }}">
+
 </head>
 <body>
   <div id="app"></div>
@@ -23,7 +24,7 @@ $config = [
   <script>
     window.config = @json($config);
   </script>
-
+  <script  src="https://unpkg.com/pdfjs-dist@latest/build/pdf.min.js"></script>
   {{-- Load the application scripts --}}
   <script src="{{ mix('dist/js/app.js') }}"></script>
 </body>
