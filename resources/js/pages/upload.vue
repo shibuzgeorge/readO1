@@ -1,7 +1,11 @@
 <template>
-    <card title="Upload textbook/document">
+    <card>
+        <h5 class="card-header d-flex justify-content-between align-items-center">
+            Upload textbook/document
+            <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
+        </h5>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)" enctype="multipart/form-data">
-            <div class="form-check">
+            <div class="form-check mt-4">
                 <label>Title:           </label> <input class="form-control" v-model="form.title" type="text" value="" required/><br/>
                 <label>Description:     </label> <input class="form-control" v-model="form.description" type="text" value="" required/><br/>
                 <label>Choose a module: </label>

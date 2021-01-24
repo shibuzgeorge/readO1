@@ -1,7 +1,14 @@
 <template>
 
-    <card :title="title" v-if="isLoaded">
-       {{description}}
+    <card v-if="isLoaded">
+        <h5 class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                Title: {{title}}
+                <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
+            </div><br/>
+            Description: {{description}}
+        </h5>
+
         <br/>
         <div style="width: 100%; text-align: center;">
         <label style="text-align: center;">View PDF: <input type="radio" v-model="selection" value="pdf"></label>
