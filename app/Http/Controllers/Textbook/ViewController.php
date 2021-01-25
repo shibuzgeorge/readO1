@@ -144,8 +144,12 @@ class ViewController extends Controller
 
         $t->title = $request->input('title');
         $t->description = $request->input('description');
-
         $t->save();
+
+        $module = Module::find($request->input('module_id'));
+        $t->modules()->detach();
+        $t->modules()->attach($module);
+
         return response()->json([
             'Success' => 'Successfully updated']
         );

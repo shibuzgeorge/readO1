@@ -1,12 +1,29 @@
 <template>
-    <card :title="name" v-if="isLoaded">
+    <card class="text-center" v-if="isLoaded">
+        <h5 class="card-header d-flex justify-content-between align-items-center">
+            {{module_code}} - {{name}}
+            <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
+        </h5>
 
-        <div class="wrapper">
-            <div class="row">
-                <div v-for="textbook in textbooks" class="card col-sm-3 ml-4 mt-4">
+        <div class="wrapper mt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="col-xs-3">
+                    <input type="search" id="form1" class="form-control" placeholder="Search..."
+                           aria-label="Search" />
+                </div>
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'upload' }">
+                    <button class="btn btn-success" v-if="role!=='User'">+ Add textbook</button>
+                </router-link>
+            </div>
+            <h1 style="text-align: center;" class="mt-4" v-if="!textbooks || !textbooks.length">
+                This module has no textbooks!
+            </h1>
+            <div class="row justify-content-center">
+
+                <div v-for="textbook in textbooks" class="card col-sm-3 ml-4 mt-4 align-items-center">
                 <div class="card-body">
                     <router-link :to="{ name: 'textbook.view.show', params: {id: textbook.id} }">
-                    <h5 class="card-title">{{textbook.title}}</h5>
+                    <h5 class="card-titlex">{{textbook.title}}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
                     </router-link>
                     <router-link :to="{ name: 'textbook.view.edit', params: {id: textbook.id} }">
@@ -98,5 +115,14 @@
 </script>
 
 <style scoped>
-
+    .flexbox {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+    .flex-item{
+        margin: auto;
+    }
 </style>

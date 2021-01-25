@@ -1,11 +1,20 @@
 <template>
     <div v-if="isLoaded">
-    <card title="Edit textbook/document">
+    <card>
+        <h5 class="card-header d-flex justify-content-between align-items-center">
+            Edit textbook/document
+            <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
+        </h5>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)" enctype="multipart/form-data">
-            <div class="form-check">
+            <div class="form-check mt-4">
                 <label>Title:           </label> <input class="form-control" v-model="form.title" type="text" value="" required/><br/>
                 <label>Description:     </label> <input class="form-control" v-model="form.description" type="text" value="" required/><br/>
-                <label>Module: <h3>{{module.name}} - {{module.module_code}} - {{module.module_year}}</h3></label>
+                <label>Change module? </label>
+                <select class="form-control" v-model="form.selected">
+                    <option v-for="module in modules" :value="module.id" :key="module.id">
+                        ({{ module.module_code }}) {{ module.name }} - {{ module.module_year }}
+                    </option>
+                </select><br/>
                 <input class="form-control" type="file" id="file" ref="file" v-on:change="handleFileUpload()"/><br/>
             </div>
             <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
@@ -37,15 +46,26 @@
             form: new Form({
                 title: '',
                 description: '',
+                selected: '',
             }),
             file: '',
             module: '',
             successMessage: '',
             errorMessage: '',
+            modules: '',
+
 
         }),
 
         created() {
+                axios.get('/api/upload')
+                    .then(response => {
+                        this.modules = response.data;
+
+                    }).catch(function (response) {
+                    //handle error
+                    console.log(response);
+                });
             let self = this
             axios.get(`/api/textbook/view/${this.$route.params.id}/edit`)
                 .then(response => {
@@ -57,6 +77,7 @@
                         this.form.title = response.data.title;
                         this.form.description = response.data.description;
                         this.module = response.data.module;
+                        this.form.selected = this.module.id;
                     }
                 }).catch(function (response) {
                 //handle error
@@ -79,6 +100,7 @@
                 formData.append('file', this.file);
                 formData.append('title', this.form.title);
                 formData.append('description', this.form.description);
+                formData.append('module_id', this.form.selected);
                 formData.append('_method', 'PATCH');
                 await axios.post(`/api/textbook/view/${this.$route.params.id}`,formData,
                     {

@@ -1,7 +1,11 @@
 <template>
-    <card title="Edit Module" v-if="isLoaded">
+    <card v-if="isLoaded">
+        <h5 class="card-header d-flex justify-content-between align-items-center">
+            Edit Module
+            <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
+        </h5>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
-            <div class="form-check">
+            <div class="form-check mt-4">
                 <label>Module Name:           </label> <input class="form-control" v-model="form.module_name" type="text" value="" required/><br/>
                 <label>Module Code:     </label> <input class="form-control" v-model="form.module_code" type="text" value="" required/><br/>
                 <label>Module Year Group:     </label> <input class="form-control" v-model="form.module_year" type="text" value="" required/><br/>
