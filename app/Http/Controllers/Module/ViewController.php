@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Module;
 use App\Http\Controllers\Controller;
 use App\Module;
 use App\Role;
+use App\YearGroup;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -27,9 +28,9 @@ class ViewController extends Controller
         $user = Auth::user();
         $user_role = $user->roles()->first();
         if($user_role->name === 'Admin'){
-            $modules = Module::all();
+            $modules = Module::with('yearGroup')->get();
         }else{
-            $modules = $user->modules()->get();
+            $modules = $user->modules()->with('yearGroup')->get();
         }
 
         return response()->json($modules);
@@ -44,7 +45,11 @@ class ViewController extends Controller
     public function create()
     {
         $modules = Module::all();
-        return response()->json($modules);
+        $year_groups = YearGroup::all();
+        return response()->json([
+            'modules' => $modules,
+            'year_groups' => $year_groups,
+        ]);
     }
 
     /**
@@ -55,10 +60,20 @@ class ViewController extends Controller
      */
     public function store(Request $request)
     {
-
-        Module::create(['name' => $request->module_name, 'module_code' => $request->module_code, 'module_year' => $request->module_year]);
-
+        Module::create(['name' => $request->module_name, 'module_code' => $request->module_code, 'year_group_id' => $request->module_year]);
         return response()->json(['Success' => 'Successfully Created!']);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function addYearGroup(Request $request)
+    {
+        YearGroup::create(['name' => $request->year_group]);
+        return response()->json(['Success' => 'Successfully created the year group!']);
     }
 
     public function getUsersForModule(int $module_id)
@@ -179,12 +194,12 @@ class ViewController extends Controller
      */
     public function edit(int $module)
     {
-       $m = Module::find($module);
+       $m = Module::with('yearGroup')->find($module);
         if($m != null) {
             return response()->json([
                 'name' => $m->name,
                 'code' => $m->module_code,
-                'year' => $m->module_year
+                'year' => $m->yearGroup,
             ]);
         }else{
             return response()->json(['Error' => 'Module not found!']);
@@ -203,8 +218,9 @@ class ViewController extends Controller
         $m = Module::find($module);
         $m->name = $request->module_name;
         $m->module_code = $request->module_code;
-        $m->module_year = $request->module_year;
+        $m->year_group_id = $request->module_year;
         $m->save();
+
         return response()->json(['Success' => 'Successfully Updated!']);
     }
 

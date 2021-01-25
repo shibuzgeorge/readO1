@@ -1,25 +1,20 @@
 <template>
     <card>
         <h5 class="card-header d-flex justify-content-between align-items-center">
-            Create Module
+            Add Year Group
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
         </h5>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
             <div class="form-check mt-4">
-                <label>Module Name:           </label> <input class="form-control" v-model="form.module_name" type="text" value="" required/><br/>
-                <label>Module Code:     </label> <input class="form-control" v-model="form.module_code" type="text" value="" required/><br/>
-                <label>Module Year Group:     </label>
-                <select class="form-control" v-model="form.module_year">
-                    <option>Please select a year group</option>
-                    <option v-for="year in year_groups" :value="year.id" :key="year.id">
-                        {{ year.name }}
-                    </option>
-                </select><br/>
-                <br/>
+                <label>Add Year Group:           </label> <input class="form-control" v-model="form.year_group" type="text" value="" required/><br/>
             </div>
             <sweet-modal ref="success" v-on:close="$router.push({name: 'module.v.index'})" icon="success">
                 {{successMessage}}
             </sweet-modal>
+            Current Year Groups:
+            <li v-for="year in current_year_groups">
+                {{year.name}}
+            </li>
             <v-button class="form-control" :loading="form.busy" type="success">
                 Add
             </v-button>
@@ -32,26 +27,21 @@
     import Form from 'vform'
     import Swal from 'sweetalert2'
     export default {
-        name: "create",
-        middleware: 'admin_plus_module_tutor',
+        name: "addYearGroup",
+        middleware: 'admin',
         data: () => ({
             isLoaded: false,
             form: new Form({
-                module_name: '',
-                module_code: '',
-                module_year: 'Please select a year group',
+                year_group: '',
 
             }),
             successMessage: '',
-            year_groups: '',
-            modules: '',
-
+            current_year_groups: '',
         }),
         created(){
             axios.get('/api/module/v/create')
                 .then(response => {
-                    this.modules = response.data.modules;
-                    this.year_groups = response.data.year_groups;
+                    this.current_year_groups = response.data.year_groups;
                 }).catch(function (response) {
                 //handle error
                 console.log(response);
@@ -59,10 +49,8 @@
         },
         methods:{
             async submit() {
-                await axios.post('/api/module/v', {
-                    module_name: this.form.module_name,
-                    module_code: this.form.module_code,
-                    module_year: this.form.module_year,
+                await axios.post('/api/module/addYearGroup', {
+                    year_group: this.form.year_group,
                 })
                     .then(response => {
                         this.successMessage = response.data.Success;

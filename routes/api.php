@@ -25,6 +25,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('module/getUsersForModule/{module_id}', 'Module\ViewController@getUsersForModule');
     Route::get('module/getAllStudents', 'Module\ViewController@getAllStudents');
     Route::post('module/assignStudents/{module_id}', 'Module\ViewController@assignStudents');
+    Route::post('module/addYearGroup', 'Module\ViewController@addYearGroup');
     Route::post('module/assignModuleTutors/{module_id}', 'Module\ViewController@assignModuleTutors');
     Route::get('module/getAllModuleTutors', 'Module\ViewController@getAllModuleTutors');
     Route::get('module/getModuleById/{module_id}', 'Module\ViewController@getModuleById');

@@ -14,6 +14,7 @@ export default [
     { path: '/admin/users', name: 'admin.users', component: page('admin/users.vue') },
     { path: '/upload', name: 'upload', component: page('upload.vue') },
     { path: '/module', name: 'module.v.index', component: page('module/index.vue') },
+    { path: '/module/addYearGroup', name: 'module.v.addYearGroup', component: page('module/addYearGroup.vue') },
     { path: '/module/create', name: 'module.v.create', component: page('module/create.vue') },
     { path: '/module/assignStudents', name: 'module.assignStudents', component: page('module/assignStudents.vue') },
     { path: '/module/assignModuleTutors', name: 'module.assignModuleTutors', component: page('module/assignModuleTutors.vue') },
