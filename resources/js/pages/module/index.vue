@@ -13,7 +13,7 @@
                 <h1 style="" v-if="role!=='Student'">All Modules</h1>
             </div>
             <div class="flex-item">
-                <router-link v-show="role==='Admin'" :to="{ name: 'module.v.addYearGroup' }">
+                <router-link v-show="role==='Admin'" :to="{ name: 'yearGroup' }">
                 <button class="btn btn-success" v-if="role==='Admin'">+ Add Year Group</button>
                 </router-link>
             </div>
@@ -83,9 +83,9 @@
 
         }),
         created() {
-            axios.get('/api/module/v/create')
+            axios.get('/api/yearGroup/getAll')
                 .then(response => {
-                    this.year_groups = response.data.year_groups;
+                    this.year_groups = response.data;
                 }).catch(function (response) {
                 //handle error
                 console.log(response);

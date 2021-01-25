@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +28,14 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('module/assignModuleTutors/{module_id}', 'Module\ViewController@assignModuleTutors');
     Route::get('module/getAllModuleTutors', 'Module\ViewController@getAllModuleTutors');
     Route::get('module/getModuleById/{module_id}', 'Module\ViewController@getModuleById');
+
     Route::get('textbook/view/{textbook_id}/pdf', 'Textbook\ViewController@pdf');
+
+    Route::get('yearGroup/getAll', 'YearGroupController@index');
+    Route::get('yearGroup/edit/{year_group_id}', 'YearGroupController@edit');
+    Route::patch('yearGroup/update/{year_group_id}', 'YearGroupController@update');
+    Route::delete('yearGroup/{year_group_id}', 'YearGroupController@destroy');
+
     Route::namespace('Textbook')->prefix('textbook')->name('textbook.')->group(function () {
         Route::resource('/upload', 'UploadController');
         Route::resource('/view', 'ViewController');

@@ -1,5 +1,7 @@
 <template>
-    <card>
+    <div class="container-fluid" v-if="isLoaded">
+        <div class="row">
+            <card class="col-6 d-flex flex-column h-100">
         <h5 class="card-header d-flex justify-content-between align-items-center">
             Create Module
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
@@ -25,6 +27,19 @@
             </v-button>
         </form>
     </card>
+            <card class="col-5 ml-4 d-flex flex-column h-100">
+                <h6 class="card-header d-flex align-items-center">
+                    Current Modules:
+                </h6>
+                <li class="mt-2" style="font-size: small;" v-for="module in modules">
+                    {{module.name}} - {{module.module_code}} - {{module.year_group.name}}
+                </li>
+            </card>
+        </div>
+    </div>
+    <div v-else>
+        <clip-loader color="black"/>
+    </div>
 </template>
 
 <script>
@@ -48,10 +63,18 @@
 
         }),
         created(){
-            axios.get('/api/module/v/create')
+            axios.get('/api/module/v')
                 .then(response => {
-                    this.modules = response.data.modules;
-                    this.year_groups = response.data.year_groups;
+                    this.modules = response.data;
+                }).catch(function (response) {
+                //handle error
+                console.log(response);
+            });
+
+            axios.get('/api/yearGroup/getAll')
+                .then(response => {
+                    this.year_groups = response.data;
+                    this.isLoaded = true;
                 }).catch(function (response) {
                 //handle error
                 console.log(response);

@@ -51,9 +51,9 @@
 
         }),
         created() {
-                axios.get('/api/module/v/create')
+                axios.get('/api/yearGroup/getAll')
                     .then(response => {
-                        this.year_groups = response.data.year_groups;
+                        this.year_groups = response.data;
                     }).catch(function (response) {
                     //handle error
                     console.log(response);
