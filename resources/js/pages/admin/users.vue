@@ -1,6 +1,9 @@
 <template>
-    <card title="Admin User Management" v-if="isLoaded">
-
+    <card v-if="isLoaded">
+        <h5 class="card-header d-flex justify-content-between align-items-center">
+            Admin User Management
+            <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
+        </h5>
         <div class="wrapper">
             <div>
                 <table class="table" >
@@ -20,7 +23,7 @@
                         <th scope="row">{{ user.id}}</th>
                         <td>{{ user.name}}</td>
                         <td>{{ user.email}}</td>
-                        <td>{{ user.roles[0].name}}</td>
+                        <td>{{ user.role.name}}</td>
 
                         <td>
                             <router-link :to="{ name: 'admin.users.edit', params: {id: user.id} }">
@@ -65,9 +68,8 @@
                     this.isLoaded = true;
                     this.users = response.data;
 
-                }).catch(function (response) {
-                //handle error
-                console.log(response);
+                }).catch(error => {
+                console.log(error.response)
             });
 
         },

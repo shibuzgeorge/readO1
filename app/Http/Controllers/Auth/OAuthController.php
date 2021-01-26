@@ -102,12 +102,14 @@ class OAuthController extends Controller
                 'name' => $name,
                 'email' => $sUser->getEmail(),
                 'email_verified_at' => now(),
+                'role_id' => Role::where('name', 'Student')->first()->id
             ]);
         }else{
             $user = User::create([
                 'name' => $sUser->getName(),
                 'email' => $sUser->getEmail(),
                 'email_verified_at' => now(),
+                'role_id' => Role::where('name', 'Student')->first()->id
             ]);
 
         }
@@ -118,8 +120,6 @@ class OAuthController extends Controller
             'refresh_token' => $sUser->refreshToken,
         ]);
 
-
-        $user->roles()->attach(Role::where('name', 'Student')->first());
         return $user;
     }
 }

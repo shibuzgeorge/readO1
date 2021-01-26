@@ -22,8 +22,8 @@ class ViewController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $user_role = $user->roles()->first();
-        if($user_role->name === 'Admin'){
+        $user_role = $user->role->name;
+        if($user_role === 'Admin'){
             $textbooks = Textbook::all();
         }else{
             $textbooks = $user->modules()->has('textbooks')->
@@ -49,7 +49,7 @@ class ViewController extends Controller
         $textbooks = call_user_func_array('array_merge', $textbooks);
         $t = collect($textbooks);
 
-        if(Auth::user()->roles()->first()->name != 'Admin'){
+        if(Auth::user()->role->name != 'Admin'){
             $checkIfUserHasPermissionToView = $t->where('id',$textbook)->first();
             if($checkIfUserHasPermissionToView != null){
                 $decoded = base64_decode($m->file);

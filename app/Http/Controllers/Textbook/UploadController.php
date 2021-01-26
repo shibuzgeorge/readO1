@@ -19,7 +19,7 @@ class UploadController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $user_role = $user->roles()->first();
+        $user_role = $user->role;
 
         if($user_role->name === 'Admin'){
             $modules = Module::all();

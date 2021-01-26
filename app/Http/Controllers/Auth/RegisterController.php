@@ -39,7 +39,6 @@ class RegisterController extends Controller
             return response()->json(['status' => trans('verification.sent')]);
         }
 
-        $user->roles()->attach(Role::where('name', 'Student')->first());
         return response()->json($user);
     }
 
@@ -71,6 +70,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
+            'role_id' => Role::where('name', 'Student')->first()->id
         ]);
     }
 }

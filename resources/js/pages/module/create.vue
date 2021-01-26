@@ -71,7 +71,7 @@
                 console.log(response);
             });
 
-            axios.get('/api/yearGroup/getAll')
+            axios.get('/api/yearGroup/')
                 .then(response => {
                     this.year_groups = response.data;
                     this.isLoaded = true;

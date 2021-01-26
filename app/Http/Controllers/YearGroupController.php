@@ -11,7 +11,7 @@ class YearGroupController extends Controller
 
     public function __construct()
     {
-        $this->middleware('admin');
+        $this->middleware('admin')->only(['edit','update', 'store', 'destroy']);
     }
 
     /**
@@ -50,6 +50,18 @@ class YearGroupController extends Controller
         $year_group->name = $request->input('name');
         $year_group->save();
         return response()->json(['Success' => 'Successfully Updated!']);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        YearGroup::create(['name' => $request->year_group]);
+        return response()->json(['Success' => 'Successfully created the year group!']);
     }
 
     /**
