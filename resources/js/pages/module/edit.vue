@@ -8,7 +8,12 @@
             <div class="form-check mt-4">
                 <label>Module Name:           </label> <input class="form-control" v-model="form.module_name" type="text" value="" required/><br/>
                 <label>Module Code:     </label> <input class="form-control" v-model="form.module_code" type="text" value="" required/><br/>
-                <label>Module Year Group:     </label> <input class="form-control" v-model="form.module_year" type="text" value="" required/><br/>
+                <label>Module Year Group:     </label>
+                <select class="form-control" v-model="form.module_year">
+                    <option v-for="year in year_groups" :value="year.id" :key="year.id">
+                        {{ year.name }}
+                    </option>
+                </select><br/>
                 <br/>
             </div>
             <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
@@ -38,13 +43,22 @@
             form: new Form({
                 module_name: '',
                 module_code: '',
-                module_year: ''
+                module_year: '',
             }),
             errorMessage: '',
             successMessage: '',
+            year_groups: '',
 
         }),
         created() {
+                axios.get('/api/yearGroup/getAll')
+                    .then(response => {
+                        this.year_groups = response.data;
+                    }).catch(function (response) {
+                    //handle error
+                    console.log(response);
+                });
+
             let self = this
             axios.get(`/api/module/v/${this.$route.params.id}/edit`)
                 .then(response => {
@@ -55,7 +69,7 @@
                         this.isLoaded = true;
                         this.form.module_name = response.data.name;
                         this.form.module_code = response.data.code;
-                        this.form.module_year = response.data.year;
+                        this.form.module_year = response.data.year.id;
 
                     }
                 }).catch(function (response) {

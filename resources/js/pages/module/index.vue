@@ -13,7 +13,9 @@
                 <h1 style="" v-if="role!=='Student'">All Modules</h1>
             </div>
             <div class="flex-item">
+                <router-link v-show="role==='Admin'" :to="{ name: 'yearGroup' }">
                 <button class="btn btn-success" v-if="role==='Admin'">+ Add Year Group</button>
+                </router-link>
             </div>
         </div>
 
@@ -21,8 +23,11 @@
             <input type="search" id="form1" class="form-control" placeholder="Search..."
             aria-label="Search" />
             <span style="padding-left: 15px;">
-                <select  class="form-control" name="years" id="years">
-                <option selected="selected" value="none">Filter by year...</option>
+                <select class="form-control">
+                    <option>Filter by year...</option>
+                    <option v-for="year in year_groups" :value="year.id" :key="year.id">
+                        {{ year.name }}
+                    </option>
                 </select>
             </span>
         </div>
@@ -35,7 +40,7 @@
            <div class="card-body">
             <router-link :to="{ name: 'module.v.show', params: {id: module.id} }">
             <h5 class="card-title">{{module.name}}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">{{module.module_code}} - {{module.module_year}}</h6>
+            <h6 class="card-subtitle mb-2 text-muted">{{module.module_code}} - {{module.year_group.name}}</h6>
             </router-link>
             <router-link :to="{ name: 'module.v.edit', params: {id: module.id} }">
                 <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
@@ -73,10 +78,18 @@
         data: () => ({
             modules: [],
             isLoaded: false,
-            loadingColor: "black"
+            loadingColor: "black",
+            year_groups: '',
 
         }),
         created() {
+            axios.get('/api/yearGroup/getAll')
+                .then(response => {
+                    this.year_groups = response.data;
+                }).catch(function (response) {
+                //handle error
+                console.log(response);
+            });
             axios.get('/api/module/v')
                 .then(response => {
                     this.isLoaded = true;
