@@ -26,7 +26,7 @@ class ViewController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $user_role = $user->roles()->first();
+        $user_role = $user->role;
         if($user_role->name === 'Admin'){
             $modules = Module::with('yearGroup')->get();
         }else{
@@ -47,18 +47,6 @@ class ViewController extends Controller
     {
         Module::create(['name' => $request->module_name, 'module_code' => $request->module_code, 'year_group_id' => $request->module_year]);
         return response()->json(['Success' => 'Successfully Created!']);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function addYearGroup(Request $request)
-    {
-        YearGroup::create(['name' => $request->year_group]);
-        return response()->json(['Success' => 'Successfully created the year group!']);
     }
 
     public function getUsersForModule(int $module_id)
@@ -86,7 +74,7 @@ class ViewController extends Controller
         $modules = Module::find($module_id);
 
         $module_tutors =  $modules->users()->whereHas(
-            'roles', function($q){
+            'role', function($q){
             $q->where('name', 'Module Tutor');
         })->pluck('users.id')
             ->toArray();
@@ -108,7 +96,7 @@ class ViewController extends Controller
         $modules = Module::find($module_id);
 
         $students =  $modules->users()->whereHas(
-            'roles', function($q){
+            'role', function($q){
             $q->where('name', 'Student');
         })->pluck('users.id')
             ->toArray();
@@ -139,14 +127,13 @@ class ViewController extends Controller
     public function show(int $module)
     {
         $m = Module::find($module);
-        if(Auth::user()->roles()->first()->name != 'Admin'){
+        if(Auth::user()->role->name != 'Admin'){
             $checkIfUserHasPermissionToView = Auth::user()->modules()->find($module);
             if($checkIfUserHasPermissionToView != null){
                 $textbook = $m->textbooks()->get();
                 return response()->json([
                     'name' => $m->name,
                     'code' => $m->module_code,
-                    'year' => $m->module_year,
                     'textbooks' => $textbook
                 ]);
             }else{
@@ -159,7 +146,6 @@ class ViewController extends Controller
                 return response()->json([
                     'name' => $m->name,
                     'code' => $m->module_code,
-                    'year' => $m->module_year,
                     'textbooks' => $textbook
                 ]);
             }else{

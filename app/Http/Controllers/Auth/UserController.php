@@ -20,6 +20,6 @@ class UserController extends Controller
     }
 
     public function checkRole(Request $request){
-        return response()->json($request->user()->roles()->first()->name);
+        return response()->json($request->user()->role->name);
     }
 }

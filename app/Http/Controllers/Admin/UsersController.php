@@ -21,8 +21,7 @@ class UsersController extends Controller
     }
 
     public function index(){
-        $users = User::with('roles')->get();
-
+        $users = User::with('role')->get();
         return response()->json($users);
     }
     /**
@@ -46,7 +45,7 @@ class UsersController extends Controller
 
         $roles = Role::all();
 
-        $user_role = $user->roles()->first();
+        $user_role = $user->role;
 
         return response()->json([
             'user' => $user,
@@ -64,7 +63,8 @@ class UsersController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $user->roles()->sync($request->checked);
+        $user->role()->associate($request->checked);
+        $user->save();
 
         return response()->json($request->checked);
 
@@ -78,9 +78,7 @@ class UsersController extends Controller
      */
     public function destroy(User $user)
     {
-        $user->roles()->detach();
         $user->delete();
-
-        return response()->json(User::with('roles')->get());
+        return response()->json(User::with('role')->get());
     }
 }

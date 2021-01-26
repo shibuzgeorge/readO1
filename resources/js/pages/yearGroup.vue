@@ -69,7 +69,7 @@
 
         }),
         created(){
-            axios.get('/api/yearGroup/getAll')
+            axios.get('/api/yearGroup')
                 .then(response => {
                     this.current_year_groups = response.data;
                     this.isLoaded = true;
@@ -80,7 +80,7 @@
         },
         methods: {
             async submit() {
-                await axios.post('/api/module/addYearGroup', {
+                await axios.post('/api/yearGroup', {
                     year_group: this.form.year_group,
                 })
                     .then(response => {
@@ -100,7 +100,7 @@
                 let formData = new FormData();
                 formData.append('name', this.form.edit_name);
                 formData.append('_method', 'PATCH');
-                await axios.post(`/api/yearGroup/update/${this.edit_id}`, formData)
+                await axios.post(`/api/yearGroup/${this.edit_id}`, formData)
                     .then(response => {
                         this.successMessage = response.data.Success;
                         this.$refs.test.close();

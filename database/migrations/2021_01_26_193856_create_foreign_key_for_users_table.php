@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class RemoveModuleYearColumnInModulesTable extends Migration
+class CreateForeignKeyForUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class RemoveModuleYearColumnInModulesTable extends Migration
      */
     public function up()
     {
-        Schema::table('modules', function (Blueprint $table) {
-            $table->dropColumn('module_year');
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
         });
-
     }
 
     /**
@@ -26,8 +25,8 @@ class RemoveModuleYearColumnInModulesTable extends Migration
      */
     public function down()
     {
-        Schema::table('modules', function (Blueprint $table) {
-            $table->string('module_year');
+        Schema::table('users', function(Blueprint $table){
+            $table->dropForeign('users_role_id_foreign');
         });
     }
 }

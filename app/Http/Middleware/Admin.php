@@ -16,7 +16,7 @@ class Admin
      */
     public function handle($request, Closure $next)
     {
-        $userRoles = $request->user()->roles()->first();
+        $userRoles = $request->user()->role;
         if($userRoles->name !== 'Admin'){
             return response()->json(['error' => 'Unauthorized'], 403);
 
