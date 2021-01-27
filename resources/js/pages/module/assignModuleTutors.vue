@@ -83,6 +83,7 @@
                 this.successMessage = '';
                 this.selectModuleTutorLoaded = false;
                 let self = this;
+                self.checked = [];
 
                 axios.get(`/api/module/getUsersForModule/${this.selected}`)
                     .then(response => {
