@@ -12,13 +12,13 @@
                 <select  class="form-control" v-model="selected">
                     <option>Please select a module</option>
                     <option v-for="module in modules" :value="module.id" :key="module.id">
-                        ({{ module.module_code }}) {{ module.name }} - {{ module.module_year }}
+                        ({{ module.module_code }}) {{ module.name }} - {{ module.year_group.name }}
                     </option>
                 </select><br/>
 
                 <input class="form-control" type="file" id="file" ref="file" v-on:change="handleFileUpload()"/><br/>
             </div>
-            <sweet-modal ref="success" v-on:close="$router.push({name: 'home'})" icon="success">
+            <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
                 Successfully Uploaded
             </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">
