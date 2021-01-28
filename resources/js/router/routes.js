@@ -15,6 +15,7 @@ export default [
     { path: '/upload', name: 'upload', component: page('upload.vue') },
     { path: '/module', name: 'module.v.index', component: page('module/index.vue') },
     { path: '/yearGroup', name: 'yearGroup', component: page('yearGroup.vue') },
+    { path: '/library', name: 'library', component: page('library.vue') },
     { path: '/module/create', name: 'module.v.create', component: page('module/create.vue') },
     { path: '/module/assignStudents', name: 'module.assignStudents', component: page('module/assignStudents.vue') },
     { path: '/module/assignModuleTutors', name: 'module.assignModuleTutors', component: page('module/assignModuleTutors.vue') },

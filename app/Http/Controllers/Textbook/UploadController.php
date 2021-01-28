@@ -22,10 +22,10 @@ class UploadController extends Controller
         $user_role = $user->role;
 
         if($user_role->name === 'Admin'){
-            $modules = Module::all();
+            $modules = Module::with('yearGroup')->get();
             return response()->json($modules);
         }else {
-            $modules = $user->modules()->get();
+            $modules = $user->modules()->with('yearGroup')->get();
             return response()->json($modules);
         }
     }
