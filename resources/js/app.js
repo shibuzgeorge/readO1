@@ -4,6 +4,7 @@ import router from '~/router'
 import i18n from '~/plugins/i18n'
 import sweetmodal from '~/plugins/sweetmodal'
 import cliploader from '~/plugins/cliploader'
+import paginate from '~/plugins/paginate'
 import App from '~/components/App'
 
 
@@ -20,6 +21,7 @@ new Vue({
   router,
   sweetmodal,
   cliploader,
+  paginate,
   ...App,
 
 })
