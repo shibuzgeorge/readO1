@@ -16,7 +16,8 @@
         </h5>
 
         <br/>
-        <div style="width: 100%; text-align: center;">
+        <div v-if="file">
+        <div style="width: 100%; text-align: center;" >
         <label style="text-align: center;">View PDF: <input type="radio" v-model="selection" value="pdf"></label>
         <label>Text view: <input type="radio" v-model="selection" value="text"></label>
         <label>Speed reading: <input type="radio" v-model="selection" value="speedreading"></label>
@@ -33,7 +34,10 @@
         <SpeedReader :text=text />
 
         </div>
-
+        </div>
+        <div v-else>
+            No file has been uploaded for this textbook
+        </div>
     </card>
     <div v-else>
         <sweet-modal ref="error" v-on:close="$router.push({name: 'home'})" icon="error">
@@ -64,6 +68,7 @@
             fileName: '',
             errorMessage: '',
             text: '',
+            file: true,
             selection: 'pdf',
             path: '/lib/pdf/web/viewer.html',
 
@@ -80,7 +85,12 @@
                         this.isLoaded = true;
                         this.title = response.data.title;
                         this.description = response.data.description;
-                        this.text = atob(response.data.text);
+                        if(response.data.text !== undefined){
+                            this.text = atob(response.data.text);
+                        }else{
+                            this.file = false;
+                        }
+
                     }
                 }).catch(function (response) {
                 //handle error

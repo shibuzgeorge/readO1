@@ -25,5 +25,8 @@ class ModulesTableSeeder extends Seeder
         Module::create(['name' => 'Enterprise Application Technology', 'module_code' => 'CS3160', 'year_group_id' => $year3->id]);
         Module::create(['name' => 'Information Security', 'module_code' => 'CS3190', 'year_group_id' => $year3->id]);
 
+        //Create faker modules
+        factory(Module::class, 5)->create();
+
     }
 }
