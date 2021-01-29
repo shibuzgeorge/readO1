@@ -86,5 +86,8 @@ class UsersTableSeeder extends Seeder
         $moduleTutor1->modules()->sync([$ci->id, $spm->id, $eat->id, $is->id]);
         $moduleTutor2->modules()->sync([$spm->id, $eat->id]);
         $moduleTutor3->modules()->sync([$ci->id, $spm->id, $is->id]);
+
+        //Create students with no modules assigned.
+        factory(User::class, 10)->create();
     }
 }

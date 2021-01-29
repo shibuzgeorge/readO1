@@ -52,16 +52,24 @@ class ViewController extends Controller
         if(Auth::user()->role->name != 'Admin'){
             $checkIfUserHasPermissionToView = $t->where('id',$textbook)->first();
             if($checkIfUserHasPermissionToView != null){
-                $decoded = base64_decode($m->file);
-                file_put_contents('file.pdf',$decoded);
-                $path = 'c:/Program Files/Git/mingw64/bin/pdftotext';
-                $text = base64_encode(PdfToText\Pdf::getText('file.pdf', $path));
-                File::delete('file.pdf');
-                return response()->json([
-                    'title' => $m->title,
-                    'description' => $m->description,
-                    'text' => $text,
-                ]);
+                if($m->file != null){
+                    $decoded = base64_decode($m->file);
+                    file_put_contents('file.pdf',$decoded);
+                    $path = 'c:/Program Files/Git/mingw64/bin/pdftotext';
+                    $text = base64_encode(PdfToText\Pdf::getText('file.pdf', $path));
+                    File::delete('file.pdf');
+                    return response()->json([
+                        'title' => $m->title,
+                        'description' => $m->description,
+                        'text' => $text,
+                    ]);
+                }else{
+                    return response()->json([
+                        'title' => $m->title,
+                        'description' => $m->description,
+                    ]);
+                }
+
 
             }else{
                 return response()->json(['Error' => 'Permission not allowed to view']);
@@ -69,18 +77,23 @@ class ViewController extends Controller
         }else {
 
             if ($m != null) {
-
-                $decoded = base64_decode($m->file);
-                file_put_contents('file.pdf',$decoded);
-                $path = 'c:/Program Files/Git/mingw64/bin/pdftotext';
-                $text = base64_encode(PdfToText\Pdf::getText('file.pdf', $path));
-                File::delete('file.pdf');
-                return response()->json([
-                    'title' => $m->title,
-                    'description' => $m->description,
-                    'text' => $text,
-                ]);
-
+                if($m->file != null) {
+                    $decoded = base64_decode($m->file);
+                    file_put_contents('file.pdf', $decoded);
+                    $path = 'c:/Program Files/Git/mingw64/bin/pdftotext';
+                    $text = base64_encode(PdfToText\Pdf::getText('file.pdf', $path));
+                    File::delete('file.pdf');
+                    return response()->json([
+                        'title' => $m->title,
+                        'description' => $m->description,
+                        'text' => $text,
+                    ]);
+                }else{
+                    return response()->json([
+                        'title' => $m->title,
+                        'description' => $m->description,
+                    ]);
+                }
             } else {
                 return response()->json(['Error' => 'Textbook not found!']);
             }
