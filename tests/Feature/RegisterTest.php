@@ -7,6 +7,11 @@ use Tests\TestCase;
 
 class RegisterTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->artisan('db:seed');
+    }
     /** @test */
     public function can_register()
     {

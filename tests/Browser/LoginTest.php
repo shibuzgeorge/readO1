@@ -12,7 +12,7 @@ class LoginTest extends DuskTestCase
     public function setUp(): void
     {
         parent::setup();
-
+        $this->artisan('db:seed');
         static::closeAll();
     }
 
@@ -34,6 +34,7 @@ class LoginTest extends DuskTestCase
         $this->browse(function ($browser) {
             $browser->visit(new Login)
                 ->submit('test@test.app', 'password')
+                ->screenshot('login_with_invalid_credentials')
                 ->assertSee('These credentials do not match our records.');
         });
     }
