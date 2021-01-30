@@ -11,20 +11,32 @@ export default [
   { path: '/password/reset/:token', name: 'password.reset', component: page('auth/password/reset.vue') },
   { path: '/email/verify/:id', name: 'verification.verify', component: page('auth/verification/verify.vue') },
   { path: '/email/resend', name: 'verification.resend', component: page('auth/verification/resend.vue') },
-    { path: '/admin/users', name: 'admin.users', component: page('admin/users.vue') },
+
+
     { path: '/upload', name: 'upload', component: page('upload.vue') },
-    { path: '/module', name: 'module.v.index', component: page('module/index.vue') },
+
     { path: '/yearGroup', name: 'yearGroup', component: page('yearGroup.vue') },
+
     { path: '/library', name: 'library', component: page('library.vue') },
+
+    { path: '/module', name: 'module.v.index', component: page('module/index.vue') },
     { path: '/module/create', name: 'module.v.create', component: page('module/create.vue') },
     { path: '/module/assignStudents', name: 'module.assignStudents', component: page('module/assignStudents.vue') },
     { path: '/module/assignModuleTutors', name: 'module.assignModuleTutors', component: page('module/assignModuleTutors.vue') },
     { path: '/module/edit/:id', name: 'module.v.edit', component: page('module/edit.vue') },
     { path: '/module/view/:id', name: 'module.v.show', component: page('module/view.vue') },
+
     { path: '/textbook/view/:id', name: 'textbook.view.show', component: page('textbook/view.vue') },
     { path: '/textbook/view/edit/:id', name: 'textbook.view.edit', component: page('textbook/edit.vue') },
+
+    { path: '/text/view/:id', name: 'text.show', component: page('text/view.vue') },
+    { path: '/text/create', name: 'text.create', component: page('text/create.vue') },
+    { path: '/text/edit', name: 'text.edit', component: page('text/edit.vue') },
+
+    { path: '/admin/users', name: 'admin.users', component: page('admin/users.vue') },
     { path: '/admin/users/edit/:id', name: 'admin.users.edit', component: page('admin/edit.vue') },
     { path: '/admin/users/update/:id', name: 'admin.users.update', component: page('admin/edit.vue') },
+
   { path: '/home', name: 'home', component: page('home.vue') },
   { path: '/settings',
     component: page('settings/index.vue'),
