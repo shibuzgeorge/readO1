@@ -8,9 +8,6 @@ use App\Textbook;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Spatie\PdfToText;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 
 class ViewController extends Controller
 {
@@ -36,69 +33,65 @@ class ViewController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param
+     * @param  \App\Module  $module
      * @return \Illuminate\Http\Response
      */
-    public function show(int $textbook)
+    public function show($textbook)
     {
-        $m = Textbook::find($textbook);
+        $t = Textbook::find($textbook);
 
-        $textbooks = Auth::user()->modules()->has('textbooks')->
-        with('textbooks')->get()->pluck('textbooks')->toArray();
-
-        $textbooks = call_user_func_array('array_merge', $textbooks);
-        $t = collect($textbooks);
+        $module = Module::whereHas(
+            'textbooks', function($q) use($textbook) {
+            $q->where('textbook_id', $textbook);
+        })->first();
 
         if(Auth::user()->role->name != 'Admin'){
-            $checkIfUserHasPermissionToView = $t->where('id',$textbook)->first();
+            $checkIfUserHasPermissionToView = Auth::user()->modules()->find($module);
             if($checkIfUserHasPermissionToView != null){
-                if($m->file != null){
-                    $decoded = base64_decode($m->file);
-                    file_put_contents('file.pdf',$decoded);
-                    $path = 'c:/Program Files/Git/mingw64/bin/pdftotext';
-                    $text = base64_encode(PdfToText\Pdf::getText('file.pdf', $path));
-                    File::delete('file.pdf');
+                $texts = $t->texts()->get();
+                if($t->file != null) {
                     return response()->json([
-                        'title' => $m->title,
-                        'description' => $m->description,
-                        'text' => $text,
+                        'title' => $t->name,
+                        'description' => $t->description,
+                        'texts' => $texts,
+                        'file' => true
                     ]);
                 }else{
                     return response()->json([
-                        'title' => $m->title,
-                        'description' => $m->description,
+                        'title' => $t->name,
+                        'description' => $t->description,
+                        'texts' => $texts,
+                        'file' => false
                     ]);
                 }
-
-
             }else{
-                return response()->json(['Error' => 'Permission not allowed to view']);
+                return response()->json(['Error' => 'Permission denied to view textbook!']);
             }
-        }else {
+        }else{
 
-            if ($m != null) {
-                if($m->file != null) {
-                    $decoded = base64_decode($m->file);
-                    file_put_contents('file.pdf', $decoded);
-                    $path = 'c:/Program Files/Git/mingw64/bin/pdftotext';
-                    $text = base64_encode(PdfToText\Pdf::getText('file.pdf', $path));
-                    File::delete('file.pdf');
+            if($t != null){
+                $texts = $t->texts()->get();
+                if($t->file != null) {
                     return response()->json([
-                        'title' => $m->title,
-                        'description' => $m->description,
-                        'text' => $text,
+                        'title' => $t->title,
+                        'description' => $t->description,
+                        'texts' => $texts,
+                        'file' => true
                     ]);
                 }else{
                     return response()->json([
-                        'title' => $m->title,
-                        'description' => $m->description,
+                        'title' => $t->title,
+                        'description' => $t->description,
+                        'texts' => $texts,
+                        'file' => false
                     ]);
                 }
-            } else {
+            }else{
                 return response()->json(['Error' => 'Textbook not found!']);
             }
 
         }
+
     }
 
     public function pdf($id)
