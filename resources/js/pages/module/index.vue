@@ -4,7 +4,7 @@
         <h1 v-if="role==='Student'">My Modules</h1>
         <div class="flexbox">
             <div class="flex-item">
-                <router-link v-show="role==='Admin'" :to="{ name: 'module.v.create' }">
+                <router-link v-show="role==='Admin'" :to="{ name: 'module.create' }">
                     <button class="btn btn-success" v-if="role==='Admin'">+ Create Module</button>
                 </router-link>
 
@@ -38,14 +38,14 @@
 
          <div v-for="module in modules" class=" card col-sm-3 ml-4 mt-4">
            <div class="card-body">
-            <router-link :to="{ name: 'module.v.show', params: {id: module.id} }">
+            <router-link :to="{ name: 'module.show', params: {id: module.id} }">
             <h5 class="card-title">{{module.name}}</h5>
             <h6 class="card-subtitle mb-2 text-muted">{{module.module_code}} - {{module.year_group.name}}</h6>
             </router-link>
-            <router-link :to="{ name: 'module.v.edit', params: {id: module.id} }">
+            <router-link :to="{ name: 'module.edit', params: {id: module.id} }">
                 <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
             </router-link>
-            <router-link :to="{ name: 'module.v.index' }">
+            <router-link :to="{ name: 'module.index' }">
             <a @click="del(module.id)" v-show="role==='Admin'" href="delete" class="card-link">Delete</a><br/>
             </router-link>
             <router-link :to="{ name: 'module.assignModuleTutors' }">
@@ -90,7 +90,7 @@
                 //handle error
                 console.log(response);
             });
-            axios.get('/api/module/v')
+            axios.get('/api/module/')
                 .then(response => {
                     this.isLoaded = true;
                     this.modules = response.data;
@@ -114,7 +114,7 @@
                     confirmButtonText: 'Yes, delete it!',
                 }).then(function (result) {
                     if (result.value) {
-                        axios.delete(`/api/module/v/${data}`);
+                        axios.delete(`/api/module/${data}`);
                         Swal.fire(
                             'Deleted!',
                             'The module has been deleted.',

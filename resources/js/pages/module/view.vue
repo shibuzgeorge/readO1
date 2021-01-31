@@ -64,7 +64,7 @@
         }),
         created() {
 
-            axios.get(`/api/module/v/${this.$route.params.id}`)
+            axios.get(`/api/module/${this.$route.params.id}`)
                 .then(response => {
                     if(response.data.Error !== undefined){
                         this.errorMessage = response.data.Error;

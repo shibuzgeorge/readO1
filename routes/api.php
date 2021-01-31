@@ -13,21 +13,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::group(['middleware' => 'auth:api'], function () {
+
     Route::get('/users', 'Admin\UsersController@index');
 
-    Route::namespace('Module')->prefix('module')->name('module.')->group(function () {
-        Route::resource('/v', 'ViewController');
-
+    Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::resource('/users', 'UsersController', ['except' => ['show', 'create', 'store']]);
     });
 
-    Route::get('module/allModules', 'Module\ViewController@allModules');
-    Route::get('module/getUsersForModule/{module_id}', 'Module\ViewController@getUsersForModule');
-    Route::get('module/getAllStudents', 'Module\ViewController@getAllStudents');
-    Route::post('module/assignStudents/{module_id}', 'Module\ViewController@assignStudents');
-    Route::post('module/addYearGroup', 'Module\ViewController@addYearGroup');
-    Route::post('module/assignModuleTutors/{module_id}', 'Module\ViewController@assignModuleTutors');
-    Route::get('module/getAllModuleTutors', 'Module\ViewController@getAllModuleTutors');
-    Route::get('module/getModuleById/{module_id}', 'Module\ViewController@getModuleById');
+    //Module Controller
+    Route::get('module/getUsersForModule/{module_id}', 'ModuleController@getUsersForModule');
+    Route::get('module/getAllStudents', 'ModuleController@getAllStudents');
+    Route::post('module/assignStudents/{module_id}', 'ModuleController@assignStudents');
+    Route::post('module/assignModuleTutors/{module_id}', 'ModuleController@assignModuleTutors');
+    Route::get('module/getAllModuleTutors', 'ModuleController@getAllModuleTutors');
+    Route::get('module/getModuleById/{module_id}', 'ModuleController@getModuleById');
+    Route::resource('/module', 'ModuleController');
+
 
     Route::get('textbook/view/{textbook_id}/pdf', 'Textbook\ViewController@pdf');
 
@@ -40,9 +41,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('/view', 'ViewController');
     });
 
-    Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function () {
-        Route::resource('/users', 'UsersController', ['except' => ['show', 'create', 'store']]);
-    });
+
 
     Route::get('/upload', 'Textbook\UploadController@index');
 
