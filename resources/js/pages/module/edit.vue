@@ -60,7 +60,7 @@
                 });
 
             let self = this
-            axios.get(`/api/module/v/${this.$route.params.id}/edit`)
+            axios.get(`/api/module/${this.$route.params.id}/edit`)
                 .then(response => {
                     if(response.data.Error !== undefined){
                         this.errorMessage = response.data.Error;
@@ -74,20 +74,20 @@
                     }
                 }).catch(function (response) {
                 //handle error
-                self.$router.push({name: 'module.v.index'})
+                self.$router.push({name: 'module.index'})
 
                 console.log(response);
             });
         },
         methods:{
             async submit(){
-                await this.form.patch(`/api/module/v/${this.$route.params.id}`)
+                await this.form.patch(`/api/module/${this.$route.params.id}`)
                     .then(response => {
                         this.successMessage = response.data.Success;
                         this.$refs.success.open();
                     }).catch(function (response) {
                         //handle error
-                        self.$router.push({name: 'module.v.index'})
+                        self.$router.push({name: 'module.index'})
 
                         console.log(response);
                     });

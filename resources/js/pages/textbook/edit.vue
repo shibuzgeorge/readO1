@@ -53,12 +53,10 @@
             successMessage: '',
             errorMessage: '',
             modules: '',
-
-
         }),
 
         created() {
-                axios.get('/api/upload')
+                axios.get('/api/module/')
                     .then(response => {
                         this.modules = response.data;
 
@@ -67,7 +65,7 @@
                     console.log(response);
                 });
             let self = this
-            axios.get(`/api/textbook/view/${this.$route.params.id}/edit`)
+            axios.get(`/api/textbook/${this.$route.params.id}/edit`)
                 .then(response => {
                     if(response.data.Error !== undefined){
                         this.errorMessage = response.data.Error;
@@ -102,7 +100,7 @@
                 formData.append('description', this.form.description);
                 formData.append('module_id', this.form.selected);
                 formData.append('_method', 'PATCH');
-                await axios.post(`/api/textbook/view/${this.$route.params.id}`,formData,
+                await axios.post(`/api/textbook/${this.$route.params.id}`,formData,
                     {
                         headers: {'Content-Type': 'multipart/form-data'
                         }

@@ -12,11 +12,11 @@
             <div class="row">
                 <div v-for="textbook in textbooks" class="card col-sm-3 ml-4 mt-4">
                     <div class="card-body">
-                        <router-link :to="{ name: 'textbook.view.show', params: {id: textbook.id} }">
+                        <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
                             <h5 class="card-title">{{textbook.title}}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
                         </router-link>
-                        <router-link :to="{ name: 'textbook.view.edit', params: {id: textbook.id} }">
+                        <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
                             <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
                         </router-link>
                         <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
@@ -48,7 +48,7 @@
         }),
         created() {
 
-            axios.get('api/textbook/view')
+            axios.get('api/textbook/')
                 .then(response => {
                     this.isLoaded = true;
                     this.textbooks = response.data
@@ -74,7 +74,7 @@
                             'The textbook has been deleted.',
                             'success'
                         );
-                        axios.delete(`/api/textbook/view/${data}`).then(response => {
+                        axios.delete(`/api/textbook/${data}`).then(response => {
                             window.location.reload();
                         })
                     }

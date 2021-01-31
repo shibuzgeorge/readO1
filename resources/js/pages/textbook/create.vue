@@ -1,7 +1,7 @@
 <template>
     <card>
         <h5 class="card-header d-flex justify-content-between align-items-center">
-            Upload textbook
+            Create textbook
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
         </h5>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)" enctype="multipart/form-data">
@@ -36,7 +36,7 @@
 
     export default {
         middleware: 'admin_plus_module_tutor',
-        name: "edit",
+        name: "create",
         data: () => ({
             isLoaded: false,
             form: new Form({
@@ -49,7 +49,7 @@
 
         }),
     created() {
-        axios.get('/api/upload')
+        axios.get('/api/textbook/create')
             .then(response => {
                 this.isLoaded = true;
                 this.modules = response.data;
@@ -76,7 +76,7 @@
                 formData.append('description', this.form.description);
                 formData.append('module_id', this.selected);
 
-                await axios.post('api/textbook/upload',formData,
+                await axios.post('/api/textbook',formData,
                 {
                     headers: {
                         'Content-Type'

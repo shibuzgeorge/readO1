@@ -13,21 +13,22 @@ export default [
   { path: '/email/resend', name: 'verification.resend', component: page('auth/verification/resend.vue') },
 
 
-    { path: '/upload', name: 'upload', component: page('upload.vue') },
+
 
     { path: '/yearGroup', name: 'yearGroup', component: page('yearGroup.vue') },
 
     { path: '/library', name: 'library', component: page('library.vue') },
 
-    { path: '/module', name: 'module.v.index', component: page('module/index.vue') },
-    { path: '/module/create', name: 'module.v.create', component: page('module/create.vue') },
+    { path: '/module', name: 'module.index', component: page('module/index.vue') },
+    { path: '/module/create', name: 'module.create', component: page('module/create.vue') },
     { path: '/module/assignStudents', name: 'module.assignStudents', component: page('module/assignStudents.vue') },
     { path: '/module/assignModuleTutors', name: 'module.assignModuleTutors', component: page('module/assignModuleTutors.vue') },
-    { path: '/module/edit/:id', name: 'module.v.edit', component: page('module/edit.vue') },
-    { path: '/module/view/:id', name: 'module.v.show', component: page('module/view.vue') },
+    { path: '/module/edit/:id', name: 'module.edit', component: page('module/edit.vue') },
+    { path: '/module/view/:id', name: 'module.show', component: page('module/view.vue') },
 
-    { path: '/textbook/view/:id', name: 'textbook.view.show', component: page('textbook/view.vue') },
-    { path: '/textbook/view/edit/:id', name: 'textbook.view.edit', component: page('textbook/edit.vue') },
+    { path: '/textbook/create', name: 'textbook.create', component: page('textbook/create.vue') },
+    { path: '/textbook/view/:id', name: 'textbook.show', component: page('textbook/view.vue') },
+    { path: '/textbook/edit/:id', name: 'textbook.edit', component: page('textbook/edit.vue') },
 
     { path: '/text/view/:id', name: 'text.show', component: page('text/view.vue') },
     { path: '/text/create', name: 'text.create', component: page('text/create.vue') },

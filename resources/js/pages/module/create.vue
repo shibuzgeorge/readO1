@@ -19,7 +19,7 @@
                 </select><br/>
                 <br/>
             </div>
-            <sweet-modal ref="success" v-on:close="$router.push({name: 'module.v.index'})" icon="success">
+            <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
                 {{successMessage}}
             </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">
@@ -45,7 +45,7 @@
 <script>
     import axios from 'axios'
     import Form from 'vform'
-    import Swal from 'sweetalert2'
+
     export default {
         name: "create",
         middleware: 'admin_plus_module_tutor',
@@ -63,18 +63,11 @@
 
         }),
         created(){
-            axios.get('/api/module/v')
+            axios.get('/api/module/create')
                 .then(response => {
-                    this.modules = response.data;
-                }).catch(function (response) {
-                //handle error
-                console.log(response);
-            });
-
-            axios.get('/api/yearGroup/')
-                .then(response => {
-                    this.year_groups = response.data;
                     this.isLoaded = true;
+                    this.modules = response.data.modules;
+                    this.year_groups = response.data.year_groups;
                 }).catch(function (response) {
                 //handle error
                 console.log(response);
@@ -82,7 +75,7 @@
         },
         methods:{
             async submit() {
-                await axios.post('/api/module/v', {
+                await axios.post('/api/module', {
                     module_name: this.form.module_name,
                     module_code: this.form.module_code,
                     module_year: this.form.module_year,

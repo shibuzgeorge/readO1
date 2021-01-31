@@ -19,8 +19,8 @@
                 Textbooks <span class="mr-3"></span>
             </a>
             <div class="collapse" id="textbooks">
-                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'upload' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                    Upload textbook
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                    Create a textbook
                 </router-link>
             </div>
 
@@ -28,13 +28,13 @@
                 Modules<span class="mr-3"></span>
             </a>
             <div class="collapse" id="modules">
-                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     All Modules
                 </router-link>
-                <router-link v-show="role==='Student'" :to="{ name: 'module.v.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                <router-link v-show="role==='Student'" :to="{ name: 'module.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     My Modules
                 </router-link>
-                <router-link v-show="role==='Admin'" :to="{ name: 'module.v.create' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                <router-link v-show="role==='Admin'" :to="{ name: 'module.create' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
                     Create Module
                 </router-link>
                 <router-link v-show="role==='Admin'" :to="{ name: 'module.assignModuleTutors' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">

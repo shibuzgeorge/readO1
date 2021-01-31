@@ -57,7 +57,7 @@
 
         }),
         created() {
-            axios.get('/api/module/v')
+            axios.get('/api/module/')
                 .then(response => {
                     this.isLoaded = true;
                     this.modules = response.data;
