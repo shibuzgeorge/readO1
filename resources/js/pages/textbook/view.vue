@@ -1,12 +1,10 @@
 <template>
         <div class="container-fluid" v-if="isLoaded">
             <div class="row" v-if="file">
-                <card class="col-5 ml-4 d-flex flex-column h-100">
-                    <PDFViewer :fileName="fileName" :path="path"/>
-                </card>
-                <card class="col-6 d-flex flex-column h-100">
+                <card class="col-lg-6 col-md-6 col-sm-12">
                     <h5 class="card-header d-flex justify-content-between align-items-center">
-                        Title: {{title}} - Description: {{description}}
+                        Title: {{title}}
+                        Description: {{description}}
                         <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
                     </h5>
 
@@ -23,20 +21,24 @@
                         <h1 style="text-align: center;" class="mt-4" v-if="!texts || !texts.length">
                             This textbook has no texts!
                         </h1>
-                    <br/>
-                            <ul class="list-group" v-for="text in texts">
-                                <li class="list-group-item">
-                                    <router-link :to="{ name: 'text.show', params: {id: text.id} }">
-                                        {{text.title}} - {{text.description }}
-                                    </router-link>
-                                    <a style="float: right;" @click="del(text.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#"><button type="button" class="btn btn-warning btn-sm">Delete</button></a>
-                                    <router-link :to="{ name: 'text.edit', params: {id: text.id} }">
-                                        <a style="float: right;" v-show="role==='Admin' || role==='Module Tutor'" href="edit"><button type="button" class="btn btn-primary btn-sm">Edit</button></a>
-                                    </router-link>
-                                </li>
+                        <br/>
+                        <ul class="list-group" v-for="text in texts">
+                            <li class="list-group-item">
+                                <router-link :to="{ name: 'text.show', params: {id: text.id} }">
+                                    {{text.title}} - {{text.description }}
+                                </router-link>
+                                <a style="float: right;" @click="del(text.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#"><button type="button" class="btn btn-warning btn-sm">Delete</button></a>
+                                <router-link :to="{ name: 'text.edit', params: {id: text.id} }">
+                                    <a style="float: right;" v-show="role==='Admin' || role==='Module Tutor'" href="edit"><button type="button" class="btn btn-primary btn-sm">Edit</button></a>
+                                </router-link>
+                            </li>
                         </ul>
                     </div>
                 </card>
+                <card class="col-lg-5 col-md-5 col-sm-12 ml-2">
+                    <PDFViewer :fileName="fileName" :path="path"/>
+                </card>
+
             </div>
             <div v-else>
                 <card>
