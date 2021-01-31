@@ -11,7 +11,7 @@ class YearGroupController extends Controller
 
     public function __construct()
     {
-        $this->middleware('admin')->only(['edit','update', 'store', 'destroy']);
+        $this->middleware('role:Admin')->only(['edit','update', 'store', 'destroy']);
     }
 
     /**
