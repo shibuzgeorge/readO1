@@ -11,7 +11,7 @@
                     <input type="search" id="form1" class="form-control" placeholder="Search..."
                            aria-label="Search" />
                 </div>
-                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'upload' }">
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }">
                     <button class="btn btn-success" v-if="role!=='User'">+ Add textbook</button>
                 </router-link>
             </div>
@@ -22,11 +22,11 @@
 
                 <div v-for="textbook in textbooks" class="card col-sm-3 ml-4 mt-4 align-items-center">
                 <div class="card-body">
-                    <router-link :to="{ name: 'textbook.view.show', params: {id: textbook.id} }">
+                    <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
                     <h5 class="card-titlex">{{textbook.title}}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
                     </router-link>
-                    <router-link :to="{ name: 'textbook.view.edit', params: {id: textbook.id} }">
+                    <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
                         <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
                     </router-link>
 
@@ -98,7 +98,7 @@
                             'The textbook has been deleted.',
                             'success'
                         );
-                        axios.delete(`/api/textbook/view/${data}`).then(response => {
+                        axios.delete(`/api/textbook/${data}`).then(response => {
                             window.location.reload();
                         })
                     }

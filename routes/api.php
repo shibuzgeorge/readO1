@@ -29,22 +29,13 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('module/getModuleById/{module_id}', 'ModuleController@getModuleById');
     Route::resource('/module', 'ModuleController');
 
-
-    Route::get('textbook/view/{textbook_id}/pdf', 'Textbook\ViewController@pdf');
+    Route::resource('/textbook', 'TextbookController');
+    Route::get('textbook/pdf/{textbook_id}', 'TextbookController@pdf');
 
     Route::resource('/yearGroup', 'YearGroupController');
 
     Route::resource('/text', 'TextController');
     Route::get('/text/pdf/{textbook_id}', 'TextController@pdf');
-    Route::namespace('Textbook')->prefix('textbook')->name('textbook.')->group(function () {
-        Route::resource('/upload', 'UploadController');
-        Route::resource('/view', 'ViewController');
-    });
-
-
-
-    Route::get('/upload', 'Textbook\UploadController@index');
-
 
 });
 Route::group(['middleware' => 'auth:api'], function () {

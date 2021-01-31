@@ -109,8 +109,8 @@
 
         }),
         created() {
-            this.fileName =`/api/textbook/view/${this.$route.params.id}/pdf`
-            axios.get(`/api/textbook/view/${this.$route.params.id}`)
+            this.fileName =`/api/textbook/pdf/${this.$route.params.id}`
+            axios.get(`/api/textbook/${this.$route.params.id}`)
                 .then(response => {
                     if(response.data.Error !== undefined){
                         this.errorMessage = response.data.Error;

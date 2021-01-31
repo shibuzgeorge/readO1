@@ -19,8 +19,8 @@
                 Textbooks <span class="mr-3"></span>
             </a>
             <div class="collapse" id="textbooks">
-                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'upload' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                    Upload textbook
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
+                    Create a textbook
                 </router-link>
             </div>
 
