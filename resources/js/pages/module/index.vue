@@ -19,13 +19,13 @@
             </div>
         </div>
 
-        <div class="input-group mt-4">
-            <input type="search" id="form1" class="form-control" placeholder="Search..."
+        <div class="input-group mt-4 d-flex justify-content-center align-items-center">
+            <input type="search" v-model="searchQuery" class="form-control col-lg-4" placeholder="Search by name or module code..."
             aria-label="Search" />
             <span style="padding-left: 15px;">
-                <select class="form-control">
+                <select class="form-control" v-model="filterYear">
                     <option>Filter by year...</option>
-                    <option v-for="year in year_groups" :value="year.id" :key="year.id">
+                    <option v-for="year in year_groups" :value="year.name" :key="year.name">
                         {{ year.name }}
                     </option>
                 </select>
@@ -36,7 +36,7 @@
         </h1>
         <div class="row justify-content-center">
 
-         <div v-for="module in modules" class=" card col-sm-3 ml-4 mt-4">
+         <div v-for="module in modulesPaginated" class=" card col-sm-3 ml-4 mt-4">
            <div class="card-body">
             <router-link :to="{ name: 'module.show', params: {id: module.id} }">
             <h5 class="card-title">{{module.name}}</h5>
@@ -56,9 +56,9 @@
             </router-link>
         </div>
              </div>
-        </div>
-</div>
-
+        </div><br/>
+        <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
+    </div>
     <div v-else>
         <clip-loader color="black"/>
     </div>
@@ -72,16 +72,43 @@
     export default {
         name: "module",
         middleware: 'auth',
-        computed: mapGetters({
-            role: 'auth/role'
-        }),
         data: () => ({
+            modulesPaginated: [],
             modules: [],
             isLoaded: false,
             loadingColor: "black",
             year_groups: '',
+            filterYear: 'Filter by year...',
+            searchQuery: null,
+            sizePage: 6,
 
         }),
+        computed : {
+            ...mapGetters({
+                role: 'auth/role'
+            }),
+            resultQuery() {
+                if (this.searchQuery && this.filterYear !== 'Filter by year...') {
+                    return this.modules.filter(item => item.year_group.name === this.filterYear &&
+                        this.searchQuery.toLowerCase().split(' ').every(
+                            v => item.module_code.toLowerCase().includes(v) ||
+                                item.name.toLowerCase().includes(v))
+                    )
+                }
+                else if (this.searchQuery) {
+                    return this.modules.filter((item) => {
+                        return this.searchQuery.toLowerCase().split(' ').every(
+                            v => item.module_code.toLowerCase().includes(v) ||
+                                item.name.toLowerCase().includes(v))
+                    })
+                }
+                else if (this.filterYear !== 'Filter by year...') {
+                    return this.modules.filter(item => item.year_group.name === this.filterYear)
+                } else {
+                    return this.modules;
+                }
+            }
+        },
         created() {
             axios.get('/api/yearGroup/')
                 .then(response => {
@@ -125,7 +152,10 @@
                     }
                 })
 
-            }
+            },
+            onChangePage(pageOfItems) {
+                this.modulesPaginated = pageOfItems;
+            },
         },
 
     }
