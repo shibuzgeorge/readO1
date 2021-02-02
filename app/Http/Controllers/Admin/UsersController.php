@@ -11,23 +11,36 @@ class UsersController extends Controller
 {
 
     /**
-     * Create a new controller instance.
      *
-     * @return void
+     * Applies middleware to all methods to restrict access.
+     * Only admins are allowed.
+     *
+     * UsersController constructor.
      */
     public function __construct()
     {
         $this->middleware('role:Admin');
     }
 
-    public function index(){
-        $users = User::with('role')->paginate(5);
-        return response()->json($users);
-    }
     /**
-     * Show the form for creating a new resource.
+     * Returns the all users and roles
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
+     *
+     */
+    public function index(){
+        $users = User::with('role')->get();
+        $roles = Role::all();
+        return response()->json([
+            'users' => $users,
+            'roles' => $roles
+        ]);
+    }
+
+    /**
+     * Create a form for a new user to be created.
+     *
+     * @return void
      */
     public function create()
     {
@@ -35,7 +48,7 @@ class UsersController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Displays the form to edit a user.
      *
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
@@ -55,7 +68,7 @@ class UsersController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified user role and saves to database.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\User  $user
@@ -71,10 +84,11 @@ class UsersController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified user from the database.
      *
-     * @param  \App\User  $user
+     * @param  \App\User $user
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function destroy(User $user)
     {
