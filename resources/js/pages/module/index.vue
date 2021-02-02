@@ -1,7 +1,7 @@
 <template>
     <div v-if="isLoaded" class="text-center">
 
-        <h1 v-if="role==='Student'">My Modules</h1>
+        <h1 id="title-my-modules" v-if="role==='Student'">My Modules</h1>
         <div class="flexbox">
             <div class="flex-item">
                 <router-link v-show="role==='Admin'" :to="{ name: 'module.create' }">
@@ -10,7 +10,7 @@
 
             </div>
             <div class="flex-item">
-                <h1 style="" v-if="role!=='Student'">All Modules</h1>
+                <h1 id="title-all-modules" v-if="role!=='Student'">All Modules</h1>
             </div>
             <div class="flex-item">
                 <router-link v-show="role==='Admin'" :to="{ name: 'yearGroup' }">
