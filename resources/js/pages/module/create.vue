@@ -19,7 +19,7 @@
                 </select><br/>
                 <br/>
             </div>
-            <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
+            <sweet-modal ref="success" v-on:close="$router.push({name: 'module.index' , query: { page: 'last' }})" icon="success">
                 {{successMessage}}
             </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">
