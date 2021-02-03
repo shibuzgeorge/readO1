@@ -2,10 +2,10 @@
     <div class="container-fluid" v-if="isLoaded">
         <div class="row">
     <card class="col-6 d-flex flex-column h-100">
-        <h5 class="card-header d-flex justify-content-between align-items-center">
-            Add Year Group
+        <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 id="title">Add Year Group</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-        </h5>
+        </div>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
             <div class="form-check mt-4">
                 <label>Add Year Group:           </label> <input class="form-control" v-model="form.year_group" type="text" value="" required/><br/>

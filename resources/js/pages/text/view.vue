@@ -1,8 +1,7 @@
 <template>
     <card v-if="isLoaded">
         <h5 class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                Title: {{title}}
+            <div id="title" class="d-flex justify-content-between align-items-center">Title: {{title}}
                 <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
             </div>
             <br/>

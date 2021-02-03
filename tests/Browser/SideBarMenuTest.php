@@ -60,8 +60,8 @@ class SideBarMenuTest extends DuskTestCase
                 ->assertSeeIn('#textbooks-expanded', 'Create a textbook')
                 ->assertSeeIn('#sidebar-wrapper', 'Modules')
                 ->assertSeeIn('#modules-expanded', 'All Modules')
-                ->assertSeeIn('#modules-expanded', 'Assign Students')
                 ->assertSeeIn('#modules-expanded', 'Create Module')
+                ->assertSeeIn('#modules-expanded', 'Assign Students')
                 ->assertSeeIn('#modules-expanded', 'Assign Module Tutors')
                 ->assertSeeIn('#sidebar-wrapper', 'Users')
                 ->assertSeeIn('#users-expanded', 'View all users')
@@ -157,6 +157,41 @@ class SideBarMenuTest extends DuskTestCase
      * @test
      * @throws \Throwable
      */
+    public function test_student_library_menu()
+    {
+        $this->browse(function ($browser) {
+            $browser->visit(new Login)
+                ->submit($this->studentUser->email, 'password')
+                ->waitFor('#sidebar-wrapper')
+                ->clickLink('Library')
+                ->waitFor('#title')
+                ->pause(1000)
+                ->assertPathis('/library')
+                ->assertSeeIn('#title', 'Library');
+        });
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function test_student_dashboard_menu()
+    {
+        $this->browse(function ($browser) {
+            $browser->visit(new Login)
+                ->submit($this->studentUser->email, 'password')
+                ->waitFor('#sidebar-wrapper')
+                ->clickLink('Dashboard')
+                ->pause(1000)
+                ->assertPathis('/home')
+                ->assertSeeIn('#title', 'Dashboard');
+        });
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
     public function test_Module_Tutor_modules_menu()
     {
         $this->browse(function ($browser) {
@@ -167,8 +202,35 @@ class SideBarMenuTest extends DuskTestCase
                 ->waitFor('#all-modules-menu')
                 ->clickLink('All Modules')
                 ->waitFor('#title-all-modules')
+                ->pause(1000)
                 ->assertPathis('/module')
-                ->assertSeeIn('#title-all-modules', 'All Modules');
+                ->assertSeeIn('#title-all-modules', 'All Modules')
+                //click assign students
+                ->clickLink('Assign Students')
+                ->waitFor('#title')
+                ->pause(1000)
+                ->assertPathis('/module/assignStudents')
+                ->assertSeeIn('#title', 'Assign students to modules');
+        });
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function test_Module_Tutor_textbooks_menu()
+    {
+        $this->browse(function ($browser) {
+            $browser->visit(new Login)
+                ->submit($this->moduleTutorUser->email, 'password')
+                ->waitFor('#textbooks-menu')
+                ->clickLink('Textbooks')
+                ->waitFor('#create-textbook-menu')
+                ->clickLink('Create a textbook')
+                ->waitFor('#title')
+                ->pause(1000)
+                ->assertPathis('/textbook/create')
+                ->assertSeeIn('#title', 'Create textbook');
         });
     }
 
@@ -178,7 +240,7 @@ class SideBarMenuTest extends DuskTestCase
      */
     public function test_Admin_modules_menu()
     {
-        $this->browse(function ($browser) {
+        $this->browse(function ($browser ) {
             $browser->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
                 ->waitFor('#modules-menu')
@@ -187,7 +249,45 @@ class SideBarMenuTest extends DuskTestCase
                 ->clickLink('All Modules')
                 ->waitFor('#title-all-modules')
                 ->assertPathis('/module')
-                ->assertSeeIn('#title-all-modules', 'All Modules');
+                ->assertSeeIn('#title-all-modules', 'All Modules')
+                //click create module
+                ->clickLink('Create Module')
+                ->waitFor('#title')
+                ->pause(1000)
+                ->assertPathis('/module/create')
+                ->assertSeeIn('#title', 'Create Module')
+                //click assign students
+                ->clickLink('Assign Students')
+                ->waitFor('#title')
+                ->pause(1000)
+                ->assertPathis('/module/assignStudents')
+                ->assertSeeIn('#title', 'Assign students to modules')
+                //click assign module tutors
+                ->clickLink('Assign Module Tutors')
+                ->waitFor('#title')
+                ->pause(1000)
+                ->assertPathis('/module/assignModuleTutors')
+                ->assertSeeIn('#title', 'Assign module tutors to modules');
+        });
+    }
+
+    /**
+     * @test
+     * @throws \Throwable
+     */
+    public function test_Admin_Users_menu()
+    {
+        $this->browse(function ($browser ) {
+            $browser->visit(new Login)
+                ->submit($this->adminUser->email, 'password')
+                ->waitFor('#users-menu')
+                ->clickLink('Users')
+                ->waitFor('#view-all-users-menu')
+                ->clickLink('View all users')
+                ->waitFor('#title')
+                ->pause(2000)
+                ->assertPathis('/admin/users')
+                ->assertSeeIn('#title', 'All Users');
         });
     }
 }

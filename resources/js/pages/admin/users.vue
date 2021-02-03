@@ -1,9 +1,9 @@
 <template>
     <card v-if="isLoaded">
-        <h5 class="card-header d-flex justify-content-between align-items-center">
-            All Users
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 id="title">All Users</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-        </h5>
+        </div>
         <div class="wrapper">
             <div>
                 <div class="form-inline d-flex justify-content-between align-items-center">

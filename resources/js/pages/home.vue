@@ -1,8 +1,8 @@
 <template>
   <card v-if="isLoaded">
-    <h5 class="card-header d-flex justify-content-between align-items-center">
-      Dashboard
-    </h5>
+    <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 id="title">Dashboard</h5>
+    </div>
     <div class="wrapper">
       <div class="container align-items-center">
 

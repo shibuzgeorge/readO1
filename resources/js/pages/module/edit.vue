@@ -1,9 +1,9 @@
 <template>
     <card v-if="isLoaded">
-        <h5 class="card-header d-flex justify-content-between align-items-center">
-            Edit Module
+        <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 id="title">Edit Module</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-        </h5>
+        </div>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
             <div class="form-check mt-4">
                 <label>Module Name:           </label> <input class="form-control" v-model="form.module_name" type="text" value="" required/><br/>
