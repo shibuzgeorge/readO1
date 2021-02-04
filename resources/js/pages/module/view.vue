@@ -7,7 +7,7 @@
         <div class="wrapper mt-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="col-xs-3">
-                    <input type="search" id="form1" class="form-control" placeholder="Search..."
+                    <input type="search" v-model="searchQuery" class="form-control col-lg-4" placeholder="Search by title or description..."
                            aria-label="Search" />
                 </div>
                 <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }">
@@ -19,7 +19,7 @@
             </h1>
             <div class="row justify-content-center">
 
-                <div v-for="textbook in textbooks" class="card col-sm-3 ml-4 mt-4 align-items-center">
+                <div v-for="textbook in textbooksPaginated" class="card col-sm-3 ml-4 mt-4 align-items-center">
                 <div class="card-body">
                     <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
                     <h5 class="card-titlex">{{textbook.title}}</h5>
@@ -33,7 +33,8 @@
 
                 </div>
             </div>
-            </div>
+            </div><br/>
+            <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
         </div>
     </card>
     <div v-else style="text-align: center;">
@@ -50,17 +51,33 @@
     import Swal from 'sweetalert2'
     export default {
         middleware: 'auth',
-        computed: mapGetters({
-            role: 'auth/role'
-        }),
         data: () => ({
             isLoaded: false,
             name: '',
             module_code: '',
             module_year: '',
             textbooks: [],
+            textbooksPaginated: [],
             errorMessage: '',
+            searchQuery: null,
+            sizePage: 9,
         }),
+        computed : {
+            ...mapGetters({
+                role: 'auth/role'
+            }),
+            resultQuery() {
+                if (this.searchQuery) {
+                    return this.textbooks.filter((item) => {
+                        return this.searchQuery.toLowerCase().split(' ').every(
+                            v => item.title.toLowerCase().includes(v) ||
+                                item.description.toLowerCase().includes(v))
+                    })
+                }else {
+                    return this.textbooks;
+                }
+            }
+        },
         created() {
 
             axios.get(`/api/module/${this.$route.params.id}`)
@@ -103,7 +120,10 @@
                     }
                 });
 
-            }
+            },
+            onChangePage(pageOfItems) {
+                this.textbooksPaginated = pageOfItems;
+            },
         },
         metaInfo () {
             return { title: this.$t('home') }
