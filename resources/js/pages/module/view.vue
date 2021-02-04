@@ -7,7 +7,7 @@
         <div class="wrapper mt-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="col-xs-3">
-                    <input type="search" v-model="searchQuery" class="form-control col-lg-4" placeholder="Search by title or description..."
+                    <input type="search" v-model="searchQuery" class="form-control" placeholder="Search by title or description..."
                            aria-label="Search" />
                 </div>
                 <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }">
@@ -22,7 +22,7 @@
                 <div v-for="textbook in textbooksPaginated" class="card col-sm-3 ml-4 mt-4 align-items-center">
                 <div class="card-body">
                     <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
-                    <h5 class="card-titlex">{{textbook.title}}</h5>
+                    <h5 class="card-title">{{textbook.title}}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
                     </router-link>
                     <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">

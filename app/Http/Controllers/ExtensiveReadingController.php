@@ -30,6 +30,19 @@ class ExtensiveReadingController extends Controller
      */
     public function index()
     {
+        $erc = ExtensiveReadingCategory::with('textbooks')->get();
+        return response()->json($erc);
+    }
+
+    /**
+     * Displays all the modules.
+     * Only Admins can access all modules.
+     * Students and Module Tutors have to be assigned to the modules to have access.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function categories()
+    {
         $erc = ExtensiveReadingCategory::all();
         return response()->json($erc);
     }

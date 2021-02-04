@@ -26,10 +26,20 @@
                aria-controls="extensive-reading-expanded">Extensive Reading<span class="mr-3"></span>
             </a>
             <div class="collapse" id="extensive-reading-expanded">
-                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'extensiveReading.index' }"
+                <router-link :to="{ name: 'extensiveReading.index' }"
+                             id="extensive-reading-home-menu"
+                             class="list-group-item list-group-item-action text-white bg-dark"
+                             active-class="active-class">Home
+                </router-link>
+                <router-link :to="{ name: 'extensiveReading.categories' }"
                              id="view-all-categories-menu"
                              class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">View all categories
+                </router-link>
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'extensiveReading.index' }"
+                             id="create-a-category-menu"
+                             class="list-group-item list-group-item-action text-white bg-dark"
+                             active-class="active-class">Create a category
                 </router-link>
             </div>
             <a v-show="role==='Admin' || role==='Module Tutor'"
@@ -39,7 +49,7 @@
                aria-controls="textbooks-expanded">Textbooks<span class="mr-3"></span>
             </a>
             <div class="collapse" id="textbooks-expanded">
-                <router-link :to="{ name: 'textbook.index' }"
+                <router-link :to="{ name: 'textbook.create' }"
                              id="view-all-textbooks-menu"
                              class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">View all textbooks
