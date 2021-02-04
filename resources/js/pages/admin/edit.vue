@@ -1,9 +1,9 @@
 <template>
     <card v-if="isLoaded">
-        <h5 class="card-header d-flex justify-content-between align-items-center">
-            Edit - {{user.name}}  as {{user_role.name}}
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 id="title">Edit - {{user.name}}  as {{user_role.name}}</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-        </h5>
+        </div>
         Choose which role you'd like to change permission<p></p>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
         <div class="form-check" v-for="role in roles">

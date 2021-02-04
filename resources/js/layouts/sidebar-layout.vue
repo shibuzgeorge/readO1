@@ -9,50 +9,78 @@
         </div>
 
         <div class="list-group list-group-flush">
-            <router-link :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                Dashboard
+            <router-link :to="{ name: 'home' }"
+                         id="dashboard-menu"
+                         class="list-group-item list-group-item-action bg-light"
+                         active-class="active-class">Dashboard
             </router-link>
-            <router-link :to="{ name: 'library' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                Library
+            <router-link :to="{ name: 'library' }"
+                         id="library-menu"
+                         class="list-group-item list-group-item-action bg-light"
+                         active-class="active-class">Library
             </router-link>
-            <a v-show="role==='Admin' || role==='Module Tutor'" class="btn collapsed list-group-item list-group-item-action bg-light" data-toggle="collapse" href="#textbooks" role="button" aria-expanded="true" aria-controls="textbooks">
-                Textbooks <span class="mr-3"></span>
+            <a v-show="role==='Admin' || role==='Module Tutor'"
+               id="textbooks-menu"
+               class="btn collapsed list-group-item list-group-item-action bg-light"
+               data-toggle="collapse" href="#textbooks-expanded" role="button" aria-expanded="true"
+               aria-controls="textbooks-expanded">Textbooks<span class="mr-3"></span>
             </a>
-            <div class="collapse" id="textbooks">
-                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                    Create a textbook
+            <div class="collapse" id="textbooks-expanded">
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }"
+                             id="create-textbook-menu"
+                             class="list-group-item list-group-item-action bg-light"
+                             active-class="active-class">Create a textbook
                 </router-link>
             </div>
 
-            <a class="btn collapsed list-group-item list-group-item-action bg-light" data-toggle="collapse" href="#modules" role="button" aria-expanded="true" aria-controls="module">
-                Modules<span class="mr-3"></span>
+            <a class="btn collapsed list-group-item list-group-item-action bg-light"
+               id="modules-menu"
+               data-toggle="collapse" href="#modules-expanded" role="button" aria-expanded="true"
+               aria-controls="modules-expanded">Modules<span class="mr-3"></span>
             </a>
-            <div class="collapse" id="modules">
-                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                    All Modules
+            <div class="collapse" id="modules-expanded">
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.index' }"
+                             id="all-modules-menu" class="list-group-item list-group-item-action bg-light"
+                             active-class="active-class">All Modules
                 </router-link>
-                <router-link v-show="role==='Student'" :to="{ name: 'module.index' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                    My Modules
+
+                <router-link v-show="role==='Student'" :to="{ name: 'module.index' }"
+                             id="my-modules-menu"
+                             class="list-group-item list-group-item-action bg-light"
+                             active-class="active-class">My Modules</router-link>
+
+                <router-link v-show="role==='Admin'" :to="{ name: 'module.create' }"
+                             id="create-module-menu" class="list-group-item list-group-item-action bg-light"
+                             active-class="active-class">Create Module
                 </router-link>
-                <router-link v-show="role==='Admin'" :to="{ name: 'module.create' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                    Create Module
+
+                <router-link v-show="role==='Admin'" :to="{ name: 'module.assignModuleTutors' }"
+                             id="assign-module-tutor-menu"
+                             class="list-group-item list-group-item-action bg-light"
+                             active-class="active-class">Assign Module Tutors
                 </router-link>
-                <router-link v-show="role==='Admin'" :to="{ name: 'module.assignModuleTutors' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                    Assign Module Tutors
-                </router-link>
-                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.assignStudents' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                    Assign Students
+
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.assignStudents' }"
+                             id="assign-students-menu"
+                             class="list-group-item list-group-item-action bg-light"
+                             active-class="active-class">Assign Students
                 </router-link>
             </div>
-            <a v-show="role==='Admin'" class="btn collapsed list-group-item list-group-item-action bg-light" data-toggle="collapse" href="#management" role="button" aria-expanded="true" aria-controls="management">
-                Management<span class="mr-3"></span>
+            <a v-show="role==='Admin'" class="btn collapsed list-group-item list-group-item-action bg-light"
+               id="users-menu"
+               data-toggle="collapse" href="#users-expanded" role="button" aria-expanded="true"
+               aria-controls="users-expanded">Users<span class="mr-3"></span>
             </a>
-            <div class="collapse" v-show="role==='Admin'" id="management">
-                <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                    User Management
+            <div class="collapse" v-show="role==='Admin'" id="users-expanded">
+                <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }"
+                             id="view-all-users-menu"
+                             class="list-group-item list-group-item-action bg-light"
+                             active-class="active-class">View all users
                 </router-link>
-                <router-link v-show="role==='Admin'" :to="{ name: 'home' }" class="list-group-item list-group-item-action bg-light" active-class="active-class">
-                    Create a user
+                <router-link v-show="role==='Admin'" :to="{ name: 'home' }"
+                             id="create-a-user-menu"
+                             class="list-group-item list-group-item-action bg-light"
+                             active-class="active-class">Create a user
                 </router-link>
             </div>
         </div>

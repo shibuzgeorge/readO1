@@ -2,10 +2,10 @@
     <div class="container-fluid" v-if="isLoaded">
         <div class="row">
             <card class="col-6 d-flex flex-column h-100">
-        <h5 class="card-header d-flex justify-content-between align-items-center">
-            Create Module
-            <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-        </h5>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 id="title">Create Module</h5>
+                    <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
+                </div>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
             <div class="form-check mt-4">
                 <label>Module Name:           </label> <input class="form-control" v-model="form.module_name" type="text" value="" required/><br/>
@@ -19,7 +19,7 @@
                 </select><br/>
                 <br/>
             </div>
-            <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
+            <sweet-modal ref="success" v-on:close="$router.push({name: 'module.index' , query: { page: 'last' }})" icon="success">
                 {{successMessage}}
             </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">

@@ -15,7 +15,7 @@ class Module extends Model
     }
 
     public function textbooks(){
-        return $this->belongsToMany('App\Textbook');
+        return $this->belongsToMany('App\Textbook')->using('App\ModuleTextbook');
     }
 
     public function yearGroup(){

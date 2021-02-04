@@ -1,10 +1,9 @@
 <template>
     <card class="text-center" v-if="isLoaded">
-        <h5 class="card-header d-flex justify-content-between align-items-center">
-            {{module_code}} - {{name}}
+        <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 id="title">{{module_code}} - {{name}}</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-        </h5>
-
+        </div>
         <div class="wrapper mt-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="col-xs-3">

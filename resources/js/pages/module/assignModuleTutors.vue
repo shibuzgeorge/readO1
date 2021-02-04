@@ -1,9 +1,9 @@
 <template>
     <card v-if="isLoaded">
-        <h5 class="card-header d-flex justify-content-between align-items-center">
-            Assign module tutors to modules
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 id="title">Assign module tutors to modules</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-        </h5>
+        </div>
         <form @submit.prevent="assign" @keydown="form.onKeydown($event)" class="mt-4">
             Select a module: <select  class="form-control" v-model="selected" v-on:change="getCurrentModuleTutors()">
             <option>Please select a module</option>

@@ -1,7 +1,7 @@
 <template>
     <div v-if="isLoaded" class="text-center">
 
-        <h1 v-if="role==='Student'">My Modules</h1>
+        <h1 id="title-my-modules" v-if="role==='Student'">My Modules</h1>
         <div class="flexbox">
             <div class="flex-item">
                 <router-link v-show="role==='Admin'" :to="{ name: 'module.create' }">
@@ -10,7 +10,7 @@
 
             </div>
             <div class="flex-item">
-                <h1 style="" v-if="role!=='Student'">All Modules</h1>
+                <h1 id="title-all-modules" v-if="role!=='Student'">All Modules</h1>
             </div>
             <div class="flex-item">
                 <router-link v-show="role==='Admin'" :to="{ name: 'yearGroup' }">
@@ -69,6 +69,9 @@
     import axios from 'axios'
     import { mapGetters } from 'vuex'
     import Swal from 'sweetalert2'
+    import $ from 'jquery';
+    import 'jquery/dist/jquery.min.js';
+    import 'popper.js/dist/umd/popper.min.js'
     export default {
         name: "module",
         middleware: 'auth',
@@ -110,6 +113,7 @@
             }
         },
         created() {
+            let self = this;
             axios.get('/api/yearGroup/')
                 .then(response => {
                     this.year_groups = response.data;
@@ -121,12 +125,22 @@
                 .then(response => {
                     this.isLoaded = true;
                     this.modules = response.data;
-
                 }).catch(function (response) {
                 //handle error
                 console.log(response);
             });
 
+        },
+        mounted: function () {
+            this.$nextTick(function () {
+                //Change to page to last page if a new module is created.
+                if (this.$route.query.page === 'last') {
+                        setTimeout(function(){
+                            let last_page = document.getElementsByClassName('page-link').length-1;
+                            document.getElementsByClassName('page-link')[last_page].click();
+                        }, 1000);
+                }
+            })
         },
         methods: {
             async del(data) {
@@ -156,6 +170,7 @@
             onChangePage(pageOfItems) {
                 this.modulesPaginated = pageOfItems;
             },
+
         },
 
     }

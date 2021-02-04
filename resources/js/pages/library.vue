@@ -1,10 +1,10 @@
 <template>
 
     <card v-if="isLoaded">
-        <h5 class="card-header d-flex justify-content-between align-items-center">
-           Library
+        <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 id="title">Library</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-        </h5>
+        </div>
         <div class="search-wrapper"><br/>
             <label>Search textbook:</label>  <input type="text" class="" placeholder="Search title.."/><p></p>
         </div>
