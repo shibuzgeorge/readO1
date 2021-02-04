@@ -11,7 +11,7 @@
                     <div class="wrapper mt-4">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="col-xs-3">
-                                <input type="search" id="form1" class="form-control" placeholder="Search..."
+                                <input type="search" v-model="searchQuery" class="form-control" placeholder="Search..."
                                        aria-label="Search" />
                             </div>
                             <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }">
@@ -22,7 +22,7 @@
                             This textbook has no texts!
                         </h1>
                         <br/>
-                        <ul class="list-group" v-for="text in texts">
+                        <ul class="list-group" v-for="text in textsPaginated">
                             <li class="list-group-item">
                                 <router-link :to="{ name: 'text.show', params: {id: text.id} }">
                                     {{text.title}} - {{text.description }}
@@ -32,7 +32,8 @@
                                     <a style="float: right;" v-show="role==='Admin' || role==='Module Tutor'" href="edit"><button type="button" class="btn btn-primary btn-sm">Edit</button></a>
                                 </router-link>
                             </li>
-                        </ul>
+                        </ul><br/>
+                        <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
                     </div>
                 </card>
                 <card class="col-lg-5 col-md-5 col-sm-12 ml-2">
@@ -50,7 +51,7 @@
                     <div class="wrapper mt-4">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="col-xs-3">
-                                <input type="search" id="form1" class="form-control" placeholder="Search..."
+                                <input type="search" v-model="searchQuery" class="form-control" placeholder="Search..."
                                        aria-label="Search" />
                             </div>
                             <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }">
@@ -61,7 +62,7 @@
                             This textbook has no texts!
                         </h1>
                         <br/>
-                        <ul class="list-group" v-for="text in texts">
+                        <ul class="list-group" v-for="text in textsPaginated">
                             <li class="list-group-item">
                                 <router-link :to="{ name: 'text.show', params: {id: text.id} }">
                                     {{text.title}} - {{text.description }}
@@ -71,7 +72,8 @@
                                     <a style="float: right;" v-show="role==='Admin' || role==='Module Tutor'" href="edit"><button type="button" class="btn btn-primary btn-sm">Edit</button></a>
                                 </router-link>
                             </li>
-                        </ul>
+                        </ul> <br/>
+                        <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
                     </div>
                 </card>
             </div>
@@ -91,23 +93,39 @@
     import PDFViewer from '~/components/PDFViewer';
     export default {
         middleware: 'auth',
-        computed: mapGetters({
-            role: 'auth/role'
-        }),
-        components:{
-            PDFViewer,
-        },
         data: () => ({
             isLoaded: false,
             title: '',
             description: '',
             texts: [],
+            textsPaginated: [],
             errorMessage: '',
             file: true,
             fileName: '',
             path: '/lib/pdf/web/viewer.html',
+            searchQuery: null,
+            sizePage: 9,
 
         }),
+        computed : {
+            ...mapGetters({
+                role: 'auth/role'
+            }),
+            resultQuery() {
+                if (this.searchQuery) {
+                    return this.texts.filter((item) => {
+                        return this.searchQuery.toLowerCase().split(' ').every(
+                            v => item.title.toLowerCase().includes(v) ||
+                                item.description.toLowerCase().includes(v))
+                    })
+                }else {
+                    return this.texts;
+                }
+            }
+        },
+        components:{
+            PDFViewer,
+        },
         created() {
             this.fileName =`/api/textbook/pdf/${this.$route.params.id}`
             axios.get(`/api/textbook/${this.$route.params.id}`)
@@ -149,8 +167,10 @@
                         })
                     }
                 });
-
-            }
+            },
+            onChangePage(pageOfItems) {
+                this.textsPaginated = pageOfItems;
+            },
         },
         metaInfo () {
             return {title: this.$t('home')}

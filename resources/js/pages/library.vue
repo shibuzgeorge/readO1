@@ -6,11 +6,12 @@
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
         </div>
         <div class="search-wrapper"><br/>
-            <label>Search textbook:</label>  <input type="text" class="" placeholder="Search title.."/><p></p>
+            <input type="search" v-model="searchQuery" class="form-control col-lg-4" placeholder="Search by title or description..."
+                   aria-label="Search" />
         </div>
         <div class="wrapper">
             <div class="row">
-                <div v-for="textbook in textbooks" class="card col-sm-3 ml-4 mt-4">
+                <div v-for="textbook in textbooksPaginated" class="card col-sm-3 ml-4 mt-4">
                     <div class="card-body">
                         <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
                             <h5 class="card-title">{{textbook.title}}</h5>
@@ -23,7 +24,8 @@
 
                     </div>
                 </div>
-            </div>
+            </div><br/>
+            <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
         </div>
     </card>
     <div v-else style="text-align: center;">
@@ -38,14 +40,30 @@
     import Swal from 'sweetalert2';
     export default {
         middleware: 'auth',
-        computed: mapGetters({
-            role: 'auth/role'
-        }),
         data: () => ({
             isLoaded: false,
             textbooks: [],
-            loadingColor: "black"
+            textbooksPaginated: [],
+            loadingColor: "black",
+            searchQuery: null,
+            sizePage: 9,
         }),
+        computed : {
+            ...mapGetters({
+                role: 'auth/role'
+            }),
+            resultQuery() {
+                if (this.searchQuery) {
+                    return this.textbooks.filter((item) => {
+                        return this.searchQuery.toLowerCase().split(' ').every(
+                            v => item.title.toLowerCase().includes(v) ||
+                                item.description.toLowerCase().includes(v))
+                    })
+                }else {
+                    return this.textbooks;
+                }
+            }
+        },
         created() {
 
             axios.get('api/textbook/')
@@ -80,7 +98,10 @@
                     }
                 });
 
-            }
+            },
+            onChangePage(pageOfItems) {
+                this.textbooksPaginated = pageOfItems;
+            },
         }
 
     }

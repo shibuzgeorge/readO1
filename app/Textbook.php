@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Textbook extends Model
 {
     protected $fillable = [
-        'title', 'description', 'module_id', 'file',
+        'title', 'description', 'file',
     ];
 
     /**
