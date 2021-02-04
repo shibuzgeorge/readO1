@@ -36,10 +36,14 @@ class SideBarMenuTest extends DuskTestCase
     }
 
     /**
+     * Expands all the menus in the side bar for an Admin User.
+     * Checks if the texts/links are working and visible.
+     * Checks it goes to the right pages and checks the title.
+     *
      * @test
      * @throws \Throwable
      */
-    public function test_what_admins_see_in_side_menu()
+    public function test_what_admins_see_in_side_bar_menu()
     {
         $this->browse(function ($browser) {
             $browser->visit(new Login)
@@ -53,7 +57,7 @@ class SideBarMenuTest extends DuskTestCase
                 ->waitFor('#users-menu')
                 ->clickLink('Users')
                 ->pause(1000)
-                //checks if these are visible on the side menu.
+                //checks if these are visible on the side bar menu.
                 ->assertSeeIn('#sidebar-wrapper', 'Dashboard')
                 ->assertSeeIn('#sidebar-wrapper', 'Library')
                 ->assertSeeIn('#sidebar-wrapper', 'Textbooks')
@@ -70,10 +74,14 @@ class SideBarMenuTest extends DuskTestCase
     }
 
     /**
+     * Expands all the menus in the side bar for an Module Tutor User.
+     * Checks if the texts/links are working and visible.
+     * Checks it goes to the right pages and checks the title.
+     *
      * @test
      * @throws \Throwable
      */
-    public function test_what_module_tutors_see_in_side_menu()
+    public function test_what_module_tutors_see_in_side_bar_menu()
     {
         $this->browse(function ($browser) {
             $browser->visit(new Login)
@@ -85,7 +93,7 @@ class SideBarMenuTest extends DuskTestCase
                 ->waitFor('#textbooks-menu')
                 ->clickLink('Textbooks')
                 ->pause(1000)
-                //checks if these are visible on the side menu.
+                //checks if these are visible on the side bar menu.
                 ->assertSeeIn('#sidebar-wrapper', 'Dashboard')
                 ->assertSeeIn('#sidebar-wrapper', 'Library')
                 ->assertSeeIn('#sidebar-wrapper', 'Textbooks')
@@ -93,7 +101,7 @@ class SideBarMenuTest extends DuskTestCase
                 ->assertSeeIn('#sidebar-wrapper', 'Modules')
                 ->assertSeeIn('#modules-expanded', 'All Modules')
                 ->assertSeeIn('#modules-expanded', 'Assign Students')
-                //checks if these are not visible on the side menu.
+                //checks if these are not visible on the side bar menu.
                 ->assertDontSeeIn('#sidebar-wrapper', 'Create Module')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Assign Module Tutors')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Users')
@@ -103,10 +111,14 @@ class SideBarMenuTest extends DuskTestCase
     }
 
     /**
+     * Expands all the menus in the side bar for an Student User.
+     * Checks if the texts/links are working and visible.
+     * Checks it goes to the right pages and checks the title.
+     *
      * @test
      * @throws \Throwable
      */
-    public function test_what_students_see_in_side_menu()
+    public function test_what_students_see_in_side_bar_menu()
     {
         $this->browse(function ($browser) {
             $browser->visit(new Login)
@@ -116,12 +128,12 @@ class SideBarMenuTest extends DuskTestCase
                 ->waitFor('#modules-menu')
                 ->clickLink('Modules')
                 ->pause(1000)
-                //checks if these are visible on the page.
+                //checks if these are visible on the side bar menu.
                 ->assertSeeIn('#sidebar-wrapper', 'Dashboard')
                 ->assertSeeIn('#sidebar-wrapper', 'Library')
                 ->assertSeeIn('#sidebar-wrapper', 'Modules')
                 ->assertSeeIn('#modules-expanded', 'My Modules')
-                //checks if these are not visible on the page.
+                //checks if these are not visible on the side bar menu.
                 ->assertDontSeeIn('#sidebar-wrapper', 'Textbooks')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Create a textbook')
                 ->assertDontSeeIn('#sidebar-wrapper', 'All Modules')
@@ -135,6 +147,10 @@ class SideBarMenuTest extends DuskTestCase
     }
 
     /**
+     * Expands all the menus in the modules section in the side bar menu for a Student User.
+     * Checks if the texts/links are working and visible.
+     * Checks it goes to the right pages and checks the title.
+     *
      * @test
      * @throws \Throwable
      */
@@ -154,45 +170,14 @@ class SideBarMenuTest extends DuskTestCase
     }
 
     /**
+     * Expands all the menus in the modules section in the side bar menu for a Module Tutor User.
+     * Checks if the texts/links are working and visible.
+     * Checks it goes to the right pages and checks the title.
+     *
      * @test
      * @throws \Throwable
      */
-    public function test_student_library_menu()
-    {
-        $this->browse(function ($browser) {
-            $browser->visit(new Login)
-                ->submit($this->studentUser->email, 'password')
-                ->waitFor('#sidebar-wrapper')
-                ->clickLink('Library')
-                ->waitFor('#title')
-                ->pause(1000)
-                ->assertPathis('/library')
-                ->assertSeeIn('#title', 'Library');
-        });
-    }
-
-    /**
-     * @test
-     * @throws \Throwable
-     */
-    public function test_student_dashboard_menu()
-    {
-        $this->browse(function ($browser) {
-            $browser->visit(new Login)
-                ->submit($this->studentUser->email, 'password')
-                ->waitFor('#sidebar-wrapper')
-                ->clickLink('Dashboard')
-                ->pause(1000)
-                ->assertPathis('/home')
-                ->assertSeeIn('#title', 'Dashboard');
-        });
-    }
-
-    /**
-     * @test
-     * @throws \Throwable
-     */
-    public function test_Module_Tutor_modules_menu()
+    public function test_module_tutor_modules_menu()
     {
         $this->browse(function ($browser) {
             $browser->visit(new Login)
@@ -215,30 +200,14 @@ class SideBarMenuTest extends DuskTestCase
     }
 
     /**
+     * Expands all the menus in the modules section in the side bar menu for a Admin User.
+     * Checks if the texts/links are working and visible.
+     * Checks it goes to the right pages and checks the title.
+     *
      * @test
      * @throws \Throwable
      */
-    public function test_Module_Tutor_textbooks_menu()
-    {
-        $this->browse(function ($browser) {
-            $browser->visit(new Login)
-                ->submit($this->moduleTutorUser->email, 'password')
-                ->waitFor('#textbooks-menu')
-                ->clickLink('Textbooks')
-                ->waitFor('#create-textbook-menu')
-                ->clickLink('Create a textbook')
-                ->waitFor('#title')
-                ->pause(1000)
-                ->assertPathis('/textbook/create')
-                ->assertSeeIn('#title', 'Create textbook');
-        });
-    }
-
-    /**
-     * @test
-     * @throws \Throwable
-     */
-    public function test_Admin_modules_menu()
+    public function test_admins_modules_menu()
     {
         $this->browse(function ($browser ) {
             $browser->visit(new Login)
@@ -253,29 +222,142 @@ class SideBarMenuTest extends DuskTestCase
                 //click create module
                 ->clickLink('Create Module')
                 ->waitFor('#title')
-                ->pause(1000)
+                ->pause(2000)
                 ->assertPathis('/module/create')
                 ->assertSeeIn('#title', 'Create Module')
                 //click assign students
                 ->clickLink('Assign Students')
                 ->waitFor('#title')
-                ->pause(1000)
+                ->pause(2000)
                 ->assertPathis('/module/assignStudents')
                 ->assertSeeIn('#title', 'Assign students to modules')
                 //click assign module tutors
                 ->clickLink('Assign Module Tutors')
                 ->waitFor('#title')
-                ->pause(1000)
+                ->pause(2000)
                 ->assertPathis('/module/assignModuleTutors')
                 ->assertSeeIn('#title', 'Assign module tutors to modules');
         });
     }
 
     /**
+     * Checks the library text and links are working for all Student, Module Tutor and Admins
+     *
      * @test
      * @throws \Throwable
      */
-    public function test_Admin_Users_menu()
+    public function test_library_menu()
+    {
+        $this->browse(function ($browser1, $browser2, $browser3) {
+            $browser1->visit(new Login)
+                ->submit($this->studentUser->email, 'password')
+                ->waitFor('#sidebar-wrapper')
+                ->clickLink('Library')
+                ->pause(5000)
+                ->waitFor('#title')
+                ->assertPathis('/library')
+                ->assertSeeIn('#title', 'Library');
+
+            $browser2->visit(new Login)
+                ->submit($this->moduleTutorUser->email, 'password')
+                ->waitFor('#sidebar-wrapper')
+                ->clickLink('Library')
+                ->pause(5000)
+                ->waitFor('#title')
+                ->assertPathis('/library')
+                ->assertSeeIn('#title', 'Library');
+
+            $browser3->visit(new Login)
+                ->submit($this->adminUser->email, 'password')
+                ->waitFor('#sidebar-wrapper')
+                ->clickLink('Library')
+                ->pause(5000)
+                ->waitFor('#title')
+                ->assertPathis('/library')
+                ->assertSeeIn('#title', 'Library');
+        });
+    }
+
+    /**
+     * Checks the dashboard text and links are working for all Student, Module Tutor and Admins
+     *
+     * @test
+     * @throws \Throwable
+     */
+    public function test_dashboard_menu()
+    {
+        $this->browse(function ($browser1,$browser2,$browser3) {
+            $browser1->visit(new Login)
+                ->submit($this->studentUser->email, 'password')
+                ->waitFor('#sidebar-wrapper')
+                ->clickLink('Dashboard')
+                ->pause(1000)
+                ->assertPathis('/home')
+                ->assertSeeIn('#title', 'Dashboard');
+
+            $browser2->visit(new Login)
+                ->submit($this->moduleTutorUser->email, 'password')
+                ->waitFor('#sidebar-wrapper')
+                ->clickLink('Dashboard')
+                ->pause(1000)
+                ->assertPathis('/home')
+                ->assertSeeIn('#title', 'Dashboard');
+
+            $browser3->visit(new Login)
+                ->submit($this->adminUser->email, 'password')
+                ->waitFor('#sidebar-wrapper')
+                ->clickLink('Dashboard')
+                ->pause(1000)
+                ->assertPathis('/home')
+                ->assertSeeIn('#title', 'Dashboard');
+        });
+    }
+
+    /**
+     * Checks the textbook text and links are working for Module Tutor and Admins
+     *
+     * @test
+     * @throws \Throwable
+     */
+    public function test_textbooks_menu()
+    {
+        $this->browse(function ($browser1, $browser2) {
+
+            //Module Tutor User
+            $browser1->visit(new Login)
+                ->submit($this->moduleTutorUser->email, 'password')
+                ->waitFor('#textbooks-menu')
+                ->clickLink('Textbooks')
+                ->waitFor('#create-textbook-menu')
+                ->clickLink('Create a textbook')
+                ->waitFor('#title')
+                ->pause(1000)
+                ->assertPathis('/textbook/create')
+                ->assertSeeIn('#title', 'Create textbook');
+
+            //Admin User
+            $browser2->visit(new Login)
+                ->submit($this->adminUser->email, 'password')
+                ->waitFor('#textbooks-menu')
+                ->clickLink('Textbooks')
+                ->waitFor('#create-textbook-menu')
+                ->clickLink('Create a textbook')
+                ->waitFor('#title')
+                ->pause(1000)
+                ->assertPathis('/textbook/create')
+                ->assertSeeIn('#title', 'Create textbook');
+        });
+    }
+
+    /**
+     * Expands all the menus in the users section in the side bar menu for a Admin User.
+     * Checks if the texts/links are working and visible.
+     * Checks it goes to the right pages and checks the title.
+     *
+     * @test
+     * @throws \Throwable
+     */
+    public function test_admin_users_menu()
     {
         $this->browse(function ($browser ) {
             $browser->visit(new Login)
