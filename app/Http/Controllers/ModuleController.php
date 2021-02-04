@@ -21,11 +21,8 @@ class ModuleController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('role:Admin')->only('create');
-        $this->middleware('role:Admin,Module Tutor')->only('getUsersForModule');
-        $this->middleware('role:Admin,Module Tutor')->only('getAllStudents');
-        $this->middleware('role:Admin')->only('getAllModuleTutors');
-        $this->middleware('role:Admin')->only('destroy');
+        $this->middleware('role:Admin')->only(['create', 'store', 'destroy', 'getAllModuleTutors', 'assignModuleTutors']);
+        $this->middleware('role:Admin,Module Tutor')->only(['getUsersForModule', 'assignStudents', 'getAllStudents', 'update', 'edit']);
     }
 
     /**
@@ -55,7 +52,8 @@ class ModuleController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(){
+    public function create()
+    {
 
         $modules = Module::with('yearGroup')->get();
         $year_groups = YearGroup::all();
@@ -111,8 +109,8 @@ class ModuleController extends Controller
      * @return \Illuminate\Http\JsonResponse
      *
      */
-    public function assignStudents(Request $request, $module_id){
-
+    public function assignStudents(Request $request, $module_id)
+    {
         $modules = Module::findOrFail($module_id);
 
         $module_tutors =  $modules->users()->whereHas(
@@ -143,8 +141,8 @@ class ModuleController extends Controller
      * @return \Illuminate\Http\JsonResponse
      *
      */
-    public function assignModuleTutors(Request $request, $module_id){
-
+    public function assignModuleTutors(Request $request, $module_id)
+    {
         $modules = Module::findOrFail($module_id);
 
         $students =  $modules->users()->whereHas(
