@@ -12,10 +12,9 @@ export default [
   { path: '/email/verify/:id', name: 'verification.verify', component: page('auth/verification/verify.vue') },
   { path: '/email/resend', name: 'verification.resend', component: page('auth/verification/resend.vue') },
 
-
-
-
     { path: '/yearGroup', name: 'yearGroup', component: page('yearGroup.vue') },
+
+    { path: '/extensiveReading/categories', name: 'extensiveReading.index', component: page('extensiveReading/index.vue') },
 
     { path: '/library', name: 'library', component: page('library.vue') },
 

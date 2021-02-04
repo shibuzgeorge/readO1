@@ -19,6 +19,14 @@ class Textbook extends Model
     }
 
     /**
+     * Extensive Reading Category relationship
+     */
+    public function extensiveReadingCategories()
+    {
+        return $this->belongsToMany('App\ExtensiveReadingCategory');
+    }
+
+    /**
      * Text relationship
      */
     public function texts()

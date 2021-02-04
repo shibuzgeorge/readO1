@@ -19,6 +19,19 @@
                          class="list-group-item list-group-item-action bg-light"
                          active-class="active-class">Library
             </router-link>
+
+            <a id="extensive-reading-menu"
+               class="btn collapsed list-group-item list-group-item-action bg-light"
+               data-toggle="collapse" href="#extensive-reading-expanded" role="button" aria-expanded="true"
+               aria-controls="extensive-reading-expanded">Extensive Reading<span class="mr-3"></span>
+            </a>
+            <div class="collapse" id="extensive-reading-expanded">
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'extensiveReading.index' }"
+                             id="view-all-categories-menu"
+                             class="list-group-item list-group-item-action text-white bg-dark"
+                             active-class="active-class">View all categories
+                </router-link>
+            </div>
             <a v-show="role==='Admin' || role==='Module Tutor'"
                id="textbooks-menu"
                class="btn collapsed list-group-item list-group-item-action bg-light"
@@ -26,10 +39,33 @@
                aria-controls="textbooks-expanded">Textbooks<span class="mr-3"></span>
             </a>
             <div class="collapse" id="textbooks-expanded">
+                <router-link :to="{ name: 'textbook.index' }"
+                             id="view-all-textbooks-menu"
+                             class="list-group-item list-group-item-action text-white bg-dark"
+                             active-class="active-class">View all textbooks
+                </router-link>
                 <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }"
                              id="create-textbook-menu"
-                             class="list-group-item list-group-item-action bg-light"
+                             class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">Create a textbook
+                </router-link>
+            </div>
+
+            <a id="texts-menu"
+               class="btn collapsed list-group-item list-group-item-action bg-light"
+               data-toggle="collapse" href="#texts-expanded" role="button" aria-expanded="true"
+               aria-controls="texts-expanded">Texts<span class="mr-3"></span>
+            </a>
+            <div class="collapse" id="texts-expanded">
+                <router-link :to="{ name: 'textbook.create' }"
+                             id="view-all-texts-menu"
+                             class="list-group-item list-group-item-action text-white bg-dark"
+                             active-class="active-class">View all texts
+                </router-link>
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }"
+                             id="add-a-text-menu"
+                             class="list-group-item list-group-item-action text-white bg-dark"
+                             active-class="active-class">Add a text
                 </router-link>
             </div>
 
@@ -40,29 +76,29 @@
             </a>
             <div class="collapse" id="modules-expanded">
                 <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.index' }"
-                             id="all-modules-menu" class="list-group-item list-group-item-action bg-light"
+                             id="all-modules-menu" class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">All Modules
                 </router-link>
 
                 <router-link v-show="role==='Student'" :to="{ name: 'module.index' }"
                              id="my-modules-menu"
-                             class="list-group-item list-group-item-action bg-light"
+                             class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">My Modules</router-link>
 
                 <router-link v-show="role==='Admin'" :to="{ name: 'module.create' }"
-                             id="create-module-menu" class="list-group-item list-group-item-action bg-light"
+                             id="create-module-menu" class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">Create Module
                 </router-link>
 
                 <router-link v-show="role==='Admin'" :to="{ name: 'module.assignModuleTutors' }"
                              id="assign-module-tutor-menu"
-                             class="list-group-item list-group-item-action bg-light"
+                             class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">Assign Module Tutors
                 </router-link>
 
                 <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'module.assignStudents' }"
                              id="assign-students-menu"
-                             class="list-group-item list-group-item-action bg-light"
+                             class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">Assign Students
                 </router-link>
             </div>
@@ -74,12 +110,12 @@
             <div class="collapse" v-show="role==='Admin'" id="users-expanded">
                 <router-link v-show="role==='Admin'" :to="{ name: 'admin.users' }"
                              id="view-all-users-menu"
-                             class="list-group-item list-group-item-action bg-light"
+                             class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">View all users
                 </router-link>
                 <router-link v-show="role==='Admin'" :to="{ name: 'home' }"
                              id="create-a-user-menu"
-                             class="list-group-item list-group-item-action bg-light"
+                             class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">Create a user
                 </router-link>
             </div>

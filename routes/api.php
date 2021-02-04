@@ -29,6 +29,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('module/getModuleById/{module_id}', 'ModuleController@getModuleById');
     Route::resource('/module', 'ModuleController');
 
+    Route::resource('/extensiveReading', 'ExtensiveReadingController');
+
     Route::resource('/textbook', 'TextbookController');
     Route::get('textbook/pdf/{textbook_id}', 'TextbookController@pdf');
 
