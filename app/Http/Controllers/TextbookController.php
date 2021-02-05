@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ExtensiveReadingCategory;
 use App\Module;
 use App\Textbook;
 use Illuminate\Support\Facades\Auth;
@@ -262,10 +263,15 @@ class TextbookController extends Controller
             $q->where('textbook_id', $textbook_id);
         })->first();
 
+        $extensiveReading = ExtensiveReadingCategory::whereHas(
+            'textbooks', function($q) use($textbook_id) {
+            $q->where('textbook_id', $textbook_id);
+        })->first();
+
         if(Auth::user()->role->name === 'Admin'){
             return true;
         } else {
-            if(Auth::user()->modules()->find($module) !== null){
+            if(Auth::user()->modules()->find($module) !== null || $extensiveReading !== null){
                 return true;
             }
         }

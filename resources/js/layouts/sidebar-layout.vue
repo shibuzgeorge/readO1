@@ -36,7 +36,7 @@
                              class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">View all categories
                 </router-link>
-                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'extensiveReading.index' }"
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'extensiveReading.create' }"
                              id="create-a-category-menu"
                              class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">Create a category

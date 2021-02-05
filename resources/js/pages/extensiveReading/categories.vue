@@ -30,7 +30,7 @@
 
             <div v-for="category in categoriesPaginated" class=" card col-sm-3 ml-4 mt-4">
                 <div class="card-body">
-                    <router-link :to="{ name: 'category.show', params: {id: category.id} }">
+                    <router-link :to="{ name: 'extensiveReading.show', params: {id: category.id} }">
                         <h5 class="card-title">{{category.name}}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">{{category.description}}</h6>
                     </router-link>
