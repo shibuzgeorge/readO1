@@ -1,7 +1,5 @@
 <template>
-    <div class="container-fluid" v-if="isLoaded">
-        <div class="row">
-            <card class="col-7 d-flex flex-column h-100">
+    <card class="container-fluid" v-if="isLoaded">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 id="title">Extensive Reading</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
@@ -18,11 +16,21 @@
             </h1>
                 <div v-for="category in categoriesPaginated" class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
-                    <h5>{{category.name}}</h5>
-                    <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }">
-                        <button class="btn btn-sm btn-success" v-if="role!=='User'">+ Add textbook</button>
-                    </router-link>
+                    <h5><router-link :to="{ name: 'extensiveReading.show', params: {id: category.id} }">
+                        {{category.name}}
+                    </router-link></h5>
+                        <div>
+                            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }">
+                                <button class="btn btn-sm btn-success" v-if="role!=='User'">+ Add textbook</button>
+                            </router-link>
+                            <router-link v-if="role==='Admin' || role==='Module Tutor'" :to="{ name: 'extensiveReading.edit', params: {id: category.id} }">
+                                <button v-show="role==='Admin' || role==='Module Tutor'" type="button" class="btn btn-primary btn-sm">Edit</button>
+                            </router-link>
+                            <a v-if="role==='Admin' || role==='Module Tutor'" @click="del(category.id, category.name)"><button type="button" class="btn btn-warning btn-sm">Delete</button></a>
+                        </div>
+
                     </div>
+
                     <hr>
                     <div v-if="category.textbooks.length > 0" v-for="textbook in category.textbooks" class="card">
                         <div class="card-body">
@@ -42,25 +50,6 @@
             <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
         </div>
             </card>
-            <card class="col-4 ml-4 d-flex flex-column h-100">
-                <h6 class="card-header d-flex justify-content-between align-items-center">
-                    Current Categories:
-                    <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'extensiveReading.create' }">
-                        <button class="btn btn-sm btn-success" v-if="role!=='User'">+ Add category</button>
-                    </router-link>
-                </h6>
-                <li class="mt-2 d-flex justify-content-between align-items-center" v-for="category in categories">
-                    <router-link :to="{ name: 'extensiveReading.show', params: {id: category.id} }">
-                    {{category.name}}
-                    </router-link>
-                    <div>
-                        <a v-if="role==='Admin' || role==='Module Tutor'" @click="edit(category.id, category.name)"><button type="button" class="btn btn-primary btn-sm">Edit</button></a>
-                    <a v-if="role==='Admin' || role==='Module Tutor'" @click="del(category.id, category.name)"><button type="button" class="btn btn-warning btn-sm">Delete</button></a>
-                    </div>
-                </li>
-            </card>
-        </div>
-    </div>
     <div v-else style="text-align: center;">
         <sweet-modal ref="error" v-on:close="$router.go(-1)" icon="error">
             {{errorMessage}}

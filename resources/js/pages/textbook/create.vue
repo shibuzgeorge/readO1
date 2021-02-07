@@ -8,13 +8,28 @@
             <div class="form-check mt-4">
                 <label>Title:           </label> <input class="form-control" v-model="form.title" type="text" value="" required/><br/>
                 <label>Description:     </label> <input class="form-control" v-model="form.description" type="text" value="" required/><br/>
-                <label>Choose a module: </label>
-                <select  class="form-control" v-model="selected">
-                    <option>Please select a module</option>
-                    <option v-for="module in modules" :value="module.id" :key="module.id">
-                        ({{ module.module_code }}) {{ module.name }} - {{ module.year_group.name }}
-                    </option>
-                </select><br/>
+                    <div v-show="section===''">
+                        <label>Select a section to upload:</label><br/>
+
+                            <button @click="section='module'" type="button" class="btn btn-sm btn-primary">Module</button>
+                             Or <button @click="section='extensiveReading'" type="button" class="btn btn-sm btn-primary">Extensive Reading</button>
+                    </div>
+
+                <div v-show="section==='module'">Choose module(s) <button @click="section=''" type="button" class="float-right btn btn-sm btn-warning">Go back X</button>
+                    <multiselect v-model="selected" :options="modules"
+                                 track-by="name" label="name"
+                                 :multiple="true"
+                                 :close-on-select="false">
+                    </multiselect>
+
+                </div>
+                <div v-show="section==='extensiveReading'">Select a extensive reading category<button @click="section=''" type="button" class="float-right btn btn-sm btn-warning">Go back X</button>
+                    <multiselect v-model="selected" :options="extensiveReadingCategories"
+                                 track-by="name" label="name"
+                                 :close-on-select="true">
+                    </multiselect>
+                </div>
+                <br/>
                 <label>Upload full textbook: </label>
                 <input class="form-control" type="file" id="file" ref="file" v-on:change="handleFileUpload()"/><br/>
             </div>
@@ -43,17 +58,29 @@
                 title: '',
                 description: ''
             }),
-            selected: "Please select a module",
+            selected: [],
             modules: [],
-            file: ''
+            extensiveReadingCategories: [],
+            file: '',
+            moduleSelect: false,
+            extensiveReadingSelect: false,
+            section: '',
 
         }),
+        watch:{
+            section: function(){
+                if(this.section===''){
+                    this.selected = [];
+                }
+            }
+
+        },
     created() {
         axios.get('/api/textbook/create')
             .then(response => {
+                this.modules = response.data.modules;
+                this.extensiveReadingCategories = response.data.extensiveReadingCategories;
                 this.isLoaded = true;
-                this.modules = response.data;
-
             }).catch(function (response) {
             //handle error
             console.log(response);
@@ -74,7 +101,8 @@
                 formData.append('file', this.file);
                 formData.append('title', this.form.title);
                 formData.append('description', this.form.description);
-                formData.append('module_id', this.selected);
+                formData.append('section', this.section);
+                formData.append('selected', JSON.stringify(this.selected));
 
                 await axios.post('/api/textbook',formData,
                 {
@@ -91,14 +119,11 @@
                     .catch(error => {
                         console.log(error.response)
                     });
+            },
 
-
-            }
         }
 
     }
 </script>
 
-<style scoped>
-
-</style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

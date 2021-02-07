@@ -18,6 +18,7 @@ export default [
     { path: '/extensiveReading/view/:id', name: 'extensiveReading.show', component: page('extensiveReading/view.vue') },
     { path: '/extensiveReading/create', name: 'extensiveReading.create', component: page('extensiveReading/create.vue') },
     { path: '/extensiveReading/categories', name: 'extensiveReading.categories', component: page('extensiveReading/categories.vue') },
+    { path: '/extensiveReading/edit/:id', name: 'extensiveReading.edit', component: page('extensiveReading/edit.vue') },
 
     { path: '/library', name: 'library', component: page('library.vue') },
 

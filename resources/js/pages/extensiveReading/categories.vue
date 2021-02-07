@@ -34,18 +34,10 @@
                         <h5 class="card-title">{{category.name}}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">{{category.description}}</h6>
                     </router-link>
-                    <!--<router-link :to="{ name: 'category.edit', params: {id: category.id} }">-->
-                        <!--<a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>-->
-                    <!--</router-link>-->
-                    <!--<router-link :to="{ name: 'category.index' }">-->
-                        <!--<a @click="del(category.id)" v-show="role==='Admin'" href="delete" class="card-link">Delete</a><br/>-->
-                    <!--</router-link>-->
-                    <!--<router-link :to="{ name: 'category.assignModuleTutors' }">-->
-                        <!--<a v-show="role==='Admin'" href="edit" class="card-link">Assign Module Tutor</a>-->
-                    <!--</router-link>-->
-                    <!--<router-link :to="{ name: 'category.assignStudents'}">-->
-                        <!--<a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Assign Students</a>-->
-                    <!--</router-link>-->
+                    <router-link :to="{ name: 'extensiveReading.edit', params: {id: category.id} }">
+                        <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
+                    </router-link>
+                        <a @click="del(category.id)" v-show="role==='Admin'" href="delete" class="card-link">Delete</a><br/>
                 </div>
             </div>
         </div><br/>

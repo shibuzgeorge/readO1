@@ -73,6 +73,16 @@ class ExtensiveReadingController extends Controller
         return response()->json(['Success' => 'Successfully created the category']);
     }
 
+    public function edit($id){
+        $erc = ExtensiveReadingCategory::find($id);
+        $textbooks = $erc->textbooks()->get();
+        return response()->json([
+            'name' => $erc->name,
+            'description' => $erc->description,
+            'textbooks' => $textbooks
+        ]);
+    }
+
     public function show($id){
         $erc = ExtensiveReadingCategory::find($id);
         $textbooks = $erc->textbooks()->get();

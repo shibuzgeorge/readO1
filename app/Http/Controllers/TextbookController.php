@@ -135,12 +135,18 @@ class TextbookController extends Controller
         if($textbook != null) {
             $checkIfUserHasPermissionToEdit = $this->checkPermission($textbook_id);
             if ($checkIfUserHasPermissionToEdit){
-                $module = $textbook->modules()->first();
+                if($textbook->extensiveReadingCategories()->count()>0){
+                    $selected = $textbook->extensiveReadingCategories()->first();
+                    $section = 'extensiveReading';
+                }else{
+                    $selected = $textbook->modules()->get();
+                    $section = 'module';
+                }
                 return response()->json([
                     'title' => $textbook->title,
                     'description' => $textbook->description,
-                    'file' => $textbook->file,
-                    'module' => $module,
+                    'selected' => $selected,
+                    'section' => $section,
                 ]);
             } else {
                 return response()->json(['Error' => 'Permission denied to edit textbook!']);
@@ -161,13 +167,19 @@ class TextbookController extends Controller
 
         $user = Auth::user();
         $user_role = $user->role;
-
+        $erc = ExtensiveReadingCategory::all();
         if($user_role->name === 'Admin'){
             $modules = Module::with('yearGroup')->get();
-            return response()->json($modules);
+            return response()->json([
+                'modules' => $modules,
+                'extensiveReadingCategories' => $erc
+            ]);
         }else {
             $modules = $user->modules()->with('yearGroup')->get();
-            return response()->json($modules);
+            return response()->json([
+                'modules' => $modules,
+                'extensiveReadingCategories' => $erc
+            ]);
         }
     }
 
@@ -193,8 +205,23 @@ class TextbookController extends Controller
 
         //create a textbook using the POST data
         $textbook =  Textbook::create($data);
-        $module = Module::find($request->input('module_id'));
-        $textbook->modules()->attach($module);
+
+        $selectedJson = $request->input('selected');
+
+        $decoded_json = json_decode($selectedJson);
+
+        if(str_contains($selectedJson,'[')){
+            $collection = collect($decoded_json);
+            $ids = $collection->pluck('id')->toArray();
+        } else{
+            $ids = collect($decoded_json->id);
+        }
+
+        if($request->input('section') === 'module'){
+            $textbook->modules()->sync($ids);
+        } else{
+            $textbook->extensiveReadingCategories()->sync($ids);
+        }
     }
 
     /**
@@ -217,9 +244,24 @@ class TextbookController extends Controller
         $textbook->description = $request->input('description');
         $textbook->save();
 
-        $module = Module::find($request->input('module_id'));
-        $textbook->modules()->detach();
-        $textbook->modules()->attach($module);
+        $selectedJson = $request->input('selected');
+
+        $decoded_json = json_decode($selectedJson);
+
+        if(str_contains($selectedJson,'[')){
+            $collection = collect($decoded_json);
+            $ids = $collection->pluck('id')->toArray();
+        } else{
+            $ids = collect($decoded_json->id);
+        }
+
+        if($request->input('section') === 'module'){
+            $textbook->modules()->sync($ids);
+            $textbook->extensiveReadingCategories()->detach();
+        } else{
+            $textbook->extensiveReadingCategories()->sync($ids);
+            $textbook->modules()->detach();
+        }
 
         return response()->json([
                 'Success' => 'Successfully updated']
