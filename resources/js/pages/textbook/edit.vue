@@ -70,13 +70,19 @@
             errorMessage: '',
             modules: [],
             section: '',
+            originalSelected: [],
             extensiveReadingCategories: '',
+            originalSection: '',
 
         }),
         watch:{
             section: function(){
                 if(this.section===''){
                     this.form.selected = [];
+                } else if(this.section==='module' && this.originalSection ==='module'){
+                    this.form.selected = this.originalSelected;
+                } else if(this.section==='extensiveReading' && this.originalSection ==='extensiveReading'){
+                    this.form.selected = this.originalSelected;
                 }
             }
 
@@ -107,7 +113,9 @@
                         this.form.title = response.data.title;
                         this.form.description = response.data.description;
                         this.form.selected = response.data.selected;
+                        this.originalSelected = response.data.selected;
                         this.section = response.data.section;
+                        this.originalSection = response.data.section;
                     }
                 }).catch(function (response) {
                 //handle error
