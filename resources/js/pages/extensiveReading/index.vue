@@ -2,7 +2,12 @@
     <card class="container-fluid" v-if="isLoaded">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 id="title">Extensive Reading</h5>
-            <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
+            <div>
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'extensiveReading.create' }">
+                    <button class="btn btn-sm btn-success" v-if="role!=='User'">Create a category</button>
+                </router-link>
+                <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
+            </div>
         </div>
         <div class="wrapper mt-4">
             <div class="d-flex justify-content-between align-items-center">
@@ -26,7 +31,7 @@
                             <router-link v-if="role==='Admin' || role==='Module Tutor'" :to="{ name: 'extensiveReading.edit', params: {id: category.id} }">
                                 <button v-show="role==='Admin' || role==='Module Tutor'" type="button" class="btn btn-primary btn-sm">Edit</button>
                             </router-link>
-                            <a v-if="role==='Admin' || role==='Module Tutor'" @click="del(category.id, category.name)"><button type="button" class="btn btn-warning btn-sm">Delete</button></a>
+                            <a v-if="role==='Admin' || role==='Module Tutor'" @click="del(category.id)"><button type="button" class="btn btn-warning btn-sm">Delete</button></a>
                         </div>
 
                     </div>
@@ -89,15 +94,43 @@
             }
         },
         created() {
-            axios.get(`/api/extensiveReading`)
-                .then(response => {
-                    this.categories = response.data;
-                    this.isLoaded = true;
-                }).catch(error => {
-                this.$router.go(-1)
-            });
+            this.isLoaded = false;
+           this.refreshData();
         },
         methods: {
+            refreshData(){
+                axios.get(`/api/extensiveReading`)
+                    .then(response => {
+                        this.categories = response.data;
+                        this.isLoaded = true;
+                    }).catch(error => {
+                    this.$router.go(-1)
+                });
+            },
+            async del(data) {
+                let self = this;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you really want to delete the category?\n" +
+                    "      If there is textbooks inside, that will get deleted also",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                }).then(function (result) {
+                    if (result.value) {
+                        axios.delete(`/api/extensiveReading/${data}`);
+                        Swal.fire(
+                            'Deleted!',
+                            'The category has been deleted.',
+                            'success'
+                        ).then(function () {
+                            self.refreshData();
+                        });
+                    }
+                })
+            },
             onChangePage(pageOfItems) {
                 this.categoriesPaginated = pageOfItems;
             },
