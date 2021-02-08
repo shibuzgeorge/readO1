@@ -9,12 +9,29 @@
             <div class="form-check mt-4">
                 <label>Title:           </label> <input class="form-control" v-model="form.title" type="text" value="" required/><br/>
                 <label>Description:     </label> <input class="form-control" v-model="form.description" type="text" value="" required/><br/>
-                <label>Change module? </label>
-                <select class="form-control" v-model="form.selected">
-                    <option v-for="module in modules" :value="module.id" :key="module.id">
-                        ({{ module.module_code }}) {{ module.name }} - {{ module.module_year }}
-                    </option>
-                </select><br/>
+                <div v-show="section===''">
+                    <label>Select a section to upload:</label><br/>
+
+                    <button @click="section='module'" type="button" class="btn btn-sm btn-primary">Module</button>
+                    Or <button @click="section='extensiveReading'" type="button" class="btn btn-sm btn-primary">Extensive Reading</button>
+                </div>
+
+                <div v-show="section==='module'">Choose module(s) <button @click="section=''" type="button" class="float-right btn btn-sm btn-warning">Change section X</button>
+                    <multiselect v-model="form.selected" :options="modules"
+                                 track-by="name" label="name"
+                                 :multiple="true"
+                                 :close-on-select="false">
+                    </multiselect>
+
+                </div>
+                <div v-show="section==='extensiveReading'">Select a extensive reading category<button @click="section=''" type="button" class="float-right btn btn-sm btn-warning">Change section X</button>
+                    <multiselect v-model="form.selected" :options="extensiveReadingCategories"
+                                 track-by="name" label="name"
+                                 :close-on-select="true">
+                    </multiselect>
+                </div>
+                <br/>
+                Update full textbook?:
                 <input class="form-control" type="file" id="file" ref="file" v-on:change="handleFileUpload()"/><br/>
             </div>
             <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
@@ -46,24 +63,46 @@
             form: new Form({
                 title: '',
                 description: '',
-                selected: '',
+                selected: [],
             }),
             file: '',
-            module: '',
             successMessage: '',
             errorMessage: '',
-            modules: '',
-        }),
+            modules: [],
+            section: '',
+            originalSelected: [],
+            extensiveReadingCategories: '',
+            originalSection: '',
 
+        }),
+        watch:{
+            section: function(){
+                if(this.section===''){
+                    this.form.selected = [];
+                } else if(this.section==='module' && this.originalSection ==='module'){
+                    this.form.selected = this.originalSelected;
+                } else if(this.section==='extensiveReading' && this.originalSection ==='extensiveReading'){
+                    this.form.selected = this.originalSelected;
+                }
+            }
+
+        },
         created() {
                 axios.get('/api/module/')
                     .then(response => {
                         this.modules = response.data;
-
                     }).catch(function (response) {
                     //handle error
                     console.log(response);
                 });
+            axios.get('/api/extensiveReading/create')
+                .then(response => {
+                    this.extensiveReadingCategories = response.data;
+                    this.isLoaded = true;
+                }).catch(function (response) {
+                //handle error
+                console.log(response);
+            });
             let self = this
             axios.get(`/api/textbook/${this.$route.params.id}/edit`)
                 .then(response => {
@@ -71,11 +110,12 @@
                         this.errorMessage = response.data.Error;
                         this.$refs.error.open();
                     }else {
-                        this.isLoaded = true;
                         this.form.title = response.data.title;
                         this.form.description = response.data.description;
-                        this.module = response.data.module;
-                        this.form.selected = this.module.id;
+                        this.form.selected = response.data.selected;
+                        this.originalSelected = response.data.selected;
+                        this.section = response.data.section;
+                        this.originalSection = response.data.section;
                     }
                 }).catch(function (response) {
                 //handle error
@@ -98,7 +138,8 @@
                 formData.append('file', this.file);
                 formData.append('title', this.form.title);
                 formData.append('description', this.form.description);
-                formData.append('module_id', this.form.selected);
+                formData.append('selected', JSON.stringify(this.form.selected));
+                formData.append('section', this.section);
                 formData.append('_method', 'PATCH');
                 await axios.post(`/api/textbook/${this.$route.params.id}`,formData,
                     {
@@ -119,6 +160,4 @@
     }
 </script>
 
-<style scoped>
-
-</style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

@@ -10,8 +10,6 @@ use Illuminate\Http\Request;
 
 class ModuleController extends Controller
 {
-
-
     /**
      *
      * Applies middleware to some of the methods to restrict access.

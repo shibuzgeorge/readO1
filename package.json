@@ -30,6 +30,7 @@
     "vue": "^2.6.12",
     "vue-i18n": "^8.22.2",
     "vue-meta": "^1.6.0",
+    "vue-multiselect": "^2.1.6",
     "vue-router": "^3.4.9",
     "vue-spinner": "^1.0.4",
     "vuex": "^3.6.0",

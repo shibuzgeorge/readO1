@@ -12,10 +12,13 @@ export default [
   { path: '/email/verify/:id', name: 'verification.verify', component: page('auth/verification/verify.vue') },
   { path: '/email/resend', name: 'verification.resend', component: page('auth/verification/resend.vue') },
 
-
-
-
     { path: '/yearGroup', name: 'yearGroup', component: page('yearGroup.vue') },
+
+    { path: '/extensiveReading', name: 'extensiveReading.index', component: page('extensiveReading/index.vue') },
+    { path: '/extensiveReading/view/:id', name: 'extensiveReading.show', component: page('extensiveReading/view.vue') },
+    { path: '/extensiveReading/create', name: 'extensiveReading.create', component: page('extensiveReading/create.vue') },
+    { path: '/extensiveReading/categories', name: 'extensiveReading.categories', component: page('extensiveReading/categories.vue') },
+    { path: '/extensiveReading/edit/:id', name: 'extensiveReading.edit', component: page('extensiveReading/edit.vue') },
 
     { path: '/library', name: 'library', component: page('library.vue') },
 

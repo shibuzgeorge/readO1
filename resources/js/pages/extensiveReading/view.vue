@@ -1,7 +1,7 @@
 <template>
     <card class="text-center" v-if="isLoaded">
         <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 id="title">{{module_code}} - {{name}}</h5>
+            <h5 id="title">{{name}} - {{description}}</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
         </div>
         <div class="wrapper mt-4">
@@ -15,24 +15,24 @@
                 </router-link>
             </div>
             <h1 style="text-align: center;" class="mt-4" v-if="!textbooks || !textbooks.length">
-                This module has no textbooks!
+                This category has no textbooks!
             </h1>
             <div class="row justify-content-center">
 
                 <div v-for="textbook in textbooksPaginated" class="card col-sm-3 ml-4 mt-4 align-items-center">
-                <div class="card-body">
-                    <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
-                    <h5 class="card-title">{{textbook.title}}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
-                    </router-link>
-                    <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
-                        <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
-                    </router-link>
+                    <div class="card-body">
+                        <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
+                            <h5 class="card-title">{{textbook.title}}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
+                        </router-link>
+                        <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
+                            <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
+                        </router-link>
 
-                    <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
+                        <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
 
+                    </div>
                 </div>
-            </div>
             </div><br/>
             <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
         </div>
@@ -54,8 +54,7 @@
         data: () => ({
             isLoaded: false,
             name: '',
-            module_code: '',
-            module_year: '',
+            description: '',
             textbooks: [],
             textbooksPaginated: [],
             errorMessage: '',
@@ -80,7 +79,7 @@
         },
         created() {
 
-            axios.get(`/api/module/${this.$route.params.id}`)
+            axios.get(`/api/extensiveReading/${this.$route.params.id}`)
                 .then(response => {
                     if(response.data.Error !== undefined){
                         this.errorMessage = response.data.Error;
@@ -88,8 +87,7 @@
                     }else {
                         this.isLoaded = true;
                         this.name = response.data.name;
-                        this.module_code = response.data.code;
-                        this.module_year = response.data.year;
+                        this.description = response.data.description;
                         this.textbooks = response.data.textbooks;
                     }
 
@@ -114,7 +112,7 @@
                             'The textbook has been deleted.',
                             'success'
                         );
-                        axios.delete(`/api/textbook/${data}`).then(response => {
+                        axios.delete(`/api/extensiveReading/${data}`).then(response => {
                             window.location.reload();
                         })
                     }

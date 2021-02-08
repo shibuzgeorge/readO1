@@ -7,7 +7,8 @@ require('laravel-mix-versionhash')
 mix
   .js('resources/js/app.js', 'public/dist/js')
   .sass('resources/sass/app.scss', 'public/dist/css')
-
+    .copy('node_modules/vue-multiselect/dist/vue-multiselect.min.css', 'public/css/vue-multiselect.min.css')
+    .copy('node_modules/vue-multiselect/dist/vue-multiselect.min.js', 'public/js/vue-multiselect.min.js')
   .disableNotifications()
 
 if (mix.inProduction()) {

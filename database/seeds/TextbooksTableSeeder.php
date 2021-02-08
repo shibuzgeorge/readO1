@@ -1,5 +1,7 @@
 <?php
 
+use App\ExtensiveReadingCategory;
+use App\ExtensiveReadingCategoryTextbook;
 use App\Textbook;
 use App\ModuleTextbook;
 use App\Module;
@@ -20,14 +22,23 @@ class TextbooksTableSeeder extends Seeder
             'description' => 'Introduction to software project management',
             'file' => base64_encode(file_get_contents(public_path('example.pdf')))]);
 
-        ModuleTextbook::create(['module_id' => Module::where('module_code', 'CS3360')->first()->id, 'textbook_id' => $textbook1->id]);
+        $textbook1->modules()->attach(Module::where('module_code', 'CS3360')->first());
 
         $textbook2 = Textbook::create([
             'title' => 'Introduction to computational intelligence',
             'description' => 'Introduction to computational intelligence',
             'file' => base64_encode(file_get_contents(public_path('example.pdf')))]);
 
-        ModuleTextbook::create(['module_id' => Module::where('module_code', 'CS3910')->first()->id, 'textbook_id' => $textbook2->id]);
+        $textbook2->modules()->attach(Module::where('module_code', 'CS3910')->first());
+
+        $textbook3 = Textbook::create([
+            'title' => 'Fun AI textbook',
+            'description' => 'Introduction to AI and data science',
+            'file' => base64_encode(file_get_contents(public_path('example.pdf')))]);
+
+        $erc = ExtensiveReadingCategory::create(['name' => 'Artificial Intelligence', 'description' => 'The world of AI technology']);
+
+        $textbook3->extensiveReadingCategories()->attach($erc);
 
         //Create faker textbooks
         factory(Textbook::class, 10)->create();
