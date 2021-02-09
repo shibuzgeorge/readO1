@@ -21,5 +21,8 @@ class YearGroupsSeeder extends Seeder
         YearGroup::create(['name' => 'Year 2']);
         YearGroup::create(['name' => 'Year 3']);
 
+        //Create fake years
+        factory(YearGroup::class, 3)->create();
+
     }
 }

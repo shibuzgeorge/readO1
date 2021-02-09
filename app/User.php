@@ -115,6 +115,36 @@ class User extends Authenticatable implements JWTSubject  //MustVerifyEmail
     }
 
     /**
+     * Return true if user has any of the roles in the array.
+     *
+     * @param array $roles
+     * @return bool
+     */
+    public function hasAnyRoles($roles)
+    {
+        foreach ($roles as $role){
+            if($this->role->name === $role){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Return true if user has the role.
+     *
+     * @param $role
+     * @return bool
+     */
+    public function hasRole($role)
+    {
+        if($this->role->name === $role){
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Module relationship
      */
     public function modules()

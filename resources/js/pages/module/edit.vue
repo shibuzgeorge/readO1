@@ -1,9 +1,9 @@
 <template>
     <card v-if="isLoaded">
-        <h5 class="card-header d-flex justify-content-between align-items-center">
-            Edit Module
+        <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 id="title">Edit Module</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-        </h5>
+        </div>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
             <div class="form-check mt-4">
                 <label>Module Name:           </label> <input class="form-control" v-model="form.module_name" type="text" value="" required/><br/>
@@ -60,7 +60,7 @@
                 });
 
             let self = this
-            axios.get(`/api/module/v/${this.$route.params.id}/edit`)
+            axios.get(`/api/module/${this.$route.params.id}/edit`)
                 .then(response => {
                     if(response.data.Error !== undefined){
                         this.errorMessage = response.data.Error;
@@ -74,20 +74,20 @@
                     }
                 }).catch(function (response) {
                 //handle error
-                self.$router.push({name: 'module.v.index'})
+                self.$router.push({name: 'module.index'})
 
                 console.log(response);
             });
         },
         methods:{
             async submit(){
-                await this.form.patch(`/api/module/v/${this.$route.params.id}`)
+                await this.form.patch(`/api/module/${this.$route.params.id}`)
                     .then(response => {
                         this.successMessage = response.data.Success;
                         this.$refs.success.open();
                     }).catch(function (response) {
                         //handle error
-                        self.$router.push({name: 'module.v.index'})
+                        self.$router.push({name: 'module.index'})
 
                         console.log(response);
                     });

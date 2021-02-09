@@ -12,7 +12,7 @@ class LoginTest extends DuskTestCase
     public function setUp(): void
     {
         parent::setup();
-
+        $this->artisan('db:seed');
         static::closeAll();
     }
 

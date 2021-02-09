@@ -1,17 +1,16 @@
 <template>
     <card class="text-center" v-if="isLoaded">
-        <h5 class="card-header d-flex justify-content-between align-items-center">
-            {{module_code}} - {{name}}
+        <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 id="title">{{module_code}} - {{name}}</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-        </h5>
-
+        </div>
         <div class="wrapper mt-4">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="col-xs-3">
-                    <input type="search" id="form1" class="form-control" placeholder="Search..."
+                    <input type="search" v-model="searchQuery" class="form-control" placeholder="Search by title or description..."
                            aria-label="Search" />
                 </div>
-                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'upload' }">
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }">
                     <button class="btn btn-success" v-if="role!=='User'">+ Add textbook</button>
                 </router-link>
             </div>
@@ -20,13 +19,13 @@
             </h1>
             <div class="row justify-content-center">
 
-                <div v-for="textbook in textbooks" class="card col-sm-3 ml-4 mt-4 align-items-center">
+                <div v-for="textbook in textbooksPaginated" class="card col-sm-3 ml-4 mt-4 align-items-center">
                 <div class="card-body">
-                    <router-link :to="{ name: 'textbook.view.show', params: {id: textbook.id} }">
-                    <h5 class="card-titlex">{{textbook.title}}</h5>
+                    <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
+                    <h5 class="card-title">{{textbook.title}}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
                     </router-link>
-                    <router-link :to="{ name: 'textbook.view.edit', params: {id: textbook.id} }">
+                    <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
                         <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
                     </router-link>
 
@@ -34,7 +33,8 @@
 
                 </div>
             </div>
-            </div>
+            </div><br/>
+            <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
         </div>
     </card>
     <div v-else style="text-align: center;">
@@ -51,20 +51,36 @@
     import Swal from 'sweetalert2'
     export default {
         middleware: 'auth',
-        computed: mapGetters({
-            role: 'auth/role'
-        }),
         data: () => ({
             isLoaded: false,
             name: '',
             module_code: '',
             module_year: '',
             textbooks: [],
+            textbooksPaginated: [],
             errorMessage: '',
+            searchQuery: null,
+            sizePage: 9,
         }),
+        computed : {
+            ...mapGetters({
+                role: 'auth/role'
+            }),
+            resultQuery() {
+                if (this.searchQuery) {
+                    return this.textbooks.filter((item) => {
+                        return this.searchQuery.toLowerCase().split(' ').every(
+                            v => item.title.toLowerCase().includes(v) ||
+                                item.description.toLowerCase().includes(v))
+                    })
+                }else {
+                    return this.textbooks;
+                }
+            }
+        },
         created() {
 
-            axios.get(`/api/module/v/${this.$route.params.id}`)
+            axios.get(`/api/module/${this.$route.params.id}`)
                 .then(response => {
                     if(response.data.Error !== undefined){
                         this.errorMessage = response.data.Error;
@@ -98,13 +114,16 @@
                             'The textbook has been deleted.',
                             'success'
                         );
-                        axios.delete(`/api/textbook/view/${data}`).then(response => {
+                        axios.delete(`/api/textbook/${data}`).then(response => {
                             window.location.reload();
                         })
                     }
                 });
 
-            }
+            },
+            onChangePage(pageOfItems) {
+                this.textbooksPaginated = pageOfItems;
+            },
         },
         metaInfo () {
             return { title: this.$t('home') }

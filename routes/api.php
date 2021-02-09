@@ -13,42 +13,32 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::group(['middleware' => 'auth:api'], function () {
+
     Route::get('/users', 'Admin\UsersController@index');
-
-    Route::namespace('Module')->prefix('module')->name('module.')->group(function () {
-        Route::resource('/v', 'ViewController');
-
-    });
-
-    Route::get('module/allModules', 'Module\ViewController@allModules');
-    Route::get('module/getUsersForModule/{module_id}', 'Module\ViewController@getUsersForModule');
-    Route::get('module/getAllStudents', 'Module\ViewController@getAllStudents');
-    Route::post('module/assignStudents/{module_id}', 'Module\ViewController@assignStudents');
-    Route::post('module/addYearGroup', 'Module\ViewController@addYearGroup');
-    Route::post('module/assignModuleTutors/{module_id}', 'Module\ViewController@assignModuleTutors');
-    Route::get('module/getAllModuleTutors', 'Module\ViewController@getAllModuleTutors');
-    Route::get('module/getModuleById/{module_id}', 'Module\ViewController@getModuleById');
-
-    Route::get('textbook/view/{textbook_id}/pdf', 'Textbook\ViewController@pdf');
-
-    Route::resource('/yearGroup', 'YearGroupController');
-//    Route::get('yearGroup/getAll', 'YearGroupController@index');
-//    Route::get('yearGroup/edit/{year_group_id}', 'YearGroupController@edit');
-//    Route::patch('yearGroup/update/{year_group_id}', 'YearGroupController@update');
-//    Route::delete('yearGroup/{year_group_id}', 'YearGroupController@destroy');
-
-    Route::namespace('Textbook')->prefix('textbook')->name('textbook.')->group(function () {
-        Route::resource('/upload', 'UploadController');
-        Route::resource('/view', 'ViewController');
-    });
-
 
     Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('/users', 'UsersController', ['except' => ['show', 'create', 'store']]);
     });
 
-    Route::get('/upload', 'Textbook\UploadController@index');
+    //Module Controller
+    Route::get('module/getUsersForModule/{module_id}', 'ModuleController@getUsersForModule');
+    Route::get('module/getAllStudents', 'ModuleController@getAllStudents');
+    Route::post('module/assignStudents/{module_id}', 'ModuleController@assignStudents');
+    Route::post('module/assignModuleTutors/{module_id}', 'ModuleController@assignModuleTutors');
+    Route::get('module/getAllModuleTutors', 'ModuleController@getAllModuleTutors');
+    Route::get('module/getModuleById/{module_id}', 'ModuleController@getModuleById');
+    Route::resource('/module', 'ModuleController');
 
+    Route::get('extensiveReading/categories', 'ExtensiveReadingController@categories');
+    Route::resource('/extensiveReading', 'ExtensiveReadingController');
+
+    Route::resource('/textbook', 'TextbookController');
+    Route::get('textbook/pdf/{textbook_id}', 'TextbookController@pdf');
+
+    Route::resource('/yearGroup', 'YearGroupController');
+
+    Route::resource('/text', 'TextController');
+    Route::get('/text/pdf/{textbook_id}', 'TextController@pdf');
 
 });
 Route::group(['middleware' => 'auth:api'], function () {

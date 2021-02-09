@@ -1,5 +1,6 @@
 <?php
 
+use App\ModuleTextbook;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 use App\Module;
@@ -25,5 +26,6 @@ class ModulesTableSeeder extends Seeder
         Module::create(['name' => 'Enterprise Application Technology', 'module_code' => 'CS3160', 'year_group_id' => $year3->id]);
         Module::create(['name' => 'Information Security', 'module_code' => 'CS3190', 'year_group_id' => $year3->id]);
 
+        factory(ModuleTextbook::class, 10)->create();
     }
 }
