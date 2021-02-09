@@ -6,12 +6,24 @@
         </div>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
             <div class="form-check mt-4">
-                <label>Category Name:           </label> <input class="form-control" v-model="form.name" type="text" value="" required/><br/>
-                <label>Category Description:     </label> <input class="form-control" v-model="form.description" type="text" value="" required/><br/>
+                <label>Category Name:           </label> <input class="form-control" v-model="form.name" :class="{ 'is-invalid': form.errors.has('name') }" type="text" value="" required/><has-error :form="form" field="name" /><br/>
+                <label>Category Description:     </label> <input class="form-control" v-model="form.description" :class="{ 'is-invalid': form.errors.has('description') }" type="text" value="" required/><has-error :form="form" field="description" /><br/>
                 <label>Current Textbooks:     </label>
                 <ul>
                     <li v-for="textbook in form.textbooks">
-                        {{textbook.title}} - {{textbook.description}}
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="exampleCheck1" :value="textbook.id" v-model="form.checked">
+                            <label class="form-check-label" for="exampleCheck1">{{textbook.title}} - {{textbook.description}}</label>
+                        </div>
+                    </li>
+                </ul>
+                <label>Unassigned Textbooks:     </label>
+                <ul>
+                    <li v-for="textbook in form.unassigned">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" :value="textbook.id" v-model="form.checked">
+                            <label class="form-check-label" for="exampleCheck1">{{textbook.title}} - {{textbook.description}}</label>
+                        </div>
                     </li>
                 </ul>
                 <br/>
@@ -45,6 +57,8 @@
                 name: '',
                 description: '',
                 textbooks: '',
+                checked: [],
+                unassigned: '',
             }),
             errorMessage: '',
             successMessage: '',
@@ -62,7 +76,10 @@
                         this.form.name = response.data.name;
                         this.form.description = response.data.description;
                         this.form.textbooks = response.data.textbooks;
-
+                        this.form.unassigned = response.data.unassigned;
+                        this.form.textbooks.forEach(function (textbook) {
+                                self.form.checked.push(textbook.id);
+                        });
                     }
                 }).catch(function (response) {
                 //handle error
@@ -70,18 +87,16 @@
 
                 console.log(response);
             });
+
         },
         methods:{
             async submit(){
-                await this.form.patch(`/api/extensiveReading/${this.$route.params.id}/update`)
+                await this.form.patch(`/api/extensiveReading/${this.$route.params.id}`)
                     .then(response => {
                         this.successMessage = response.data.Success;
                         this.$refs.success.open();
-                    }).catch(function (response) {
-                        //handle error
-                        self.$router.push({name: 'extensiveReading.index'})
-
-                        console.log(response);
+                    }).catch(error => {
+                        console.log(error.response)
                     });
 
             }
