@@ -14,7 +14,7 @@ class ExtensiveReadingCategoriesTableSeeder extends Seeder
     public function run()
     {
         factory(ExtensiveReadingCategory::class, 5)->create();
-        ExtensiveReadingCategory::create(['name' => 'Artificial Intelligence', 'description' => 'Covers all areas of AI except Vision, Robotics, Machine Learning, Multiagent Systems, and Computation and Language (Natural Language Processing)']);
+        ExtensiveReadingCategory::create(['name' => 'Human-Computer Interaction', 'description' => 'Covers human factors, user interfaces, and collaborative computing.']);
         ExtensiveReadingCategory::create(['name' => 'Computation and Language', 'description' => 'Covers natural language processing. Roughly includes material']);
         ExtensiveReadingCategory::create(['name' => 'Data Structures and Algorithms', 'description' => 'Covers data structures and analysis of algorithms. Roughly includes material']);
         ExtensiveReadingCategory::create(['name' => 'Computational Complexity', 'description' => 'Covers models of computation, complexity classes, structural complexity, complexity tradeoffs, upper and lower bounds.']);
