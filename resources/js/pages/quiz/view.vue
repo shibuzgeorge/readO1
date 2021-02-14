@@ -30,7 +30,7 @@
         </div>
         </div>
         <div v-else>
-            No quiz is available for this textbook.
+            No quiz is available for this text.
         </div>
     </card>
     <div v-else>
