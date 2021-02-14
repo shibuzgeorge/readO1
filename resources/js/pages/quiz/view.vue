@@ -28,6 +28,7 @@
                 </tbody>
             </table>
         </div>
+            <v-button class="form-control" type="success">Submit</v-button>
         </div>
         <div v-else>
             No quiz is available for this text.

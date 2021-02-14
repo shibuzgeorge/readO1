@@ -10,6 +10,10 @@ class Option extends Model
         'option', 'points', 'question_id',
     ];
 
+    protected $hidden = [
+        'points',
+    ];
+
     /**
      * Question relationship
      */
