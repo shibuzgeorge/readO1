@@ -23,17 +23,17 @@ class QuizController extends Controller
     }
 
     /**
-     * Displays all quizzes for a particular text based on the text_id.
+     * Displays at random a quiz for a particular text based on the text_id.
      *
      * @param $text_id
      *
      * @return \Illuminate\Http\JsonResponse
      */
     public function show($text_id){
-        $quizzes = Quiz::where('text_id', $text_id)->with('questions','options')->get();
+        $quiz = Quiz::where('text_id', $text_id)->with('questions','options')->inRandomOrder()->first();
 
         return response()->json([
-            'quizzes' => $quizzes
+            'quiz' => $quiz
         ]);
     }
 

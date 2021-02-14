@@ -8,8 +8,7 @@
         </h5>
 
         <br/>
-        <div v-if="quizzes || quizzes.length" v-for="quiz in quizzes">
-            <h2 class="text-center">Quiz: {{numOfQuizzes++}}</h2>
+        <div v-if="quiz || quiz.length">
         <div v-for="question in quiz.questions">
             <table class="table table-bordered table-question">
                 <thead>
@@ -31,7 +30,7 @@
             <v-button class="form-control" type="success">Submit</v-button>
         </div>
         <div v-else>
-            No quiz is available for this text.
+            There is no quiz is available for this text.
         </div>
     </card>
     <div v-else>
@@ -52,7 +51,7 @@
         }),
         data: () => ({
             isLoaded: false,
-            quizzes: [],
+            quiz: [],
             errorMessage: '',
             numOfQuestions: 1,
             numOfQuizzes: 1,
@@ -67,7 +66,7 @@
                         this.$refs.error.open();
                     }else{
                         this.isLoaded = true;
-                        this.quizzes = response.data.quizzes;
+                        this.quiz = response.data.quiz;
                     }
                 }).catch(function (response) {
                 //handle error
