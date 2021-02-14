@@ -2,6 +2,7 @@
 
 use App\Option;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class OptionsTableSeeder extends Seeder
 {

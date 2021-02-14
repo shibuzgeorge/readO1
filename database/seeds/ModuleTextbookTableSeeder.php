@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\ModuleTextbook;
+use Illuminate\Support\Facades\Schema;
 
 class ModuleTextbookTableSeeder extends Seeder
 {

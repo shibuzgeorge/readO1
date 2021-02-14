@@ -5,6 +5,7 @@ use App\Question;
 use App\Quiz;
 use App\Text;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class TextsTableSeeder extends Seeder
 {
@@ -15,7 +16,6 @@ class TextsTableSeeder extends Seeder
      */
     public function run()
     {
-
         $text1 = Text::create([
             'title' => 'Chapter 1',
             'description' => 'Chapter 1',

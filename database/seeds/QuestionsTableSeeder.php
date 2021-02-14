@@ -2,6 +2,7 @@
 
 use App\Question;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class QuestionsTableSeeder extends Seeder
 {

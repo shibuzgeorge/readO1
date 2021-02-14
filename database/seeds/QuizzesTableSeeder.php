@@ -2,6 +2,7 @@
 
 use App\Quiz;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class QuizzesTableSeeder extends Seeder
 {

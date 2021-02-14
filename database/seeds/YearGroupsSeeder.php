@@ -13,10 +13,6 @@ class YearGroupsSeeder extends Seeder
      */
     public function run()
     {
-        Schema::disableForeignKeyConstraints();
-        YearGroup::truncate();
-        Schema::enableForeignKeyConstraints();
-
         YearGroup::create(['name' => 'Year 1']);
         YearGroup::create(['name' => 'Year 2']);
         YearGroup::create(['name' => 'Year 3']);
