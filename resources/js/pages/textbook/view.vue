@@ -14,9 +14,12 @@
                                 <input type="search" v-model="searchQuery" class="form-control" placeholder="Search..."
                                        aria-label="Search" />
                             </div>
-                            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }">
-                                <button class="btn btn-success" v-if="role!=='Student'">+ Add text</button>
-                            </router-link>
+                            <div>
+                                <a style="float: right;" @click="manageQuiz()"><button class="btn btn-success" v-if="role!=='Student'">+ Manage Quizzes</button></a>
+                                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }">
+                                    <button class="btn btn-success" v-if="role!=='Student'">+ Add text</button>
+                                </router-link>
+                            </div>
                         </div>
                         <h1 style="text-align: center;" class="mt-4" v-if="!texts || !texts.length">
                             This textbook has no texts!
@@ -54,6 +57,7 @@
                                 <input type="search" v-model="searchQuery" class="form-control" placeholder="Search..."
                                        aria-label="Search" />
                             </div>
+                            <a style="float: right;" @click="manageQuiz()"><button class="btn btn-success" v-if="role!=='Student'">+ Manage Quizzes</button></a>
                             <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }">
                                 <button class="btn btn-success" v-if="role!=='Student'">+ Add text</button>
                             </router-link>
@@ -77,6 +81,18 @@
                     </div>
                 </card>
             </div>
+            <sweet-modal ref="success" icon="success">
+                {{successMessage}}
+            </sweet-modal>
+            <sweet-modal ref="manageQuiz">
+                <select class="form-control" v-model="quizTextSelected">
+                    <option>Please a text...</option>
+                    <option v-for="text in texts" :value="text.id" :key="text.id">
+                        {{ text.title }}
+                    </option>
+                </select><br/>
+                <manage-quiz :text_id="quizTextSelected" :parent="2"></manage-quiz>
+            </sweet-modal>
         </div>
     <div v-else style="text-align: center;">
         <sweet-modal ref="error" v-on:close="$router.go(-1)" icon="error">
@@ -91,6 +107,7 @@
     import { mapGetters } from 'vuex'
     import Swal from 'sweetalert2'
     import PDFViewer from '~/components/PDFViewer';
+    import ManageQuiz from "../../components/ManageQuiz";
     export default {
         middleware: 'auth',
         data: () => ({
@@ -100,12 +117,13 @@
             texts: [],
             textsPaginated: [],
             errorMessage: '',
+            successMessage: '',
             file: true,
             fileName: '',
             path: '/lib/pdf/web/viewer.html',
             searchQuery: null,
             sizePage: 9,
-
+            quizTextSelected: 'Please a text...',
         }),
         computed : {
             ...mapGetters({
@@ -124,6 +142,7 @@
             }
         },
         components:{
+            ManageQuiz,
             PDFViewer,
         },
         created() {
@@ -170,6 +189,9 @@
             },
             onChangePage(pageOfItems) {
                 this.textsPaginated = pageOfItems;
+            },
+            manageQuiz(){
+                this.$refs.manageQuiz.open();
             },
         },
         metaInfo () {

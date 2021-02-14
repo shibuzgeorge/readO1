@@ -40,6 +40,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::resource('/text', 'TextController');
     Route::get('/text/pdf/{textbook_id}', 'TextController@pdf');
 
+    Route::get('/quiz/{text_id}', 'QuizController@show');
+    Route::get('/quiz/edit/{text_id}', 'QuizController@edit');
+    Route::post('/quiz/{text_id}', 'QuizController@manage');
 });
 Route::group(['middleware' => 'auth:api'], function () {
     Route::post('logout', 'Auth\LoginController@logout');

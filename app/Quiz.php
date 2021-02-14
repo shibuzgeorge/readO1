@@ -25,4 +25,12 @@ class Quiz extends Model
     {
         return $this->hasMany('App\Question');
     }
+
+    /**
+     * Options relationship
+     */
+    public function options()
+    {
+        return $this->hasManyThrough('App\Option','App\Question', 'quiz_id', 'question_id', 'id', 'id');
+    }
 }
