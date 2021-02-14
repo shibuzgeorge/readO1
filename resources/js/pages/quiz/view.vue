@@ -8,15 +8,6 @@
         </h5>
 
         <br/>
-        <!--<div v-if="quizzes || quizzes.length" v-for="quiz in quizzes">-->
-            <!--Quiz: {{numOfQuestions++}}-->
-            <!--<div v-for="question in quiz.questions">-->
-                <!--<b>{{question.question}}</b>-->
-                <!--<div v-for="op in allOptions(quiz.options, question.id)">-->
-                    <!--{{op.option}}<input type="radio" name="op"/>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
         <div v-if="quizzes || quizzes.length" v-for="quiz in quizzes">
             <h2 class="text-center">Quiz: {{numOfQuizzes++}}</h2>
         <div v-for="question in quiz.questions">
@@ -32,12 +23,12 @@
                         {{op.option}}
                 </label>
                     </div>
-                    </td></tr></tbody></table>
-
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
         </div>
-
-
         <div v-else>
             No quiz is available for this textbook.
         </div>
