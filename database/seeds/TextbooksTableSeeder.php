@@ -6,6 +6,7 @@ use App\Textbook;
 use App\ModuleTextbook;
 use App\Module;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class TextbooksTableSeeder extends Seeder
 {
@@ -16,7 +17,6 @@ class TextbooksTableSeeder extends Seeder
      */
     public function run()
     {
-
         $textbook1 = Textbook::create([
             'title' => 'Introduction to software project management',
             'description' => 'Introduction to software project management',

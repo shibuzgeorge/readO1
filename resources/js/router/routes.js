@@ -41,6 +41,8 @@ export default [
     { path: '/admin/users/edit/:id', name: 'admin.users.edit', component: page('admin/edit.vue') },
     { path: '/admin/users/update/:id', name: 'admin.users.update', component: page('admin/edit.vue') },
 
+    { path: '/quiz/view/:id', name: 'quiz.show', component: page('quiz/view.vue') },
+
   { path: '/home', name: 'home', component: page('home.vue') },
   { path: '/settings',
     component: page('settings/index.vue'),

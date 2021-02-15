@@ -13,6 +13,7 @@ class ExtensiveReadingCategoriesTableSeeder extends Seeder
      */
     public function run()
     {
+
         factory(ExtensiveReadingCategory::class, 5)->create();
         ExtensiveReadingCategory::create(['name' => 'Human-Computer Interaction', 'description' => 'Covers human factors, user interfaces, and collaborative computing.']);
         ExtensiveReadingCategory::create(['name' => 'Computation and Language', 'description' => 'Covers natural language processing. Roughly includes material']);

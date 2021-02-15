@@ -10,6 +10,6 @@ use Faker\Generator as Faker;
 $factory->define(Question::class, function (Faker $faker) {
     return [
         'question' => $faker->sentence,
-        'quiz_id' => Quiz::inRandomOrder()->first()->id,
+        'quiz_id' => factory(App\Quiz::class)->create()->id,
     ];
 });

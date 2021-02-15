@@ -13,10 +13,6 @@ class RolesTableSeeder extends Seeder
      */
     public function run()
     {
-        Schema::disableForeignKeyConstraints();
-        Role::truncate();
-        Schema::enableForeignKeyConstraints();
-
         Role::create(['name' => 'Admin']);
         Role::create(['name' => 'Module Tutor']);
         Role::create(['name' => 'Student']);

@@ -8,6 +8,6 @@ use Faker\Generator as Faker;
 
 $factory->define(Quiz::class, function (Faker $faker) {
     return [
-        'text_id' => Text::inRandomOrder()->first()->id,
+        'text_id' => factory(App\Text::class)->create()->id,
     ];
 });

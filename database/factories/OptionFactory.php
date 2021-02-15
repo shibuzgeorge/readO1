@@ -11,6 +11,6 @@ $factory->define(Option::class, function (Faker $faker) {
     return [
         'option' => $faker->word,
         'points' => $faker->numberBetween(0,1),
-        'question_id' => Question::inRandomOrder()->first()->id,
+        'question_id' => factory(App\Question::class)->create()->id,
     ];
 });
