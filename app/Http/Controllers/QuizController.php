@@ -31,9 +31,27 @@ class QuizController extends Controller
      */
     public function show($text_id){
         $quiz = Quiz::where('text_id', $text_id)->with('questions','options')->inRandomOrder()->first();
-
         return response()->json([
-            'quiz' => $quiz
+            'quiz' => $quiz,
+        ]);
+    }
+
+    /**
+     * Returns the points the user collected from answering the quiz.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function result(Request $request){
+        $points = [];
+
+        foreach (json_decode($request->input('selected')) as $option){
+            $o = Option::find($option);
+            array_push($points,$o->points);
+        }
+        $totalPointsCollected = array_sum($points);
+        return response()->json([
+            'totalPointsCollected' => $totalPointsCollected,
         ]);
     }
 

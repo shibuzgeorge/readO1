@@ -6,28 +6,31 @@
             </div>
             <br/>
         </h5>
-
         <br/>
-        <div v-if="quiz || quiz.length">
-        <div v-for="question in quiz.questions">
+        <div v-if="form.quiz || form.quiz.length">
+            <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
+        <div v-for="(question, index) in form.quiz.questions">
             <table class="table table-bordered table-question">
                 <thead>
-                <th width="20%" class="text-left text-bold align-top">Question: {{numOfQuestions++}}</th>
+                <th width="20%" class="text-left text-bold align-top">Question: {{index+1}}</th>
                 <th class="text-left text-bold">
                     <span>{{question.question}}</span></th></thead>
                 <tbody><tr>
                     <td class="text-left">Options</td> <td class="text-left">
-                    <div v-for="op in allOptions(quiz.options, question.id)" class="form-check">
-                    <input type="radio" :name="question.id" id="option642" class="form-check-input" value="642"> <label for="option642" class="form-check-label">
-                        {{op.option}}
-                </label>
+                    <div v-for="op in allOptions(form.quiz.options, question.id)" class="form-check">
+                    <input type="radio" :name="question.id" :value="op.id" v-model="form.selected[index]">
+                        <label>{{op.option}}</label>
                     </div>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
-            <v-button class="form-control" type="success">Submit</v-button>
+            <v-button class="form-control" :loading="form.busy" type="success">Submit</v-button>
+            </form>
+            <sweet-modal ref="success" icon="success">
+                You've scored: {{totalPointsCollected}} out of a possible {{totalAvailablePoints}}
+            </sweet-modal>
         </div>
         <div v-else>
             There is no quiz is available for this text.
@@ -44,6 +47,7 @@
 <script>
     import axios from 'axios'
     import { mapGetters } from 'vuex'
+    import Form from 'vform'
     export default {
         middleware: 'auth',
         computed: mapGetters({
@@ -51,14 +55,19 @@
         }),
         data: () => ({
             isLoaded: false,
-            quiz: [],
+            form: new Form({
+                quiz: [],
+                busy: false,
+                selected: [],
+            }),
             errorMessage: '',
+            successMessage: '',
             numOfQuestions: 1,
-            numOfQuizzes: 1,
-            selected: '',
+            totalPointsCollected: '',
+            totalAvailablePoints: 0,
         }),
         created() {
-            let self = this
+            let self = this;
             axios.get(`/api/quiz/${this.$route.params.id}`)
                 .then(response => {
                     if(response.data.Error !== undefined){
@@ -66,18 +75,48 @@
                         this.$refs.error.open();
                     }else{
                         this.isLoaded = true;
-                        this.quiz = response.data.quiz;
+                        this.form.quiz = response.data.quiz;
+                        this.getTotal(self);
                     }
                 }).catch(function (response) {
                 //handle error
                 console.log(response);
             });
+
         },
         methods:{
             allOptions(options, question_id){
                 return options.filter(item => {
                     return item.question_id === question_id
                 });
+            },
+            async submit(){
+                this.form.busy = true;
+                let formData = new FormData();
+                formData.append('selected', JSON.stringify(this.form.selected));
+                await axios.post('/api/quiz/result',formData,
+                    {})
+                    .then(response => {
+                        this.totalPointsCollected = response.data.totalPointsCollected;
+                        this.$refs.success.open();
+                    })
+                    .catch(error => {
+                        console.log(error.response)
+                    });
+                this.form.busy = false;
+            },
+            getTotal(self){
+                const qpoints = [];
+                const max = [];
+                this.form.quiz.questions.forEach(function(b){
+                    let t = [];
+                    self.allOptions(self.form.quiz.options, b.id).forEach(function(a){
+                        t.push(a.points)
+                    });
+                    qpoints.push(t);
+                });
+                qpoints.forEach(g => max.push(Math.max.apply(Math, g)));
+                self.totalAvailablePoints = max.reduce((a, b) => a + b, 0);
             }
         }
     }

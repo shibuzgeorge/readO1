@@ -41,6 +41,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/text/pdf/{textbook_id}', 'TextController@pdf');
 
     Route::get('/quiz/{text_id}', 'QuizController@show');
+    Route::post('/quiz/result', 'QuizController@result');
     Route::get('/quiz/edit/{text_id}', 'QuizController@edit');
     Route::post('/quiz/{text_id}', 'QuizController@manage');
 });
