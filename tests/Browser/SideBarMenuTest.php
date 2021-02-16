@@ -49,24 +49,35 @@ class SideBarMenuTest extends DuskTestCase
             $browser->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
                 ->pause(1000)
-                //expands all menus for a student
-                ->waitFor('#modules-menu')
-                ->clickLink('Modules')
+                //expands all menus for a admin
+                ->waitFor('#extensive-reading-menu')
+                ->clickLink('Extensive Reading')
                 ->waitFor('#textbooks-menu')
                 ->clickLink('Textbooks')
+                ->waitFor('#texts-menu')
+                ->clickLink('Texts')
+                ->waitFor('#modules-menu')
+                ->clickLink('Modules')
                 ->waitFor('#users-menu')
                 ->clickLink('Users')
                 ->pause(1000)
                 //checks if these are visible on the side bar menu.
                 ->assertSeeIn('#sidebar-wrapper', 'Dashboard')
                 ->assertSeeIn('#sidebar-wrapper', 'Library')
+                ->assertSeeIn('#sidebar-wrapper', 'Extensive Reading')
+                ->assertSeeIn('#extensive-reading-expanded', 'Home')
+                ->assertSeeIn('#extensive-reading-expanded', 'View all categories')
+                ->assertSeeIn('#extensive-reading-expanded', 'Create a category')
                 ->assertSeeIn('#sidebar-wrapper', 'Textbooks')
                 ->assertSeeIn('#textbooks-expanded', 'Create a textbook')
+                ->assertSeeIn('#sidebar-wrapper', 'Texts')
+                ->assertSeeIn('#texts-expanded', 'Add a text')
                 ->assertSeeIn('#sidebar-wrapper', 'Modules')
                 ->assertSeeIn('#modules-expanded', 'All Modules')
                 ->assertSeeIn('#modules-expanded', 'Create Module')
                 ->assertSeeIn('#modules-expanded', 'Assign Students')
                 ->assertSeeIn('#modules-expanded', 'Assign Module Tutors')
+                ->assertSeeIn('#sidebar-wrapper', 'Year Groups')
                 ->assertSeeIn('#sidebar-wrapper', 'Users')
                 ->assertSeeIn('#users-expanded', 'View all users')
                 ->assertSeeIn('#users-expanded', 'Create a user');
@@ -87,23 +98,34 @@ class SideBarMenuTest extends DuskTestCase
             $browser->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
                 ->pause(1000)
-                //expands all menus for a student
-                ->waitFor('#modules-menu')
-                ->clickLink('Modules')
+                //expands all menus for a module tutor
+                ->waitFor('#extensive-reading-menu')
+                ->clickLink('Extensive Reading')
                 ->waitFor('#textbooks-menu')
                 ->clickLink('Textbooks')
+                ->waitFor('#texts-menu')
+                ->clickLink('Texts')
+                ->waitFor('#modules-menu')
+                ->clickLink('Modules')
                 ->pause(1000)
                 //checks if these are visible on the side bar menu.
                 ->assertSeeIn('#sidebar-wrapper', 'Dashboard')
                 ->assertSeeIn('#sidebar-wrapper', 'Library')
+                ->assertSeeIn('#sidebar-wrapper', 'Extensive Reading')
+                ->assertSeeIn('#extensive-reading-expanded', 'Home')
+                ->assertSeeIn('#extensive-reading-expanded', 'View all categories')
+                ->assertSeeIn('#extensive-reading-expanded', 'Create a category')
                 ->assertSeeIn('#sidebar-wrapper', 'Textbooks')
                 ->assertSeeIn('#textbooks-expanded', 'Create a textbook')
+                ->assertSeeIn('#sidebar-wrapper', 'Texts')
+                ->assertSeeIn('#texts-expanded', 'Add a text')
                 ->assertSeeIn('#sidebar-wrapper', 'Modules')
                 ->assertSeeIn('#modules-expanded', 'All Modules')
                 ->assertSeeIn('#modules-expanded', 'Assign Students')
                 //checks if these are not visible on the side bar menu.
                 ->assertDontSeeIn('#sidebar-wrapper', 'Create Module')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Assign Module Tutors')
+                ->assertDontSeeIn('#sidebar-wrapper', 'Year Groups')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Users')
                 ->assertDontSeeIn('#sidebar-wrapper', 'View all users')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Create a user');
@@ -125,21 +147,28 @@ class SideBarMenuTest extends DuskTestCase
                 ->submit($this->studentUser->email, 'password')
                 ->pause(1000)
                 //expands all menus for a student
+                ->waitFor('#extensive-reading-menu')
+                ->clickLink('Extensive Reading')
                 ->waitFor('#modules-menu')
                 ->clickLink('Modules')
                 ->pause(1000)
                 //checks if these are visible on the side bar menu.
                 ->assertSeeIn('#sidebar-wrapper', 'Dashboard')
                 ->assertSeeIn('#sidebar-wrapper', 'Library')
+                ->assertSeeIn('#sidebar-wrapper', 'Extensive Reading')
+                ->assertSeeIn('#extensive-reading-expanded', 'Home')
+                ->assertSeeIn('#extensive-reading-expanded', 'View all categories')
                 ->assertSeeIn('#sidebar-wrapper', 'Modules')
                 ->assertSeeIn('#modules-expanded', 'My Modules')
                 //checks if these are not visible on the side bar menu.
+                ->assertDontSeeIn('#sidebar-wrapper', 'Create a category')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Textbooks')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Create a textbook')
                 ->assertDontSeeIn('#sidebar-wrapper', 'All Modules')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Create Module')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Assign Module Tutors')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Assign Students')
+                ->assertDontSeeIn('#sidebar-wrapper', 'Year Groups')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Users')
                 ->assertDontSeeIn('#sidebar-wrapper', 'View all users')
                 ->assertDontSeeIn('#sidebar-wrapper', 'Create a user');
@@ -159,7 +188,9 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser) {
             $browser->visit(new Login)
                 ->submit($this->studentUser->email, 'password')
+                ->pause(1000)
                 ->waitFor('#modules-menu')
+                ->pause(1000)
                 ->clickLink('Modules')
                 ->waitFor('#my-modules-menu')
                 ->clickLink('My Modules')
@@ -182,6 +213,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser) {
             $browser->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
+                ->pause(1000)
                 ->waitFor('#modules-menu')
                 ->clickLink('Modules')
                 ->waitFor('#all-modules-menu')
@@ -212,6 +244,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser ) {
             $browser->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
+                ->pause(1000)
                 ->waitFor('#modules-menu')
                 ->clickLink('Modules')
                 ->waitFor('#all-modules-menu')
@@ -314,6 +347,74 @@ class SideBarMenuTest extends DuskTestCase
     }
 
     /**
+     * Checks the extensive reading text and links are working for Student, Module Tutor and Admins
+     *
+     * @test
+     * @throws \Throwable
+     */
+    public function test_extensive_reading_menu()
+    {
+        $this->browse(function ($browser1,$browser2,$browser3) {
+            $browser1->visit(new Login)
+                ->submit($this->studentUser->email, 'password')
+                ->waitFor('#extensive-reading-menu')
+                ->clickLink('Extensive Reading')
+                ->waitFor('#extensive-reading-home-menu')
+                ->clickLink('Home')
+                ->pause(5000)
+                ->waitFor('#title')
+                ->assertPathis('/extensiveReading')
+                ->assertSeeIn('#title', 'Extensive Reading')
+                ->clickLink('View all categories')
+                ->pause(5000)
+                ->waitFor('#title')
+                ->assertPathis('/extensiveReading/categories')
+                ->assertSeeIn('#title', 'Extensive Reading Categories');
+
+            $browser2->visit(new Login)
+                ->submit($this->moduleTutorUser->email, 'password')
+                ->waitFor('#extensive-reading-menu')
+                ->clickLink('Extensive Reading')
+                ->waitFor('#extensive-reading-home-menu')
+                ->clickLink('Home')
+                ->pause(5000)
+                ->waitFor('#title')
+                ->assertPathis('/extensiveReading')
+                ->assertSeeIn('#title', 'Extensive Reading')
+                ->clickLink('View all categories')
+                ->pause(5000)
+                ->waitFor('#title')
+                ->assertPathis('/extensiveReading/categories')
+                ->assertSeeIn('#title', 'Extensive Reading Categories')
+                ->clickLink('Create a category')
+                ->pause(5000)
+                ->waitFor('#title')
+                ->assertPathis('/extensiveReading/create')
+                ->assertSeeIn('#title', 'Create a category');
+
+            $browser3->visit(new Login)
+                ->submit($this->adminUser->email, 'password')
+                ->waitFor('#extensive-reading-menu')
+                ->clickLink('Extensive Reading')
+                ->waitFor('#extensive-reading-home-menu')
+                ->clickLink('Home')
+                ->pause(5000)
+                ->waitFor('#title')
+                ->assertPathis('/extensiveReading')
+                ->assertSeeIn('#title', 'Extensive Reading')
+                ->clickLink('View all categories')
+                ->pause(5000)
+                ->waitFor('#title')
+                ->assertPathis('/extensiveReading/categories')
+                ->assertSeeIn('#title', 'Extensive Reading Categories')
+                ->clickLink('Create a category')
+                ->pause(5000)
+                ->waitFor('#title')
+                ->assertPathis('/extensiveReading/create')
+                ->assertSeeIn('#title', 'Create a category');
+        });
+    }
+    /**
      * Checks the textbook text and links are working for Module Tutor and Admins
      *
      * @test
@@ -326,6 +427,7 @@ class SideBarMenuTest extends DuskTestCase
             //Module Tutor User
             $browser1->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
+                ->pause(1000)
                 ->waitFor('#textbooks-menu')
                 ->clickLink('Textbooks')
                 ->waitFor('#create-textbook-menu')
@@ -338,6 +440,7 @@ class SideBarMenuTest extends DuskTestCase
             //Admin User
             $browser2->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
+                ->pause(1000)
                 ->waitFor('#textbooks-menu')
                 ->clickLink('Textbooks')
                 ->waitFor('#create-textbook-menu')
@@ -346,6 +449,67 @@ class SideBarMenuTest extends DuskTestCase
                 ->pause(1000)
                 ->assertPathis('/textbook/create')
                 ->assertSeeIn('#title', 'Create textbook');
+        });
+    }
+
+    /**
+     * Checks the Texts text and links are working for Module Tutor and Admins
+     *
+     * @test
+     * @throws \Throwable
+     */
+    public function test_texts_menu()
+    {
+        $this->browse(function ($browser1, $browser2) {
+
+            //Module Tutor User
+            $browser1->visit(new Login)
+                ->submit($this->moduleTutorUser->email, 'password')
+                ->pause(1000)
+                ->waitFor('#texts-menu')
+                ->clickLink('Texts')
+                ->waitFor('#add-a-text-menu')
+                ->clickLink('Add a text')
+                ->waitFor('#title')
+                ->pause(1000)
+                ->assertPathis('/text/create')
+                ->assertSeeIn('#title', 'Upload text');
+
+            //Admin User
+            $browser2->visit(new Login)
+                ->submit($this->adminUser->email, 'password')
+                ->pause(1000)
+                ->waitFor('#texts-menu')
+                ->clickLink('Texts')
+                ->waitFor('#add-a-text-menu')
+                ->clickLink('Add a text')
+                ->waitFor('#title')
+                ->pause(1000)
+                ->assertPathis('/text/create')
+                ->assertSeeIn('#title', 'Upload text');
+        });
+    }
+
+    /**
+     * Checks the year groups menu in the side bar menu for a Admin User.
+     * Checks if the texts/links are working and visible.
+     * Checks it goes to the right pages and checks the title.
+     *
+     * @test
+     * @throws \Throwable
+     */
+    public function test_admin_year_groups_menu()
+    {
+        $this->browse(function ($browser ) {
+            $browser->visit(new Login)
+                ->submit($this->adminUser->email, 'password')
+                ->pause(1000)
+                ->waitFor('#year-groups-menu')
+                ->clickLink('Year Groups')
+                ->waitFor('#title')
+                ->pause(2000)
+                ->assertPathis('/yearGroup')
+                ->assertSeeIn('#title', 'Add Year Group');
         });
     }
 
@@ -362,6 +526,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser ) {
             $browser->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
+                ->pause(1000)
                 ->waitFor('#users-menu')
                 ->clickLink('Users')
                 ->waitFor('#view-all-users-menu')

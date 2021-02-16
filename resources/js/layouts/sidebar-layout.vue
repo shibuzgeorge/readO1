@@ -49,11 +49,6 @@
                aria-controls="textbooks-expanded">Textbooks<span class="mr-3"></span>
             </a>
             <div class="collapse" id="textbooks-expanded">
-                <router-link :to="{ name: 'textbook.create' }"
-                             id="view-all-textbooks-menu"
-                             class="list-group-item list-group-item-action text-white bg-dark"
-                             active-class="active-class">View all textbooks
-                </router-link>
                 <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.create' }"
                              id="create-textbook-menu"
                              class="list-group-item list-group-item-action text-white bg-dark"
@@ -61,17 +56,13 @@
                 </router-link>
             </div>
 
-            <a id="texts-menu"
+            <a v-show="role==='Admin' || role==='Module Tutor'"
+               id="texts-menu"
                class="btn collapsed list-group-item list-group-item-action bg-light"
                data-toggle="collapse" href="#texts-expanded" role="button" aria-expanded="true"
                aria-controls="texts-expanded">Texts<span class="mr-3"></span>
             </a>
             <div class="collapse" id="texts-expanded">
-                <router-link :to="{ name: 'textbook.create' }"
-                             id="view-all-texts-menu"
-                             class="list-group-item list-group-item-action text-white bg-dark"
-                             active-class="active-class">View all texts
-                </router-link>
                 <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }"
                              id="add-a-text-menu"
                              class="list-group-item list-group-item-action text-white bg-dark"
@@ -112,6 +103,11 @@
                              active-class="active-class">Assign Students
                 </router-link>
             </div>
+            <router-link v-show="role==='Admin'" :to="{ name: 'yearGroup' }"
+                         id="year-groups-menu"
+                         class="list-group-item list-group-item-action bg-light"
+                         active-class="active-class">Year Groups
+            </router-link>
             <a v-show="role==='Admin'" class="btn collapsed list-group-item list-group-item-action bg-light"
                id="users-menu"
                data-toggle="collapse" href="#users-expanded" role="button" aria-expanded="true"
