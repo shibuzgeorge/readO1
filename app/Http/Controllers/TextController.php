@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ExtensiveReadingCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Spatie\PdfToText;
@@ -13,17 +14,23 @@ use App\Textbook;
 class TextController extends Controller
 {
     /**
-     * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * Applies middleware to some of the methods to restrict access.
+     *
+     * TextController constructor.
+     *
      */
-    public function index()
+    public function __construct()
     {
-        //
+        $this->middleware('role:Admin,Module Tutor')->only('create');
+        $this->middleware('role:Admin,Module Tutor')->only('destroy');
+        $this->middleware('role:Admin,Module Tutor')->only('update');
+        $this->middleware('role:Admin,Module Tutor')->only('edit');
+        $this->middleware('role:Admin,Module Tutor')->only('store');
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new text.
      *
      * @return \Illuminate\Http\Response
      */
@@ -46,8 +53,8 @@ class TextController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request $request
+     * @return void
      */
     public function store(Request $request)
     {
@@ -74,7 +81,8 @@ class TextController extends Controller
     }
 
     /**
-     * Get's the texts base64 and decodes and reproduces the pdf version.
+     * Check if the current user can download the pdf.
+     * Get's the texts base64 and decodes and reproduces the pdf version
      *
      * @param $id
      * @return mixed
@@ -83,17 +91,27 @@ class TextController extends Controller
     public function pdf($id)
     {
         //find textbook
-        $textbook = Text::find($id);
+        $text = Text::find($id);
 
-        $file_contents = base64_decode($textbook->file);
+        if ($text == null) {
+            return response()->json(['Error' => 'Text not found!']);
+        }
 
-        return response($file_contents)
-            ->header('Cache-Control', 'no-cache private')
-            ->header('Content-Description', 'File Transfer')
-            ->header('Content-Type', 'application/x-pdf')
-            ->header('Content-Length', strlen($file_contents))
-            ->header('Content-Disposition', 'inline; filename="example.pdf"')
-            ->header('Content-Transfer-Encoding', 'binary');
+        $checkIfUserHasPermissionToDownload = $this->checkPermission($text->textbook_id);
+
+        if ($checkIfUserHasPermissionToDownload) {
+            $file_contents = base64_decode($text->file);
+
+            return response($file_contents)
+                ->header('Cache-Control', 'no-cache private')
+                ->header('Content-Description', 'File Transfer')
+                ->header('Content-Type', 'application/x-pdf')
+                ->header('Content-Length', strlen($file_contents))
+                ->header('Content-Disposition', 'inline; filename="example.pdf"')
+                ->header('Content-Transfer-Encoding', 'binary');
+        } else {
+            return response()->json(['Error' => 'Permission denied to download textbook!']);
+        }
     }
 
     /**
@@ -106,41 +124,13 @@ class TextController extends Controller
     {
         $text = Text::find($id);
 
-        $module = Module::whereHas(
-            'textbooks', function($q) use($text) {
-            $q->where('textbook_id', $text->textbook_id);
-        })->first();
+        if ($text == null) {
+            return response()->json(['Error' => 'Text not found!']);
+        }
+            $checkIfUserHasPermissionToView = $this->checkPermission($text->textbook_id);
 
-
-        if(Auth::user()->role->name != 'Admin'){
-            $checkIfUserHasPermissionToView = Auth::user()->modules()->find($module);
-            if($checkIfUserHasPermissionToView != null){
-                if($text->file != null){
-                    $decoded = base64_decode($text->file);
-                    file_put_contents('file.pdf',$decoded);
-                    $path = 'c:/Program Files/Git/mingw64/bin/pdftotext';
-                    $pdftext = base64_encode(PdfToText\Pdf::getText('file.pdf', $path));
-                    File::delete('file.pdf');
-                    return response()->json([
-                        'title' => $text->title,
-                        'description' => $text->description,
-                        'text' => $pdftext,
-                    ]);
-                }else{
-                    return response()->json([
-                        'title' => $text->title,
-                        'description' => $text->description,
-                    ]);
-                }
-
-
-            }else{
-                return response()->json(['Error' => 'Permission not allowed to view the text']);
-            }
-        }else {
-
-            if ($text != null) {
-                if($text->file != null) {
+            if ($checkIfUserHasPermissionToView) {
+                if ($text->file != null) {
                     $decoded = base64_decode($text->file);
                     file_put_contents('file.pdf', $decoded);
                     $path = 'c:/Program Files/Git/mingw64/bin/pdftotext';
@@ -151,36 +141,42 @@ class TextController extends Controller
                         'description' => $text->description,
                         'text' => $pdftext,
                     ]);
-                }else{
+                } else {
                     return response()->json([
                         'title' => $text->title,
                         'description' => $text->description,
                     ]);
                 }
             } else {
-                return response()->json(['Error' => 'Text not found!']);
+                return response()->json(['Error' => 'Permission not allowed to view the text']);
             }
 
-        }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the text.
+     * Checks permission if the user can actually edit.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        $t = Text::find($id);
-        if($t != null) {
-            $textbook = Textbook::find($t->textbook_id);
-            return response()->json([
-                'title' => $t->title,
-                'description' => $t->description,
-                'file' => $t->file,
-                'textbook' => $textbook,
-            ]);
+        $text = Text::find($id);
+        if($text != null) {
+            $checkIfUserHasPermissionToEdit = $this->checkPermission($text->textbook_id);
+            if($checkIfUserHasPermissionToEdit){
+                $textbook = Textbook::find($text->textbook_id);
+                return response()->json([
+                    'title' => $text->title,
+                    'description' => $text->description,
+                    'file' => $text->file,
+                    'textbook' => $textbook,
+                ]);
+            }else{
+                return response()->json(['Error' => 'Permission denied to edit the text!']);
+            }
+
         }
         else{
             return response()->json(['Error' => 'Textbook not found!']);
@@ -188,7 +184,7 @@ class TextController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the text based on the text id.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -221,9 +217,46 @@ class TextController extends Controller
      */
     public function destroy($id)
     {
-        $t = Text::find($id);
-        $t->delete();
+        $text = Text::findOrFail($id);
+        $checkIfUserHasPermissionToDelete = $this->checkPermission($text->textbook_id);
 
-        return response()->json($t);
+        if($checkIfUserHasPermissionToDelete) {
+            $text->delete();
+        }else{
+            return response()->json(['Error' => 'Permission denied to delete text!']);
+        }
+        return response()->json($text);
+    }
+
+    /**
+     * Returns true or false if current user has the permission to perform an action.
+     * Admins are allowed to have access to anything.
+     * Module Tutors must have a text assigned to them to have access to CRUD.
+     * Students can only view data.
+     *
+     * @param $textbook_id
+     * @return bool
+     *
+     */
+    private function checkPermission($textbook_id)
+    {
+        $module = Module::whereHas(
+            'textbooks', function($q) use($textbook_id) {
+            $q->where('textbook_id', $textbook_id);
+        })->first();
+
+        $extensiveReading = ExtensiveReadingCategory::whereHas(
+            'textbooks', function($q) use($textbook_id) {
+            $q->where('textbook_id', $textbook_id);
+        })->first();
+
+        if(Auth::user()->role->name === 'Admin'){
+            return true;
+        } else {
+            if(Auth::user()->modules()->find($module) !== null || $extensiveReading !== null){
+                return true;
+            }
+        }
+        return false;
     }
 }
