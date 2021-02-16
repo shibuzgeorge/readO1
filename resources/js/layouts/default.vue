@@ -1,13 +1,18 @@
 <template >
-    <div v-if="user" class="d-flex" id="wrapper">
+    <div v-if="user && role" class="d-flex" id="wrapper">
       <!-- Sidebar -->
-    <sidebar-layout/>
-        <div id="page-content-wrapper">
+        <sidebar-layout />
+            <div id="page-content-wrapper">
+                <container-layout/>
+            </div>
+        </div>
+    <div v-else>
+        <div v-if="user && !role">
+            <clip-loader color="black"></clip-loader>
+        </div>
+        <div v-else>
             <container-layout/>
         </div>
-    </div>
-    <div v-else>
-        <container-layout/>
     </div>
 </template>
 
@@ -24,7 +29,8 @@ export default {
         ContainerLayout
     },
     computed: mapGetters({
-        user: 'auth/user'
+        user: 'auth/user',
+        role: 'auth/role',
     }),
 
 
