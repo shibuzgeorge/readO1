@@ -135,7 +135,7 @@ class TextbookTest extends TestCase
      * @test
      * @return void
      */
-    public function test_create_a_textbook_for_one_module_authorised_extensive_reading_category()
+    public function test_create_a_textbook_for_extensive_reading_category_authorised()
     {
         $randomExtensiveReadingCategory1 = ExtensiveReadingCategory::inRandomOrder()->first();
 
@@ -189,6 +189,39 @@ class TextbookTest extends TestCase
         $this->assertDatabaseHas('extensive_reading_category_textbook', [
             'extensive_reading_category_id' => $randomExtensiveReadingCategory2->id,
             'textbook_id' => Textbook::where('title', $ModuleTutorTextbook['title'])->first()->id,
+        ]);
+
+    }
+
+    /**
+     * A test to create a textbook unauthorised to a extensive reading category
+     * by logging in as a Student.
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_textbook_for_extensive_reading_category_unauthorised_as_student()
+    {
+        $randomExtensiveReadingCategory1 = ExtensiveReadingCategory::inRandomOrder()->first();
+
+        $StudentTextbook = [
+            'title' => 'Testing create a new textbook for extensive reading student',
+            'description' => 'This is a test for create a new textbook for extensive reading student',
+            'file' =>  new UploadedFile(public_path('example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'section' => 'extensiveReading',
+            'selected' => $randomExtensiveReadingCategory1->toJson()
+        ];
+
+        //Student textbook upload
+        $this->actingAs($this->studentUser)
+            ->postJson('/api/textbook', $StudentTextbook)
+            ->assertJsonFragment(['error' => 'Unauthorized'])
+            ->assertStatus(403);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $StudentTextbook['title'],
+            'description' => $StudentTextbook['description'],
+            'file' => base64_encode(file_get_contents(public_path('example.pdf')))
         ]);
 
     }
