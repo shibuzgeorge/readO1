@@ -12,6 +12,12 @@ use Tests\TestCase;
 
 class VerificationTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->artisan('db:seed');
+    }
+
     /** @test */
     public function can_verify_email()
     {
