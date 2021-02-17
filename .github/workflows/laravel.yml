@@ -2,9 +2,9 @@ name: read(O)1
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ main, dev ]
   pull_request:
-    branches: [ dev ]
+    branches: [ main, dev ]
 
 jobs:
   laravel-tests:
