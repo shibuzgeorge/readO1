@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CreateTextbooksTable extends Migration
@@ -17,9 +18,9 @@ class CreateTextbooksTable extends Migration
             $table->bigIncrements('id');
             $table->string('title');
             $table->string('description');
-            $table->binary('file')->nullable();
             $table->timestamps();
         });
+        DB::statement('ALTER TABLE textbooks ADD COLUMN file LONGBLOB DEFAULT NULL');
     }
 
     /**
