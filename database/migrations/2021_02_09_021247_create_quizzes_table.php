@@ -3,9 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
-class UpdateTextsFileType extends Migration
+class CreateQuizzesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +13,11 @@ class UpdateTextsFileType extends Migration
      */
     public function up()
     {
-        DB::statement('ALTER TABLE texts MODIFY COLUMN file LONGBLOB');
+        Schema::create('quizzes', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->bigInteger('text_id')->unsigned();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -24,6 +27,6 @@ class UpdateTextsFileType extends Migration
      */
     public function down()
     {
-        DB::statement('ALTER TABLE texts MODIFY COLUMN file BLOB');
+        Schema::dropIfExists('quizzes');
     }
 }

@@ -2,10 +2,9 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTextbooksTable extends Migration
+class CreateOptionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,13 +13,13 @@ class CreateTextbooksTable extends Migration
      */
     public function up()
     {
-        Schema::create('textbooks', function (Blueprint $table) {
+        Schema::create('options', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('title');
-            $table->string('description');
+            $table->longText('option');
+            $table->integer('points');
+            $table->bigInteger('question_id')->unsigned();
             $table->timestamps();
         });
-        DB::statement('ALTER TABLE textbooks ADD COLUMN file LONGBLOB DEFAULT NULL');
     }
 
     /**
@@ -30,6 +29,6 @@ class CreateTextbooksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('textbooks');
+        Schema::dropIfExists('options');
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
+use App\Option;
 use Illuminate\Database\Seeder;
-use App\ModuleTextbook;
 use Illuminate\Support\Facades\Schema;
 
-class ModuleTextbookTableSeeder extends Seeder
+class OptionsTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,6 +13,6 @@ class ModuleTextbookTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(ModuleTextbook::class, 10)->create();
+        factory(Option::class, 10)->create();
     }
 }

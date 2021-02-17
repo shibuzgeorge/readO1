@@ -3,9 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
-class UpdateTextbookType extends Migration
+class CreateForeignKeyForQuizzesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,9 +13,9 @@ class UpdateTextbookType extends Migration
      */
     public function up()
     {
-
-            DB::statement('ALTER TABLE textbooks MODIFY COLUMN file LONGBLOB');
-
+        Schema::table('quizzes', function (Blueprint $table) {
+            $table->foreign('text_id')->references('id')->on('texts')->onDelete('cascade');
+        });
     }
 
     /**
@@ -26,8 +25,8 @@ class UpdateTextbookType extends Migration
      */
     public function down()
     {
-
-            DB::statement('ALTER TABLE textbooks MODIFY COLUMN file BLOB');
-
+        Schema::table('quizzes', function (Blueprint $table) {
+            $table->dropForeign('quizzes_text_id_foreign');
+        });
     }
 }

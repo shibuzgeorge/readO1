@@ -1,10 +1,10 @@
 <?php
 
+use App\Question;
 use Illuminate\Database\Seeder;
-use App\ModuleTextbook;
 use Illuminate\Support\Facades\Schema;
 
-class ModuleTextbookTableSeeder extends Seeder
+class QuestionsTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,6 +13,6 @@ class ModuleTextbookTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(ModuleTextbook::class, 10)->create();
+        factory(Question::class, 10)->create();
     }
 }

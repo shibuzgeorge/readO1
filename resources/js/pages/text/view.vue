@@ -7,6 +7,10 @@
             <br/>
             <div class="d-flex justify-content-between align-items-center">
                 Description: {{description}}
+                <a style="float: right;" @click="manageQuiz()"><button class="btn btn-success" v-if="role==='Admin'|| role==='Module Tutor'">Edit Quiz</button></a>
+                <router-link :to="{ name: 'quiz.show', params: {id: $route.params.id} }">
+                    <button class="btn btn-success" v-if="role==='Student'">Finished Reading?</button>
+                </router-link>
                 <router-link :to="{ name: 'text.edit', params: {id: $route.params.id} }">
                     <button class="btn btn-success" v-if="role==='Admin'|| role==='Module Tutor'">Edit</button>
                 </router-link>
@@ -36,6 +40,12 @@
         <div v-else>
             No file has been uploaded for this text
         </div>
+        <sweet-modal ref="success" icon="success">
+            {{successMessage}}
+        </sweet-modal>
+        <sweet-modal ref="manageQuiz">
+                <manage-quiz :text_id="text_id" :parent="3"></manage-quiz>
+        </sweet-modal>
     </card>
     <div v-else>
         <sweet-modal ref="error" v-on:close="$router.push({name: 'home'})" icon="error">
@@ -49,10 +59,12 @@
     import axios from 'axios'
     import SpeedReader from '~/components/SpeedReader';
     import PDFViewer from '~/components/PDFViewer';
+    import ManageQuiz from "../../components/ManageQuiz";
     import { mapGetters } from 'vuex'
     export default {
         middleware: 'auth',
         components:{
+            ManageQuiz,
             SpeedReader,
             PDFViewer,
         },
@@ -69,6 +81,8 @@
             file: true,
             selection: 'pdf',
             path: '/lib/pdf/web/viewer.html',
+            successMessage: '',
+            text_id: '',
 
         }),
         created() {
@@ -92,9 +106,14 @@
                     }
                 }).catch(function (response) {
                 //handle error
-                self.$router.push({name: 'module.v.index'})
                 console.log(response);
             });
+        },
+        methods:{
+            manageQuiz(){
+                this.text_id = parseInt(this.$route.params.id);
+                this.$refs.manageQuiz.open();
+            },
         }
     }
 </script>

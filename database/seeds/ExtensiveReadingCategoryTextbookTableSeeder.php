@@ -2,6 +2,7 @@
 
 use App\ExtensiveReadingCategoryTextbook;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class ExtensiveReadingCategoryTextbookTableSeeder extends Seeder
 {

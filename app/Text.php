@@ -17,4 +17,12 @@ class Text extends Model
     {
         return $this->belongsTo('App\Textbook', 'textbook_id');
     }
+
+    /**
+     * Quizzes relationship
+     */
+    public function quizzes()
+    {
+        return $this->hasMany('App\Quiz');
+    }
 }

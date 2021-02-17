@@ -15,10 +15,6 @@ class ModulesTableSeeder extends Seeder
      */
     public function run()
     {
-        Schema::disableForeignKeyConstraints();
-        Module::truncate();
-        Schema::enableForeignKeyConstraints();
-
         $year3 = YearGroup::where('name', 'Year 3')->first();
 
         Module::create(['name' => 'Software Project Management', 'module_code' => 'CS3360', 'year_group_id' => $year3->id]);
