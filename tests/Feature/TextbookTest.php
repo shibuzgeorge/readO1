@@ -96,4 +96,35 @@ class TextbookTest extends TestCase
         ]);
     }
 
+    /**
+     * A test to create a textbook unauthorised by logging in as a Student
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_textbook_for_one_module_unauthorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => 'Testing create a new textbook as student',
+            'description' => 'This is a test for create a new textbook as student',
+            'file' =>  new UploadedFile(public_path('example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'section' => 'module',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->studentUser)
+            ->postJson('/api/textbook', $textbook)
+            ->assertJsonFragment(['error' => 'Unauthorized'])
+            ->assertStatus(403);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+            'file' => base64_encode(file_get_contents(public_path('example.pdf')))
+        ]);
+
+    }
+
 }
