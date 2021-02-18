@@ -19,8 +19,8 @@ class TextsTableSeeder extends Seeder
         $text1 = Text::create([
             'title' => 'Chapter 1',
             'description' => 'Chapter 1',
-            'textbook_id' => \App\Textbook::where('title', 'Introduction to software project management')->first()->id,
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))]);
+            'textbook_id' => \App\Textbook::where('title', 'Software Measurement and Estimation')->first()->id,
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
 
         $quiz_object1 = Quiz::create(['text_id' => $text1->id]);
         $create_question1 = Question::create(['question' => 'What is software project management', 'quiz_id' => $quiz_object1->id]);
@@ -47,20 +47,44 @@ class TextsTableSeeder extends Seeder
         Text::create([
             'title' => 'Chapter 2',
             'description' => 'Chapter 2',
-            'textbook_id' => \App\Textbook::where('title', 'Introduction to software project management')->first()->id,
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))]);
+            'textbook_id' => \App\Textbook::where('title', 'Software Measurement and Estimation')->first()->id,
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
+
+        Text::create([
+            'title' => 'Chapter 1',
+            'description' => 'Chapter 1',
+            'textbook_id' => \App\Textbook::where('title', 'Project Management for Information Systems (5th Edition)')->first()->id,
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/PMIS/chapter1.pdf')))]);
+
+        Text::create([
+            'title' => 'Chapter 2',
+            'description' => 'Chapter 2',
+            'textbook_id' => \App\Textbook::where('title', 'Project Management for Information Systems (5th Edition)')->first()->id,
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/PMIS/chapter2.pdf')))]);
 
         Text::create([
             'title' => 'Chapter 1',
             'description' => 'Chapter 1',
             'textbook_id' => \App\Textbook::where('title', 'Introduction to computational intelligence')->first()->id,
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))]);
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
 
         Text::create([
             'title' => 'Chapter 2',
             'description' => 'Chapter 2',
             'textbook_id' => \App\Textbook::where('title', 'Introduction to computational intelligence')->first()->id,
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))]);
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
+
+        Text::create([
+            'title' => 'Chapter 1',
+            'description' => 'Chapter 1',
+            'textbook_id' => \App\Textbook::where('title', 'Data Mining Concepts and Techniques Third Edition')->first()->id,
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
+
+        Text::create([
+            'title' => 'Chapter 2',
+            'description' => 'Chapter 2',
+            'textbook_id' => \App\Textbook::where('title', 'Data Mining Concepts and Techniques Third Edition')->first()->id,
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
 
         //Create faker texts
         factory(Text::class, 20)->create();

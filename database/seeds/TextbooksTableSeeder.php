@@ -17,24 +17,39 @@ class TextbooksTableSeeder extends Seeder
      */
     public function run()
     {
-        $textbook1 = Textbook::create([
-            'title' => 'Introduction to software project management',
-            'description' => 'Introduction to software project management',
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))]);
+        $textbookspm1 = Textbook::create([
+            'title' => 'Software Measurement and Estimation',
+            'description' => 'Linda M. Laird M. Carol Brennan ISBN 0-471-67622-5',
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/Software_Measurement_and_Estimation.pdf')))]);
 
-        $textbook1->modules()->attach(Module::where('module_code', 'CS3360')->first());
+        $textbookspm2 = Textbook::create([
+            'title' => 'Project Management for Information Systems (5th Edition)',
+            'description' => 'James Cadle and Donald Yeates',
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/Project_Management_for_Information_Systems_(5th Edition).pdf')))]);
+
+        $textbookspm1->modules()->attach(Module::where('module_code', 'CS3360')->first());
+        $textbookspm2->modules()->attach(Module::where('module_code', 'CS3360')->first());
 
         $textbook2 = Textbook::create([
             'title' => 'Introduction to computational intelligence',
             'description' => 'Introduction to computational intelligence',
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))]);
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
 
         $textbook2->modules()->attach(Module::where('module_code', 'CS3910')->first());
+
+        $textbook4 = Textbook::create([
+            'title' => 'Data Mining Concepts and Techniques Third Edition',
+            'description' => 'Han, J., Kamber, M. and Pei, J. (2011) Data
+            Mining: Concepts and Techniques, Morgan
+            Kaufmann Publishers. ISBN 0123814790',
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/data_mining_textbook.pdf')))]);
+
+        $textbook4->modules()->attach(Module::where('module_code', 'CS3440')->first());
 
         $textbook3 = Textbook::create([
             'title' => 'Fun AI textbook',
             'description' => 'Introduction to AI and data science',
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))]);
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
 
         $erc = ExtensiveReadingCategory::create(['name' => 'Artificial Intelligence', 'description' => 'The world of AI technology']);
 

@@ -49,7 +49,7 @@ class TextbookTest extends TestCase
         $AdminTextbook = [
             'title' => 'Testing create a new textbook as admin',
             'description' => 'This is a test for create a new textbook as admin',
-            'file' =>  new UploadedFile(public_path('example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
             'section' => 'module',
             'selected' => $randomModule->toJson()
         ];
@@ -63,7 +63,7 @@ class TextbookTest extends TestCase
         $this->assertDatabaseHas('textbooks', [
             'title' => $AdminTextbook['title'],
             'description' => $AdminTextbook['description'],
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))
         ]);
 
         $this->assertDatabaseHas('module_textbook', [
@@ -75,7 +75,7 @@ class TextbookTest extends TestCase
         $ModuleTutorTextbook = [
             'title' => 'Testing create a new textbook as module tutor',
             'description' => 'This is a test for create a new textbook as module tutor',
-            'file' =>  new UploadedFile(public_path('example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
             'section' => 'module',
             'selected' => $this->moduleTutorUser->modules()->first()->toJson()
         ];
@@ -88,7 +88,7 @@ class TextbookTest extends TestCase
         $this->assertDatabaseHas('textbooks', [
             'title' => $ModuleTutorTextbook['title'],
             'description' => $ModuleTutorTextbook['description'],
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))
         ]);
 
         $this->assertDatabaseHas('module_textbook', [
@@ -110,7 +110,7 @@ class TextbookTest extends TestCase
         $textbook = [
             'title' => 'Testing create a new textbook as student',
             'description' => 'This is a test for create a new textbook as student',
-            'file' =>  new UploadedFile(public_path('example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
             'section' => 'module',
             'selected' => $randomModule->toJson()
         ];
@@ -123,7 +123,7 @@ class TextbookTest extends TestCase
         $this->assertDatabaseMissing('textbooks', [
             'title' => $textbook['title'],
             'description' => $textbook['description'],
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))
         ]);
 
     }
@@ -142,7 +142,7 @@ class TextbookTest extends TestCase
         $AdminTextbook = [
             'title' => 'Testing create a new textbook for extensive reading admin',
             'description' => 'This is a test for create a new textbook for extensive reading admin',
-            'file' =>  new UploadedFile(public_path('example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
             'section' => 'extensiveReading',
             'selected' => $randomExtensiveReadingCategory1->toJson()
         ];
@@ -156,7 +156,7 @@ class TextbookTest extends TestCase
         $this->assertDatabaseHas('textbooks', [
             'title' => $AdminTextbook['title'],
             'description' => $AdminTextbook['description'],
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))
         ]);
 
         $this->assertDatabaseHas('extensive_reading_category_textbook', [
@@ -170,7 +170,7 @@ class TextbookTest extends TestCase
         $ModuleTutorTextbook = [
             'title' => 'Testing create a new textbook for extensive reading module tutor',
             'description' => 'This is a test for create a new textbook for extensive reading module tutor',
-            'file' =>  new UploadedFile(public_path('example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
             'section' => 'extensiveReading',
             'selected' => $randomExtensiveReadingCategory2->toJson()
         ];
@@ -183,7 +183,7 @@ class TextbookTest extends TestCase
         $this->assertDatabaseHas('textbooks', [
             'title' => $ModuleTutorTextbook['title'],
             'description' => $ModuleTutorTextbook['description'],
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))
         ]);
 
         $this->assertDatabaseHas('extensive_reading_category_textbook', [
@@ -207,7 +207,7 @@ class TextbookTest extends TestCase
         $StudentTextbook = [
             'title' => 'Testing create a new textbook for extensive reading student',
             'description' => 'This is a test for create a new textbook for extensive reading student',
-            'file' =>  new UploadedFile(public_path('example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
             'section' => 'extensiveReading',
             'selected' => $randomExtensiveReadingCategory1->toJson()
         ];
@@ -221,7 +221,7 @@ class TextbookTest extends TestCase
         $this->assertDatabaseMissing('textbooks', [
             'title' => $StudentTextbook['title'],
             'description' => $StudentTextbook['description'],
-            'file' => base64_encode(file_get_contents(public_path('example.pdf')))
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))
         ]);
 
     }
