@@ -27,6 +27,7 @@ class UsersTableSeeder extends Seeder
         $eat = Module::where('module_code', 'CS3160')->first();
         $spm = Module::where('module_code', 'CS3360')->first();
         $is = Module::where('module_code', 'CS3190')->first();
+        $dm = Module::where('module_code', 'CS3440')->first();
 
         User::create([
             'name'=> 'Admin User',
@@ -78,10 +79,10 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $student1->modules()->sync([$ci->id, $spm->id, $eat->id, $is->id]);
-        $student2->modules()->sync([$spm->id, $eat->id]);
+        $student2->modules()->sync([$spm->id, $eat->id, $dm->id]);
         $student3->modules()->sync([$ci->id, $spm->id, $is->id]);
         $moduleTutor1->modules()->sync([$ci->id, $spm->id, $eat->id, $is->id]);
-        $moduleTutor2->modules()->sync([$spm->id, $eat->id]);
+        $moduleTutor2->modules()->sync([$spm->id, $eat->id, $dm->id]);
         $moduleTutor3->modules()->sync([$ci->id, $spm->id, $is->id]);
 
         //Create students with no modules assigned.
