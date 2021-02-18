@@ -54,13 +54,13 @@ class TextsTableSeeder extends Seeder
             'title' => 'Chapter 1',
             'description' => 'Chapter 1',
             'textbook_id' => \App\Textbook::where('title', 'Project Management for Information Systems (5th Edition)')->first()->id,
-            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/PMIS/chapter1.pdf')))]);
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
 
         Text::create([
             'title' => 'Chapter 2',
             'description' => 'Chapter 2',
             'textbook_id' => \App\Textbook::where('title', 'Project Management for Information Systems (5th Edition)')->first()->id,
-            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/PMIS/chapter2.pdf')))]);
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
 
         Text::create([
             'title' => 'Chapter 1',
