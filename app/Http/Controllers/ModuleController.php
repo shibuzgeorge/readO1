@@ -53,12 +53,13 @@ class ModuleController extends Controller
      */
     public function create()
     {
-
         $modules = Module::with('yearGroup')->get();
+        $unassigned = Textbook::doesntHave('modules')->doesntHave('extensiveReadingCategories')->get();
         $year_groups = YearGroup::all();
         return response()->json([
             'modules' => $modules,
-            'year_groups'=> $year_groups
+            'year_groups'=> $year_groups,
+            'unassigned' => $unassigned
         ]);
     }
 

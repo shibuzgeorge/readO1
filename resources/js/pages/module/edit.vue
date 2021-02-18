@@ -14,6 +14,7 @@
                         {{ year.name }}
                     </option>
                 </select><br/>
+                <div v-if="form.textbooks.length > 0">
                 <label>Current Textbooks:     </label>
                 <ul>
                     <li v-for="textbook in form.textbooks">
@@ -23,7 +24,9 @@
                         </div>
                     </li>
                 </ul>
-                <label>Unassigned Textbooks:     </label>
+                </div>
+                <div v-if="form.unassigned.length > 0">
+                <label>Add any of these unassigned Textbooks?     </label>
                 <ul>
                     <li v-for="textbook in form.unassigned">
                         <div class="form-check">
@@ -32,7 +35,7 @@
                         </div>
                     </li>
                 </ul>
-
+                </div>
             </div>
             <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
                 {{successMessage}}
