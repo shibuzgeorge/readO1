@@ -19,7 +19,7 @@ class TextsTableSeeder extends Seeder
         $text1 = Text::create([
             'title' => 'Chapter 1',
             'description' => 'Chapter 1',
-            'textbook_id' => \App\Textbook::where('title', 'Software Project Management 2nd Edition')->first()->id,
+            'textbook_id' => \App\Textbook::where('title', 'Software Measurement and Estimation')->first()->id,
             'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
 
         $quiz_object1 = Quiz::create(['text_id' => $text1->id]);
@@ -47,7 +47,7 @@ class TextsTableSeeder extends Seeder
         Text::create([
             'title' => 'Chapter 2',
             'description' => 'Chapter 2',
-            'textbook_id' => \App\Textbook::where('title', 'Software Project Management 2nd Edition')->first()->id,
+            'textbook_id' => \App\Textbook::where('title', 'Software Measurement and Estimation')->first()->id,
             'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
 
         Text::create([

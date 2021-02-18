@@ -18,9 +18,9 @@ class TextbooksTableSeeder extends Seeder
     public function run()
     {
         $textbookspm1 = Textbook::create([
-            'title' => 'Software Project Management 2nd Edition',
-            'description' => 'Bob Hughes and Mike Cotterell, McGraw-Hill IS007B 70N9505 7',
-            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/Software_Project_Management_2nd_Edition.pdf')))]);
+            'title' => 'Software Measurement and Estimation',
+            'description' => 'Linda M. Laird M. Carol Brennan ISBN 0-471-67622-5',
+            'file' => base64_encode(file_get_contents(public_path('/readingMaterial/Software_Measurement_and_Estimation.pdf')))]);
 
         $textbookspm2 = Textbook::create([
             'title' => 'Project Management for Information Systems (5th Edition)',
