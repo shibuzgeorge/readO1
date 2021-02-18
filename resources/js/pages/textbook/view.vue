@@ -9,17 +9,20 @@
                     </h5>
 
                     <div class="wrapper mt-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="col-xs-3">
+                        <div>
+                            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.edit', params: {id: $route.params.id} }">
+                                <button class="btn btn-sm btn-primary" v-if="role!=='Student'">Edit</button>
+                            </router-link>
+                            <div style="float: right;" class="ml-2">
+                            <a @click="manageQuiz()"><button class="btn btn-sm btn-success" v-if="role!=='Student'">+ Manage Quizzes</button></a>
+                            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }">
+                                <button class="btn btn-sm btn-success" v-if="role!=='Student'">+ Add text</button>
+                            </router-link>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
                                 <input type="search" v-model="searchQuery" class="form-control" placeholder="Search..."
                                        aria-label="Search" />
-                            </div>
-                            <div>
-                                <a style="float: right;" @click="manageQuiz()"><button class="btn btn-success" v-if="role!=='Student'">+ Manage Quizzes</button></a>
-                                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }">
-                                    <button class="btn btn-success" v-if="role!=='Student'">+ Add text</button>
-                                </router-link>
-                            </div>
                         </div>
                         <h1 style="text-align: center;" class="mt-4" v-if="!texts || !texts.length">
                             This textbook has no texts!
@@ -52,15 +55,20 @@
                     </h5>
 
                     <div class="wrapper mt-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="col-xs-3">
+                        <div>
+                            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.edit', params: {id: $route.params.id} }">
+                                <button class="btn btn-sm btn-primary" v-if="role!=='Student'">Edit</button>
+                            </router-link>
+                            <div style="float: right;" class="ml-2">
+                                <a @click="manageQuiz()"><button class="btn btn-sm btn-success" v-if="role!=='Student'">+ Manage Quizzes</button></a>
+                                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }">
+                                    <button class="btn btn-sm btn-success" v-if="role!=='Student'">+ Add text</button>
+                                </router-link>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
                                 <input type="search" v-model="searchQuery" class="form-control" placeholder="Search..."
                                        aria-label="Search" />
-                            </div>
-                            <a style="float: right;" @click="manageQuiz()"><button class="btn btn-success" v-if="role!=='Student'">+ Manage Quizzes</button></a>
-                            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }">
-                                <button class="btn btn-success" v-if="role!=='Student'">+ Add text</button>
-                            </router-link>
                         </div>
                         <h1 style="text-align: center;" class="mt-4" v-if="!texts || !texts.length">
                             This textbook has no texts!
