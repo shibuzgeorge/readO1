@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Textbook;
 use App\YearGroup;
 use App\Module;
 use App\User;
@@ -60,6 +61,45 @@ class ModuleTest extends TestCase
     }
 
     /**
+     * A test to create a module with 2 unassigned textbooks checked and authorised by logging in as an Admin
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_module_checking_unassigned_textbooks_authorised()
+    {
+        $unassignedTextbookIds = Textbook::doesntHave('modules')->doesntHave('extensiveReadingCategories')
+            ->inRandomOrder()->take(2)->pluck('id')->toArray();
+
+        $module = [
+            'module_name' => 'testing1234',
+            'module_code' => 'CS37788',
+            'module_year' => YearGroup::find(1)->id,
+            'checked' => $unassignedTextbookIds
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/module', $module)
+            ->assertSuccessful()
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('modules', [
+            'name' => $module['module_name'],
+            'module_code' => $module['module_code'],
+            'year_group_id' => $module['module_year']
+        ]);
+
+        $getModule = Module::where('name', $module['module_name'])->first();
+
+        foreach ($unassignedTextbookIds as $unassignedTextbookId){
+            $this->assertDatabaseHas('module_textbook', [
+                'module_id' => $getModule->id,
+                'textbook_id' => $unassignedTextbookId
+            ]);
+        }
+    }
+
+    /**
      * A test to create a module unauthorised by logging in as a Student or Module Tutor.
      *
      * @test
@@ -84,11 +124,11 @@ class ModuleTest extends TestCase
             'year_group_id' => $module['module_year']
         ]);
 
-
         $this->actingAs($this->moduleTutorUser)
             ->postJson('/api/module', $module)
             ->assertJsonFragment(['error' => 'Unauthorized'])
             ->assertStatus(403);
+
         $this->assertDatabaseMissing('modules', [
             'name' => $module['module_name'],
             'module_code' => $module['module_code'],
@@ -194,6 +234,79 @@ class ModuleTest extends TestCase
             'name' => 'updated module 2',
             'module_code' => 'CS3778878',
             'year_group_id' => YearGroup::find(3)->id
+        ]);
+    }
+
+    /**
+     * A test to update a module with checked unassigned textbook authorised
+     * Also test to uncheck a current textbook in the module
+     * by logging in as a Admin or Module tutor
+     *
+     * @return void
+     */
+    public function test_update_a_module_checked_unassigned_textbooks_authorised()
+    {
+        $year_group = YearGroup::find(1);
+
+        $module = Module::create([
+            'name' => 'original module',
+            'module_code' => 'TS357755',
+            'year_group_id' => $year_group->id]);
+
+        $unassignedTextbookIds = Textbook::doesntHave('modules')->doesntHave('extensiveReadingCategories')
+            ->inRandomOrder()->take(2)->pluck('id')->toArray();
+
+        $this->actingAs($this->adminUser)
+            ->patchJson('/api/module/'.$module->id, [
+                'module_name' => 'updated module 1',
+                'module_code' => 'CS377887',
+                'module_year' => YearGroup::find(2)->id,
+                'checked' => $unassignedTextbookIds
+            ])->assertSuccessful()
+            ->assertJsonFragment(['Success' => 'Successfully Updated!'])
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('modules', [
+            'id' => $module->id,
+            'name' => 'updated module 1',
+            'module_code' => 'CS377887',
+            'year_group_id' => YearGroup::find(2)->id
+        ]);
+
+        foreach ($unassignedTextbookIds as $unassignedTextbookId){
+            $this->assertDatabaseHas('module_textbook', [
+                'module_id' => $module->id,
+                'textbook_id' => $unassignedTextbookId
+            ]);
+        }
+
+        $getTextbooks = $module->textbooks()->pluck('textbooks.id')->toArray();
+
+        $this->actingAs($this->moduleTutorUser)
+            ->patchJson('/api/module/'.$module->id, [
+                'module_name' => 'updated module 2',
+                'module_code' => 'CS3778878',
+                'module_year' => YearGroup::find(3)->id,
+                'checked' => $getTextbooks[0]
+            ])->assertSuccessful()
+            ->assertJsonFragment(['Success' => 'Successfully Updated!'])
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('modules', [
+            'id' => $module->id,
+            'name' => 'updated module 2',
+            'module_code' => 'CS3778878',
+            'year_group_id' => YearGroup::find(3)->id
+        ]);
+
+        $this->assertDatabaseHas('module_textbook', [
+            'module_id' => $module->id,
+            'textbook_id' => $getTextbooks[0]
+        ]);
+
+        $this->assertDatabaseMissing('module_textbook', [
+            'module_id' => $module->id,
+            'textbook_id' => $getTextbooks[1]
         ]);
     }
 

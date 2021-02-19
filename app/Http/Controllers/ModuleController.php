@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Module;
 use App\Role;
+use App\Textbook;
 use App\YearGroup;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -52,12 +53,13 @@ class ModuleController extends Controller
      */
     public function create()
     {
-
         $modules = Module::with('yearGroup')->get();
+        $unassigned = Textbook::doesntHave('modules')->doesntHave('extensiveReadingCategories')->get();
         $year_groups = YearGroup::all();
         return response()->json([
             'modules' => $modules,
-            'year_groups'=> $year_groups
+            'year_groups'=> $year_groups,
+            'unassigned' => $unassigned
         ]);
     }
 
@@ -69,7 +71,13 @@ class ModuleController extends Controller
      */
     public function store(Request $request)
     {
-        Module::create(['name' => $request->module_name, 'module_code' => $request->module_code, 'year_group_id' => $request->module_year]);
+        $module = Module::create([
+            'name' => $request->module_name,
+            'module_code' => $request->module_code,
+            'year_group_id' => $request->module_year
+        ]);
+
+        $module->textbooks()->sync($request->checked);
         return response()->json(['Success' => 'Successfully Created!']);
     }
 
@@ -220,11 +228,16 @@ class ModuleController extends Controller
     public function edit($module_id)
     {
         $m = Module::with('yearGroup')->find($module_id);
+        $textbooks = $m->textbooks()->get();
+        $unassigned = Textbook::doesntHave('modules')->doesntHave('extensiveReadingCategories')->get();
+
         if($m != null) {
             return response()->json([
                 'name' => $m->name,
                 'code' => $m->module_code,
                 'year' => $m->yearGroup,
+                'textbooks' => $textbooks,
+                'unassigned' => $unassigned
             ]);
         }else{
             return response()->json(['Error' => 'Module not found!']);
@@ -245,7 +258,7 @@ class ModuleController extends Controller
         $m->module_code = $request->module_code;
         $m->year_group_id = $request->module_year;
         $m->save();
-
+        $m->textbooks()->sync($request->checked);
         return response()->json(['Success' => 'Successfully Updated!']);
     }
 

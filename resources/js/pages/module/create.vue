@@ -17,7 +17,17 @@
                         {{ year.name }}
                     </option>
                 </select><br/>
-                <br/>
+                <div v-if="form.unassigned.length > 0">
+                    <label>Want to add of these unassigned textbooks?     </label>
+                <div>
+                    <div v-for="textbook in form.unassigned">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" :value="textbook.id" v-model="form.checked">
+                            <label class="form-check-label">{{textbook.title}} - {{textbook.description}}</label>
+                        </div>
+                    </div>
+                </div>
+                </div>
             </div>
             <sweet-modal ref="success" v-on:close="$router.push({name: 'module.index' , query: { page: 'last' }})" icon="success">
                 {{successMessage}}
@@ -55,7 +65,8 @@
                 module_name: '',
                 module_code: '',
                 module_year: 'Please select a year group',
-
+                unassigned: '',
+                checked: [],
             }),
             successMessage: '',
             year_groups: '',
@@ -68,6 +79,7 @@
                     this.isLoaded = true;
                     this.modules = response.data.modules;
                     this.year_groups = response.data.year_groups;
+                    this.form.unassigned = response.data.unassigned;
                 }).catch(function (response) {
                 //handle error
                 console.log(response);
@@ -79,6 +91,7 @@
                     module_name: this.form.module_name,
                     module_code: this.form.module_code,
                     module_year: this.form.module_year,
+                    checked: this.form.checked,
                 })
                     .then(response => {
                         this.successMessage = response.data.Success;

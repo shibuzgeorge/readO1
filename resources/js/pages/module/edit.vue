@@ -14,7 +14,28 @@
                         {{ year.name }}
                     </option>
                 </select><br/>
-                <br/>
+                <div v-if="form.textbooks.length > 0">
+                <label>Current Textbooks:     </label>
+                <ul>
+                    <li v-for="textbook in form.textbooks">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="exampleCheck1" :value="textbook.id" v-model="form.checked">
+                            <label class="form-check-label" for="exampleCheck1">{{textbook.title}} - {{textbook.description}}</label>
+                        </div>
+                    </li>
+                </ul>
+                </div>
+                <div v-if="form.unassigned.length > 0">
+                <label>Add any of these unassigned Textbooks?     </label>
+                <ul>
+                    <li v-for="textbook in form.unassigned">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" :value="textbook.id" v-model="form.checked">
+                            <label class="form-check-label" for="exampleCheck1">{{textbook.title}} - {{textbook.description}}</label>
+                        </div>
+                    </li>
+                </ul>
+                </div>
             </div>
             <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
                 {{successMessage}}
@@ -44,6 +65,9 @@
                 module_name: '',
                 module_code: '',
                 module_year: '',
+                textbooks: '',
+                checked: [],
+                unassigned: '',
             }),
             errorMessage: '',
             successMessage: '',
@@ -70,6 +94,11 @@
                         this.form.module_name = response.data.name;
                         this.form.module_code = response.data.code;
                         this.form.module_year = response.data.year.id;
+                        this.form.textbooks = response.data.textbooks;
+                        this.form.unassigned = response.data.unassigned;
+                        this.form.textbooks.forEach(function (textbook) {
+                            self.form.checked.push(textbook.id);
+                        });
 
                     }
                 }).catch(function (response) {
