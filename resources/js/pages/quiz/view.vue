@@ -34,6 +34,9 @@
         </div>
         <div v-else>
             There is no quiz is available for this text.
+            <router-link :to="{ name: 'home' }">
+                <button class="btn btn-success">Go back to dashboard</button>
+            </router-link>
         </div>
     </card>
     <div v-else>
@@ -75,8 +78,13 @@
                         this.$refs.error.open();
                     }else{
                         this.isLoaded = true;
-                        this.form.quiz = response.data.quiz;
-                        this.getTotal(self);
+                        if(response.data.quiz !== null){
+                            this.form.quiz = response.data.quiz;
+                            this.getTotal(self);
+                        }else{
+                            this.form.quiz = '';
+                        }
+
                     }
                 }).catch(function (response) {
                 //handle error
