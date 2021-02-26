@@ -12,4 +12,12 @@ class ReadingSession extends Model
         'text_id', 'user_id', 'time_taken', 'attempt_number'
     ];
 
+    /**
+     * Text relationship
+     */
+    public function text()
+    {
+        return $this->belongsTo('App\Text', 'text_id');
+    }
+
 }

@@ -22,6 +22,8 @@ return [
         // Post::class => [
         //     'user'
         // ]
+        \App\ExtensiveReadingCategoryTextbook::class,
+        \App\ModuleTextbook::class
     ],
 
     /*
