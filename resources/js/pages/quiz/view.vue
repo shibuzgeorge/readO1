@@ -7,6 +7,7 @@
             <br/>
         </h5>
         <br/>
+        Attempt Number: {{attempt_num+1}}
         <div v-if="form.quiz || form.quiz.length">
             <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
         <div v-for="(question, index) in form.quiz.questions">
@@ -29,7 +30,14 @@
             <v-button class="form-control" :loading="form.busy" type="success">Submit</v-button>
             </form>
             <sweet-modal ref="success" icon="success">
-                You've scored: {{totalPointsCollected}} out of a possible {{totalAvailablePoints}}
+                You've scored: {{totalPointsCollected}} out of a possible {{totalAvailablePoints}}<br/>
+                We've emailed you the results as a PDF and you can view and download right now. <br/><br/>
+                <button class="btn btn-success" v-on:click="$refs.viewResults.open()">View results</button>
+                <button class="btn btn-success">Download PDF results</button>
+                <button class="btn btn-success">Go to dashboard</button>
+            </sweet-modal>
+            <sweet-modal ref="viewResults">
+                <PDFViewer :fileName="fileName" :path="path"/>
             </sweet-modal>
         </div>
         <div v-else>
@@ -51,11 +59,15 @@
     import axios from 'axios'
     import { mapGetters } from 'vuex'
     import Form from 'vform'
+    import PDFViewer from '~/components/PDFViewer';
     export default {
         middleware: 'auth',
         computed: mapGetters({
             role: 'auth/role'
         }),
+        components:{
+            PDFViewer,
+        },
         data: () => ({
             isLoaded: false,
             form: new Form({
@@ -63,7 +75,11 @@
                 busy: false,
                 selected: [],
             }),
+            fileName: '',
+            quiz_id: 0,
+            path: '/lib/pdf/web/viewer.html',
             errorMessage: '',
+            attempt_num: 0,
             successMessage: '',
             numOfQuestions: 1,
             totalPointsCollected: '',
@@ -77,9 +93,9 @@
                         this.errorMessage = response.data.Error;
                         this.$refs.error.open();
                     }else{
-                        this.isLoaded = true;
                         if(response.data.quiz !== null){
                             this.form.quiz = response.data.quiz;
+                            this.getAttempt(self);
                             this.getTotal(self);
                         }else{
                             this.form.quiz = '';
@@ -90,6 +106,7 @@
                 //handle error
                 console.log(response);
             });
+
 
         },
         methods:{
@@ -102,10 +119,14 @@
                 this.form.busy = true;
                 let formData = new FormData();
                 formData.append('selected', JSON.stringify(this.form.selected));
+                formData.append('quiz_id', JSON.stringify(this.form.quiz.id));
+                formData.append('attempt_num', JSON.stringify(this.attempt_num+1));
                 await axios.post('/api/quiz/result',formData,
                     {})
                     .then(response => {
+                        console.log(response);
                         this.totalPointsCollected = response.data.totalPointsCollected;
+                        this.fileName =`/api/quiz/getResultPDF/${this.form.quiz.id}`
                         this.$refs.success.open();
                     })
                     .catch(error => {
@@ -125,6 +146,21 @@
                 });
                 qpoints.forEach(g => max.push(Math.max.apply(Math, g)));
                 self.totalAvailablePoints = max.reduce((a, b) => a + b, 0);
+            },
+            getAttempt(self){
+                //Gets attempt number of previous attempts for a user for a particular quiz.
+                axios.get('/api/quiz/getAttempt/'+self.form.quiz.id)
+                    .then(response => {
+                        if(Object.keys(response.data).length){
+                            self.attempt_num = response.data.attempt;
+                        }else{
+                            self.attempt_num = 0;
+                        }
+                        this.isLoaded = true;
+                    }).catch(function (response) {
+                    //handle error
+                    console.log(response);
+                });
             }
         }
     }

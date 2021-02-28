@@ -4,20 +4,20 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ReadingSession extends Model
+class UserQuizScore extends Model
 {
-    protected $table = 'reading_sessions';
+    protected $table = 'user_quiz_score';
 
     protected $fillable = [
-        'text_id', 'user_id', 'time_taken', 'attempt_number'
+         'user_id', 'quiz_id', 'attempt_number', 'result', 'score'
     ];
 
     /**
-     * Text relationship
+     * Quiz relationship
      */
-    public function text()
+    public function quiz()
     {
-        return $this->belongsTo('App\Text', 'text_id');
+        return $this->belongsTo('App\Quiz', 'quiz_id');
     }
 
     /**
@@ -27,5 +27,4 @@ class ReadingSession extends Model
     {
         return $this->belongsTo('App\User', 'user_id');
     }
-
 }

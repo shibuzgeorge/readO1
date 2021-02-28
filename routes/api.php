@@ -43,6 +43,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/text/saveAttempt', 'TextController@saveAttempt');
     Route::get('/text/getAttempt/{text_id}', 'TextController@getAttempt');
 
+    Route::get('/quiz/getAttempt/{quiz_id}', 'QuizController@getAttempt');
+    Route::get('/quiz/getResultPDF/{quiz_id}', 'QuizController@getResultPDF');
     Route::get('/quiz/{text_id}', 'QuizController@show');
     Route::post('/quiz/result', 'QuizController@result');
     Route::get('/quiz/edit/{text_id}', 'QuizController@edit');

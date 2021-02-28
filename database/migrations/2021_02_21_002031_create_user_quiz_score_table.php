@@ -18,6 +18,7 @@ class CreateUserQuizScoreTable extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('quiz_id')->unsigned();
             $table->Integer('attempt_number');
+            $table->binary('result');
             $table->Integer('score');
             $table->timestamps();
         });

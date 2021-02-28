@@ -6,6 +6,9 @@ use App\Option;
 use App\Question;
 use App\Quiz;
 use App\Text;
+use App\UserQuizScore;
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 
 class QuizController extends Controller
@@ -50,9 +53,55 @@ class QuizController extends Controller
             array_push($points,$o->points);
         }
         $totalPointsCollected = array_sum($points);
+
+        $quiz_object = Quiz::where('id',$request->input('quiz_id'));
+
+        $quiz = collect($quiz_object->with('questions','options')->get()
+            ->map(function ($event) {
+                return [
+                    'questions' => $event->questions->map(function ($event2) {
+                        return [
+                            'question_text' => $event2->question,
+                            'options' =>$event2->options->map(function ($event3) {
+                                return [
+                                    'option_text' => $event3->option,
+                                    'points' => $event3->points
+                                ];})
+                        ];})
+                ];})[0]);
+
+        $pdf = PDF::loadView('pdf', compact('quiz', 'totalPointsCollected'));
+        $pdf->save('testing.pdf');
+        $base64 = base64_encode(file_get_contents('testing.pdf'));
+        File::delete('testing.pdf');
+        UserQuizScore::create([
+            'user_id' => auth()->user()->id,
+            'quiz_id' => $request->input('quiz_id'),
+            'attempt_number' => $request->input('attempt_num'),
+            'result' => $base64,
+            'score' => $totalPointsCollected
+            ]);
+
         return response()->json([
             'totalPointsCollected' => $totalPointsCollected,
         ]);
+    }
+
+    /**
+     * Gets the last attempt for a particular quiz for a user to the database.
+     * @param $quiz_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAttempt($quiz_id)
+    {
+        $last_attempt = UserQuizScore::where('quiz_id',$quiz_id)->where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
+        if($last_attempt!= null){
+            return response()->json([
+                'attempt' => $last_attempt->attempt_number,
+            ]);
+        }else{
+            return response()->json(null);
+        }
     }
 
     /**
@@ -110,5 +159,34 @@ class QuizController extends Controller
         return response()->json([
             'quizzes' => $allQuiz
         ]);
+    }
+
+    /**
+     *
+     * Returns a header for PDF download.
+     * Downloads the PDF of the results based on the quiz_id passed in.
+     * Only authorised users can download.
+     *
+     * @param $quiz_id
+     * @return mixed
+     */
+    public function getResultPDF($quiz_id)
+    {
+        $quiz = UserQuizScore::where('quiz_id', $quiz_id)->where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
+
+        if ($quiz == null) {
+            return response()->json(['Error' => 'Quiz results not found!']);
+        }
+
+            $file_contents = base64_decode($quiz->result);
+
+            return response($file_contents)
+                ->header('Cache-Control', 'no-cache private')
+                ->header('Content-Description', 'File Transfer')
+                ->header('Content-Type', 'application/x-pdf')
+                ->header('Content-Length', strlen($file_contents))
+                ->header('Content-Disposition', 'inline; filename="result.pdf"')
+                ->header('Content-Transfer-Encoding', 'binary');
+
     }
 }
