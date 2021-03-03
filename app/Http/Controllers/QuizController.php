@@ -47,9 +47,11 @@ class QuizController extends Controller
      */
     public function result(Request $request){
         $points = [];
+        $selectedOptions = [];
 
         foreach (json_decode($request->input('selected')) as $option){
             $o = Option::find($option);
+            array_push($selectedOptions,$o->option);
             array_push($points,$o->points);
         }
         $totalPointsCollected = array_sum($points);
@@ -59,8 +61,10 @@ class QuizController extends Controller
         $quiz = collect($quiz_object->with('questions','options')->get()
             ->map(function ($event) {
                 return [
+                    'max_points' => $event->max_points,
                     'questions' => $event->questions->map(function ($event2) {
                         return [
+                            'max_points' => $event2->max_points,
                             'question_text' => $event2->question,
                             'options' =>$event2->options->map(function ($event3) {
                                 return [
@@ -70,11 +74,12 @@ class QuizController extends Controller
                         ];})
                 ];})[0]);
 
-        $pdf = PDF::loadView('pdf', compact('quiz', 'totalPointsCollected'));
-        $pdf->save('testing.pdf');
-        $base64 = base64_encode(file_get_contents('testing.pdf'));
-        File::delete('testing.pdf');
-        UserQuizScore::create([
+        $pdf = PDF::loadView('pdf', compact('quiz', 'totalPointsCollected', 'selectedOptions'));
+        $pdf->save('quiz_result.pdf');
+        $base64 = base64_encode(file_get_contents('quiz_result.pdf'));
+        File::delete('quiz_result.pdf');
+
+        $user_score = UserQuizScore::create([
             'user_id' => auth()->user()->id,
             'quiz_id' => $request->input('quiz_id'),
             'attempt_number' => $request->input('attempt_num'),
@@ -84,7 +89,21 @@ class QuizController extends Controller
 
         return response()->json([
             'totalPointsCollected' => $totalPointsCollected,
+            'user_score_id' => $user_score->id
         ]);
+    }
+
+    /**
+     * Gets all the attempts for a user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllAttemptsForCurrentUser()
+    {
+        $attempts = UserQuizScore::where('user_id', auth()->user()->id)->with('quiz.text.textbook')->get()
+            ->groupBy(['quiz.text.textbook.title', 'quiz.text.title', 'quiz.id']);
+
+        return response()->json($attempts);
+
     }
 
     /**
@@ -112,24 +131,110 @@ class QuizController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function manage(Request $request, $text_id){
-
+    public function manage(Request $request, $text_id)
+    {
         $quizzes = collect(json_decode($request->quizzes));
+        $quizzesId = [];
+        $questionsId = [];
+        $optionsId = [];
+
         $text = Text::find($text_id);
-        $text->quizzes()->delete();
+        //list of ids in the database for the quiz
+        $quiz_ids = $text->quizzes()->get()->pluck('id')->toArray();
+        $question_ids = Question::with('quiz')->get()->where('quiz.text_id', $text_id)->pluck('id')->toArray();
+        $option_ids = Option::with('question.quiz')->get()->where('question.quiz.text_id', $text_id)->pluck('id')->toArray();
+
         foreach ($quizzes as $quiz) {
-            $quiz_object = Quiz::create(['text_id' => $text_id]);
-            foreach ($quiz->questions as $question) {
-                $create_question = Question::create(['question' => $question->question_text, 'quiz_id' => $quiz_object->id]);
-                foreach ($question->options as $option) {
-                 Option::create(['option' => $option->option_text, 'question_id' => $create_question->id, 'points' => $option->points]);
-                }
+            if(isset($quiz->id) && $quiz->id !== "new"){
+                $quiz_object = Quiz::where('id', $quiz->id)->first();
+            }else{
+                $quiz_object = Quiz::create(['text_id' => $text_id, 'max_points' => 0]);
             }
+            array_push($quizzesId, $quiz_object->id);
+            foreach ($quiz->questions as $question) {
+                if(isset($question->id) && $question->id !== "new"){
+                    $question_object = Question::where('id', $question->id)->first();
+                    $question_object->question = $question->question_text;
+                    $question_object->quiz_id = $quiz_object->id;
+                    $question_object->save();
+                }else{
+                    $question_object = Question::create(['question' => $question->question_text, 'quiz_id' => $quiz_object->id, 'max_points' => 0]);
+                }
+                array_push($questionsId, $question_object->id);
+                foreach ($question->options as $option) {
+                    if(isset($option->id) && $option->id !== "new"){
+                        $option_object = Option::where('id', $option->id)->first();
+                        $option_object->option = $option->option_text;
+                        $option_object->question_id = $question_object->id;
+                        $option_object->points = $option->points;
+                        $option_object->save();
+                    }else{
+                        $option_object = Option::create(['option' => $option->option_text, 'question_id' => $question_object->id, 'points' => $option->points]);
+                    }
+                    array_push($optionsId, $option_object->id);
+                }
+                $question_object->max_points = Question::where('id', $question_object->id)->with('options')->get()->max('options')->pluck('points')->max();
+                $question_object->save();
+            }
+            $quiz_object->max_points = Quiz::where('id', $quiz_object->id)->with('questions')->get()->max('questions')->pluck('max_points')->sum();
+            $quiz_object->save();
+        }
+
+        $deletedOptions = array_diff($option_ids,$optionsId);
+        if(!empty($deletedOptions)){
+            Option::whereIn('id', $deletedOptions)->delete();
+        }
+
+        $deletedQuestions = array_diff($question_ids,$questionsId);
+
+        if(!empty($deletedQuestions)){
+            Question::whereIn('id', $deletedQuestions)->delete();
+            //Update max_points
+            $question_ids = Question::with('quiz')->get()->where('quiz.text_id', $text_id)->pluck('id')->toArray();
+            foreach($question_ids as $question_id){
+                $question_object = Question::where('id', $question_id)->first();
+
+                $question_object->max_points = Question::where('id', $question_id)->with('options')->get()->max('options')->pluck('points')->max();
+                $question_object->save();
+            }
+            //Update max_points
+            $quiz_ids = $text->quizzes()->get()->pluck('id')->toArray();
+            foreach($quiz_ids as $quiz_id){
+                $quiz_object = Question::where('id', $quiz_id)->first();
+
+                $quiz_object->max_points = Quiz::where('id', $quiz_id)->with('questions')->get()->max('questions')->pluck('max_points')->sum();
+                $quiz_object->save();
+            }
+        }
+
+        $deletedQuizzes = array_diff($quiz_ids,$quizzesId);
+        if(!empty($deletedQuizzes)){
+            Quiz::whereIn('id', $deletedQuizzes)->delete();
         }
 
         return response()->json([
             'Success' => 'Successfully updated your quizzes!'
         ]);
+//        $quizzes = collect(json_decode($request->quizzes));
+//        $text = Text::find($text_id);
+//        $text->quizzes()->delete();
+//        foreach ($quizzes as $quiz) {
+//            $quiz_object = Quiz::create(['text_id' => $text_id, 'max_points' => 0]);
+//            foreach ($quiz->questions as $question) {
+//                $question_object = Question::create(['question' => $question->question_text, 'quiz_id' => $quiz_object->id, 'max_points' => 0]);
+//                foreach ($question->options as $option) {
+//                    Option::create(['option' => $option->option_text, 'question_id' => $question_object->id, 'points' => $option->points]);
+//                }
+//                $question_object->max_points = Question::where('id', $question_object->id)->with('options')->get()->max('options')->pluck('points')->max();
+//                $question_object->save();
+//            }
+//            $quiz_object->max_points = Quiz::where('id', $quiz_object->id)->with('questions')->get()->max('questions')->pluck('max_points')->sum();
+//            $quiz_object->save();
+//        }
+//
+//        return response()->json([
+//            'Success' => 'Successfully updated your quizzes!'
+//        ]);
     }
 
     /**
@@ -145,11 +250,14 @@ class QuizController extends Controller
         $allQuiz = $text->quizzes()->with('questions','options')->get()
             ->map(function ($event) {
             return [
+                'id' => $event->id,
                 'questions' => $event->questions->map(function ($event2) {
                     return [
+                        'id' => $event2->id,
                         'question_text' => $event2->question,
                         'options' =>$event2->options->map(function ($event3) {
                             return [
+                                'id' => $event3->id,
                                 'option_text' => $event3->option,
                                 'points' => $event3->points
                             ];})
@@ -167,12 +275,12 @@ class QuizController extends Controller
      * Downloads the PDF of the results based on the quiz_id passed in.
      * Only authorised users can download.
      *
-     * @param $quiz_id
+     * @param $id
      * @return mixed
      */
-    public function getResultPDF($quiz_id)
+    public function getResultPDF($id)
     {
-        $quiz = UserQuizScore::where('quiz_id', $quiz_id)->where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
+        $quiz = UserQuizScore::where('id', $id)->where('user_id', auth()->user()->id)->first();
 
         if ($quiz == null) {
             return response()->json(['Error' => 'Quiz results not found!']);

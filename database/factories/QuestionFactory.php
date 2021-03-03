@@ -10,6 +10,7 @@ use Faker\Generator as Faker;
 $factory->define(Question::class, function (Faker $faker) {
     return [
         'question' => $faker->sentence,
-        'quiz_id' => factory(App\Quiz::class)->create()->id,
+        'max_points' => $faker->numberBetween(1,10),
+        'quiz_id' => Quiz::where('id','!=', 1)->inRandomOrder()->first()->id,
     ];
 });

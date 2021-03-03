@@ -13,6 +13,15 @@ class UserQuizScore extends Model
     ];
 
     /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'result',
+    ];
+
+    /**
      * Quiz relationship
      */
     public function quiz()

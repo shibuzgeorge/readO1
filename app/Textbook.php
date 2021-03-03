@@ -9,6 +9,14 @@ class Textbook extends Model
     protected $fillable = [
         'title', 'description', 'file',
     ];
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'file',
+    ];
 
     /**
      * Module relationship

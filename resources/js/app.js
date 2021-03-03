@@ -5,6 +5,7 @@ import i18n from '~/plugins/i18n'
 import sweetmodal from '~/plugins/sweetmodal'
 import cliploader from '~/plugins/cliploader'
 import multiselect from '~/plugins/multiselect'
+import GChart from '~/plugins/GChart'
 import paginate from '~/plugins/paginate'
 import App from '~/components/App'
 
@@ -24,6 +25,7 @@ new Vue({
   cliploader,
   paginate,
   multiselect,
+  GChart,
   ...App,
 
 })
