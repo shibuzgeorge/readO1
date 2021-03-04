@@ -29,12 +29,12 @@
         </div>
             <v-button class="form-control" :loading="form.busy" type="success">Submit</v-button>
             </form>
-            <sweet-modal ref="success" icon="success" v-on:close="$router.go($router.push({name: 'home'}))">
+            <sweet-modal ref="success" icon="success" v-on:close="$router.push({name: 'home'})">
                 You've scored: {{totalPointsCollected}} out of a possible {{form.quiz.max_points}}<br/>
                 We've emailed you the results as a PDF and you can view and download right now. <br/><br/>
                 <button class="btn btn-success" v-on:click="$refs.viewResults.open()">View results</button>
                 <button class="btn btn-success" v-on:click="downloadPDF()">Download PDF results</button>
-                <button class="btn btn-success" v-on:click="$router.push({name: 'home'}).then(() => window.scrollTo(0, 0))">Go to dashboard</button>
+                <button class="btn btn-success" v-on:click="goToDashboard()">Go to dashboard</button>
             </sweet-modal>
             <sweet-modal ref="viewResults" width="100%">
                 <PDFViewer :fileName="fileName" :path="path"/>
@@ -127,7 +127,7 @@
                         console.log(response);
                         this.totalPointsCollected = response.data.totalPointsCollected;
                         this.user_score_id = response.data.user_score_id;
-                        this.fileName =`/api/quiz/getResultPDF/${response.data.user_score_id}`
+                        this.fileName =`/api/quiz/getResultPDF/${response.data.user_score_id}`;
                         this.$refs.success.open();
                     })
                     .catch(error => {
@@ -166,6 +166,10 @@
                     //handle error
                     console.log(response);
                 });
+            },
+            goToDashboard(){
+                this.$refs.success.close();
+                this.$router.push({name: 'home'})
             }
         }
     }
