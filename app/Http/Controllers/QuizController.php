@@ -134,13 +134,17 @@ class QuizController extends Controller
      */
     public function manage(Request $request, $text_id)
     {
+        //Collection of quizzes from from
         $quizzes = collect(json_decode($request->quizzes));
+
+        //Array of quizzesId, questionsId and optionsId
         $quizzesId = [];
         $questionsId = [];
         $optionsId = [];
 
         $text = Text::find($text_id);
-        //list of ids in the database for the quiz
+
+        //list of ids in the database for the quiz, questions, and options currently
         $quiz_ids = $text->quizzes()->get()->pluck('id')->toArray();
         $question_ids = Question::with('quiz')->get()->where('quiz.text_id', $text_id)->pluck('id')->toArray();
         $option_ids = Option::with('question.quiz')->get()->where('question.quiz.text_id', $text_id)->pluck('id')->toArray();
@@ -198,7 +202,7 @@ class QuizController extends Controller
                 $question_object->max_points = Question::where('id', $question_id)->with('options')->get()->max('options')->pluck('points')->max();
                 $question_object->save();
             }
-            //Update max_points
+
             $quiz_ids = $text->quizzes()->get()->pluck('id')->toArray();
             foreach($quiz_ids as $quiz_id){
                 $quiz_object = Question::where('id', $quiz_id)->first();
@@ -216,26 +220,6 @@ class QuizController extends Controller
         return response()->json([
             'Success' => 'Successfully updated your quizzes!'
         ]);
-//        $quizzes = collect(json_decode($request->quizzes));
-//        $text = Text::find($text_id);
-//        $text->quizzes()->delete();
-//        foreach ($quizzes as $quiz) {
-//            $quiz_object = Quiz::create(['text_id' => $text_id, 'max_points' => 0]);
-//            foreach ($quiz->questions as $question) {
-//                $question_object = Question::create(['question' => $question->question_text, 'quiz_id' => $quiz_object->id, 'max_points' => 0]);
-//                foreach ($question->options as $option) {
-//                    Option::create(['option' => $option->option_text, 'question_id' => $question_object->id, 'points' => $option->points]);
-//                }
-//                $question_object->max_points = Question::where('id', $question_object->id)->with('options')->get()->max('options')->pluck('points')->max();
-//                $question_object->save();
-//            }
-//            $quiz_object->max_points = Quiz::where('id', $quiz_object->id)->with('questions')->get()->max('questions')->pluck('max_points')->sum();
-//            $quiz_object->save();
-//        }
-//
-//        return response()->json([
-//            'Success' => 'Successfully updated your quizzes!'
-//        ]);
     }
 
     /**
