@@ -11,6 +11,15 @@ class Text extends Model
     ];
 
     /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'file',
+    ];
+
+    /**
      * Textbook relationship
      */
     public function textbook()

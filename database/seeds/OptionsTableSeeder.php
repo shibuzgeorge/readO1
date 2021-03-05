@@ -13,6 +13,6 @@ class OptionsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Option::class, 10)->create();
+        factory(Option::class, 50)->create();
     }
 }

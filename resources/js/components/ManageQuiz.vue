@@ -71,6 +71,7 @@
         methods: {
             addQuiz(){
                 this.form.quizzes.push({
+                    id: "new",
                     questions: [{
                         question_text: '',
                         options: [{
@@ -83,6 +84,7 @@
             },
             addQuestion(quiz){
                 quiz.questions.push({
+                    id: "new",
                     question_text: '',
                     options: [{
                         option_text: '',
@@ -95,6 +97,7 @@
             },
             addOption(question){
                 question.options.push({
+                    id: "new",
                     option_text: '',
                     points: '',
                 })

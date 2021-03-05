@@ -272,7 +272,8 @@ class TextController extends Controller
      */
     public function getAllAttemptsForCurrentUser()
     {
-        $attempts = ReadingSession::where('user_id', auth()->user()->id)->get();
+
+        $attempts = ReadingSession::where('user_id', auth()->user()->id)->with('text.textbook')->get()->groupBy(['text.textbook.title', 'text.title']);
 
         return response()->json($attempts);
 

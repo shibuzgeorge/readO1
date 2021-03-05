@@ -22,9 +22,9 @@ class TextsTableSeeder extends Seeder
             'textbook_id' => \App\Textbook::where('title', 'Software Measurement and Estimation')->first()->id,
             'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf')))]);
 
-        $quiz_object1 = Quiz::create(['text_id' => $text1->id]);
-        $create_question1 = Question::create(['question' => 'What is software project management', 'quiz_id' => $quiz_object1->id]);
-        $create_question2 = Question::create(['question' => 'Why is software project management important', 'quiz_id' => $quiz_object1->id]);
+        $quiz_object1 = Quiz::create(['text_id' => $text1->id, 'max_points' => 2]);
+        $create_question1 = Question::create(['question' => 'What is software project management', 'quiz_id' => $quiz_object1->id, 'max_points' => 1]);
+        $create_question2 = Question::create(['question' => 'Why is software project management important', 'quiz_id' => $quiz_object1->id, 'max_points' => 1]);
 
         Option::create(['option' => 'Collaboration among team members on an on-going basis',
             'question_id' => $create_question1->id, 'points' => 0]);

@@ -29,14 +29,14 @@
         </div>
             <v-button class="form-control" :loading="form.busy" type="success">Submit</v-button>
             </form>
-            <sweet-modal ref="success" icon="success">
-                You've scored: {{totalPointsCollected}} out of a possible {{totalAvailablePoints}}<br/>
+            <sweet-modal ref="success" icon="success" v-on:close="$router.push({name: 'home'})">
+                You've scored: {{totalPointsCollected}} out of a possible {{form.quiz.max_points}}<br/>
                 We've emailed you the results as a PDF and you can view and download right now. <br/><br/>
                 <button class="btn btn-success" v-on:click="$refs.viewResults.open()">View results</button>
-                <button class="btn btn-success">Download PDF results</button>
-                <button class="btn btn-success">Go to dashboard</button>
+                <button class="btn btn-success" v-on:click="downloadPDF()">Download PDF results</button>
+                <button class="btn btn-success" v-on:click="goToDashboard()">Go to dashboard</button>
             </sweet-modal>
-            <sweet-modal ref="viewResults">
+            <sweet-modal ref="viewResults" width="100%">
                 <PDFViewer :fileName="fileName" :path="path"/>
             </sweet-modal>
         </div>
@@ -82,8 +82,8 @@
             attempt_num: 0,
             successMessage: '',
             numOfQuestions: 1,
+            user_score_id: 0,
             totalPointsCollected: '',
-            totalAvailablePoints: 0,
         }),
         created() {
             let self = this;
@@ -96,9 +96,9 @@
                         if(response.data.quiz !== null){
                             this.form.quiz = response.data.quiz;
                             this.getAttempt(self);
-                            this.getTotal(self);
                         }else{
                             this.form.quiz = '';
+                            this.isLoaded = true;
                         }
 
                     }
@@ -126,26 +126,14 @@
                     .then(response => {
                         console.log(response);
                         this.totalPointsCollected = response.data.totalPointsCollected;
-                        this.fileName =`/api/quiz/getResultPDF/${this.form.quiz.id}`
+                        this.user_score_id = response.data.user_score_id;
+                        this.fileName =`/api/quiz/getResultPDF/${response.data.user_score_id}`;
                         this.$refs.success.open();
                     })
                     .catch(error => {
                         console.log(error.response)
                     });
                 this.form.busy = false;
-            },
-            getTotal(self){
-                const qpoints = [];
-                const max = [];
-                this.form.quiz.questions.forEach(function(b){
-                    let t = [];
-                    self.allOptions(self.form.quiz.options, b.id).forEach(function(a){
-                        t.push(a.points)
-                    });
-                    qpoints.push(t);
-                });
-                qpoints.forEach(g => max.push(Math.max.apply(Math, g)));
-                self.totalAvailablePoints = max.reduce((a, b) => a + b, 0);
             },
             getAttempt(self){
                 //Gets attempt number of previous attempts for a user for a particular quiz.
@@ -161,6 +149,27 @@
                     //handle error
                     console.log(response);
                 });
+            },
+            downloadPDF(){
+                //Downloads the file for the user
+                axios.get('/api/quiz/getResultPDF/'+this.user_score_id, {
+                    responseType: 'blob',
+                })
+                    .then(response => {
+                        const url = window.URL.createObjectURL(new Blob([response.data]));
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', 'quiz_result.pdf');
+                        document.body.appendChild(link);
+                        link.click();
+                    }).catch(function (response) {
+                    //handle error
+                    console.log(response);
+                });
+            },
+            goToDashboard(){
+                this.$refs.success.close();
+                this.$router.push({name: 'home'})
             }
         }
     }

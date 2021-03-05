@@ -16,7 +16,7 @@
 
         <br/>
         <div v-if="file">
-            <h5 style="text-align: center">Attempt Number: {{attempt_num+1}} <div v-if="attempt_num!==0"> <br/>Last time taken to complete: {{last_time_taken}}</div></h5>
+            <h5 v-if="role==='Student'" style="text-align: center">Attempt Number: {{attempt_num+1}} <div v-if="attempt_num!==0"> <br/>Last time taken to complete: {{last_time_taken}}</div></h5>
             <div style="width: 100%; text-align: center;" >
                 <label style="text-align: center;">View PDF: <input type="radio" v-model="selection" value="pdf"></label>
                 <label>Text view: <input type="radio" v-model="selection" value="text"></label>
@@ -78,7 +78,7 @@
         computed: {
             ...mapGetters({
                            role: 'auth/role'
-                       }),
+            }),
             formattedElapsedTime() {
                 const date = new Date(null);
                 date.setSeconds(this.elapsedTime / 1000);
@@ -104,8 +104,8 @@
             last_time_taken: '',
         }),
         created() {
-            this.fileName =`/api/text/pdf/${this.$route.params.id}`
-            let self = this
+            this.fileName =`/api/text/pdf/${this.$route.params.id}`;
+            let self = this;
             axios.get(`/api/text/${this.$route.params.id}`)
                 .then(response => {
                     if(response.data.Error !== undefined){
