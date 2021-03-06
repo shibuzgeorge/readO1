@@ -38,6 +38,7 @@ export default [
     { path: '/text/edit', name: 'text.edit', component: page('text/edit.vue') },
 
     { path: '/admin/users', name: 'admin.users', component: page('admin/users.vue') },
+    { path: '/admin/users/create', name: 'admin.users.create', component: page('admin/create.vue') },
     { path: '/admin/users/edit/:id', name: 'admin.users.edit', component: page('admin/edit.vue') },
     { path: '/admin/users/update/:id', name: 'admin.users.update', component: page('admin/edit.vue') },
 
