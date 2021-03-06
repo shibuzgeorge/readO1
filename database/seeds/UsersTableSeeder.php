@@ -33,6 +33,7 @@ class UsersTableSeeder extends Seeder
             'name'=> 'Admin User',
             'email' => 'admin@admin.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
             'role_id' => $adminRole->id
         ]);
 
@@ -40,6 +41,7 @@ class UsersTableSeeder extends Seeder
             'name'=> 'Module Tutor 1',
             'email' => 'ModuleTutor1@ModuleTutor1.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
             'role_id' => $moduleTutorRole->id
         ]);
 
@@ -47,6 +49,7 @@ class UsersTableSeeder extends Seeder
             'name'=> 'Module Tutor 2',
             'email' => 'ModuleTutor2@ModuleTutor2.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
             'role_id' => $moduleTutorRole->id
         ]);
 
@@ -54,6 +57,7 @@ class UsersTableSeeder extends Seeder
             'name'=> 'Module Tutor 3',
             'email' => 'ModuleTutor3@ModuleTutor3.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
             'role_id' => $moduleTutorRole->id
         ]);
 
@@ -61,6 +65,7 @@ class UsersTableSeeder extends Seeder
             'name'=> 'Student 1',
             'email' => 'student1@student1.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
             'role_id' => $userRole->id
         ]);
 
@@ -68,6 +73,7 @@ class UsersTableSeeder extends Seeder
             'name'=> 'Student 2',
             'email' => 'student2@student2.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
             'role_id' => $userRole->id
         ]);
 
@@ -75,6 +81,7 @@ class UsersTableSeeder extends Seeder
             'name'=> 'Student 3',
             'email' => 'student3@student3.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
             'role_id' => $userRole->id
         ]);
 

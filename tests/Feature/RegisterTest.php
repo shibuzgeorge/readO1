@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Notifications\VerifyEmail;
 use App\User;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class RegisterTest extends TestCase
@@ -15,6 +17,8 @@ class RegisterTest extends TestCase
     /** @test */
     public function can_register()
     {
+        Notification::fake();
+
         $this->postJson('/api/register', [
             'name' => 'Test User',
             'email' => 'test@test.app',
@@ -22,7 +26,11 @@ class RegisterTest extends TestCase
             'password_confirmation' => 'secret',
         ])
         ->assertSuccessful()
-        ->assertJsonStructure(['id', 'name', 'email']);
+        ->assertJsonFragment(['status' => trans('verification.sent')]);
+
+        $user = User::where('email', 'test@test.app')->first();
+
+        Notification::assertSentTo($user, VerifyEmail::class);
     }
 
     /** @test */
