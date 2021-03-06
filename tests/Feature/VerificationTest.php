@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Notifications\VerifyEmail;
 use App\User;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
@@ -15,6 +16,7 @@ class VerificationTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware(ThrottleRequests::class);
         $this->artisan('db:seed');
     }
 
