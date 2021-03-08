@@ -260,13 +260,13 @@ class SideBarMenuTest extends DuskTestCase
                 ->assertSeeIn('#title', 'Create Module')
                 //click assign students
                 ->clickLink('Assign Students')
-                ->waitFor('#title')
+                ->waitFor('#title', 10)
                 ->pause(2000)
                 ->assertPathis('/module/assignStudents')
                 ->assertSeeIn('#title', 'Assign students to modules')
                 //click assign module tutors
                 ->clickLink('Assign Module Tutors')
-                ->waitFor('#title')
+                ->waitFor('#title', 10)
                 ->pause(2000)
                 ->assertPathis('/module/assignModuleTutors')
                 ->assertSeeIn('#title', 'Assign module tutors to modules');
@@ -284,7 +284,8 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser1, $browser2, $browser3) {
             $browser1->visit(new Login)
                 ->submit($this->studentUser->email, 'password')
-                ->waitFor('#sidebar-wrapper')
+                ->pause(1000)
+                ->waitFor('#library-menu')
                 ->clickLink('Library')
                 ->pause(5000)
                 ->waitFor('#title')
@@ -293,7 +294,8 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser2->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
-                ->waitFor('#sidebar-wrapper')
+                ->pause(1000)
+                ->waitFor('#library-menu')
                 ->clickLink('Library')
                 ->pause(5000)
                 ->waitFor('#title')
@@ -302,7 +304,8 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser3->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->waitFor('#sidebar-wrapper')
+                ->pause(1000)
+                ->waitFor('#library-menu')
                 ->clickLink('Library')
                 ->pause(5000)
                 ->waitFor('#title')
@@ -322,7 +325,8 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser1,$browser2,$browser3) {
             $browser1->visit(new Login)
                 ->submit($this->studentUser->email, 'password')
-                ->waitFor('#sidebar-wrapper')
+                ->pause(1000)
+                ->waitFor('#dashboard-menu')
                 ->clickLink('Dashboard')
                 ->pause(1000)
                 ->assertPathis('/home')
@@ -330,7 +334,8 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser2->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
-                ->waitFor('#sidebar-wrapper')
+                ->pause(1000)
+                ->waitFor('#dashboard-menu')
                 ->clickLink('Dashboard')
                 ->pause(1000)
                 ->assertPathis('/home')
@@ -338,7 +343,8 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser3->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->waitFor('#sidebar-wrapper')
+                ->pause(1000)
+                ->waitFor('#dashboard-menu')
                 ->clickLink('Dashboard')
                 ->pause(1000)
                 ->assertPathis('/home')
@@ -357,6 +363,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser1,$browser2,$browser3) {
             $browser1->visit(new Login)
                 ->submit($this->studentUser->email, 'password')
+                ->pause(1000)
                 ->waitFor('#extensive-reading-menu')
                 ->clickLink('Extensive Reading')
                 ->waitFor('#extensive-reading-home-menu')
@@ -373,6 +380,7 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser2->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
+                ->pause(1000)
                 ->waitFor('#extensive-reading-menu')
                 ->clickLink('Extensive Reading')
                 ->waitFor('#extensive-reading-home-menu')
@@ -394,6 +402,7 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser3->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
+                ->pause(1000)
                 ->waitFor('#extensive-reading-menu')
                 ->clickLink('Extensive Reading')
                 ->waitFor('#extensive-reading-home-menu')
