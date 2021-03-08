@@ -8,10 +8,10 @@
                 </div>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
             <div class="form-check mt-4">
-                <label>Module Name:           </label> <input class="form-control" v-model="form.module_name" type="text" value="" required/><br/>
-                <label>Module Code:     </label> <input class="form-control" v-model="form.module_code" type="text" value="" required/><br/>
+                <label>Module Name:           </label> <input class="form-control" v-model="form.module_name" name="name" type="text" value="" required/><br/>
+                <label>Module Code:     </label> <input class="form-control" v-model="form.module_code" name="code" type="text" value="" required/><br/>
                 <label>Module Year Group:     </label>
-                <select class="form-control" v-model="form.module_year">
+                <select class="form-control" name="year_group" v-model="form.module_year">
                     <option>Please select a year group</option>
                     <option v-for="year in year_groups" :value="year.id" :key="year.id">
                         {{ year.name }}

@@ -5,7 +5,7 @@
         <div class="flexbox">
             <div class="flex-item">
                 <router-link v-show="role==='Admin'" :to="{ name: 'module.create' }">
-                    <button class="btn btn-success" v-if="role==='Admin'">+ Create Module</button>
+                    <button id="create" class="btn btn-success" v-if="role==='Admin'">+ Create Module</button>
                 </router-link>
 
             </div>
@@ -20,7 +20,7 @@
         </div>
 
         <div class="input-group mt-4 d-flex justify-content-center align-items-center">
-            <input type="search" v-model="searchQuery" class="form-control col-lg-4" placeholder="Search by name or module code..."
+            <input type="search" name="search" v-model="searchQuery" class="form-control col-lg-4" placeholder="Search by name or module code..."
             aria-label="Search" />
             <span style="padding-left: 15px;">
                 <select class="form-control" v-model="filterYear">
