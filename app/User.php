@@ -2,14 +2,16 @@
 
 namespace App;
 
+use App\Notifications\AdminUserCreate;
+use App\Notifications\CustomPassword;
 use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-//use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements JWTSubject  //MustVerifyEmail
+class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
     use Notifiable;
 
@@ -88,6 +90,16 @@ class User extends Authenticatable implements JWTSubject  //MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmail);
+    }
+
+    /**
+     * @param  string  $token
+     * @return void
+     */
+    public function sendEmailCreateNewUserVerifyAndResetPassword($token)
+    {
+
+        $this->notify(new AdminUserCreate($token));
     }
 
     /**

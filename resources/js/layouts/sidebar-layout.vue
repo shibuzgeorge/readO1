@@ -119,7 +119,7 @@
                              class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">View all users
                 </router-link>
-                <router-link v-show="role==='Admin'" :to="{ name: 'home' }"
+                <router-link v-show="role==='Admin'" :to="{ name: 'admin.users.create' }"
                              id="create-a-user-menu"
                              class="list-group-item list-group-item-action text-white bg-dark"
                              active-class="active-class">Create a user

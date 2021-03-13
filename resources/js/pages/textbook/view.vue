@@ -1,66 +1,29 @@
 <template>
         <div class="container-fluid" v-if="isLoaded">
-            <div class="row" v-if="file">
-                <card class="col-lg-6 col-md-6 col-sm-12">
+            <div>
+                <card>
                     <h5 class="card-header d-flex justify-content-between align-items-center">
-                        Title: {{title}}
+                        Title: {{title}}<br/>
                         Description: {{description}}
                         <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
                     </h5>
 
                     <div class="wrapper mt-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="col-xs-3">
-                                <input type="search" v-model="searchQuery" class="form-control" placeholder="Search..."
-                                       aria-label="Search" />
-                            </div>
-                            <div>
-                                <a style="float: right;" @click="manageQuiz()"><button class="btn btn-success" v-if="role!=='Student'">+ Manage Quizzes</button></a>
+                        <div>
+                            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.edit', params: {id: $route.params.id} }">
+                                <button class="btn btn-sm btn-primary" v-if="role!=='Student'">Edit</button>
+                            </router-link>
+                            <div style="float: right;" class="ml-2">
+                                <button class="btn btn-sm btn-success" v-on:click="$refs.viewFullTextbook.open()" v-if="file">View Full Textbook</button>
+                                <a @click="manageQuiz()"><button class="btn btn-sm btn-success" v-if="role!=='Student'">+ Manage Quizzes</button></a>
                                 <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }">
-                                    <button class="btn btn-success" v-if="role!=='Student'">+ Add text</button>
+                                    <button class="btn btn-sm btn-success" v-if="role!=='Student'">+ Add Text</button>
                                 </router-link>
                             </div>
                         </div>
-                        <h1 style="text-align: center;" class="mt-4" v-if="!texts || !texts.length">
-                            This textbook has no texts!
-                        </h1>
-                        <br/>
-                        <ul class="list-group" v-for="text in textsPaginated">
-                            <li class="list-group-item">
-                                <router-link :to="{ name: 'text.show', params: {id: text.id} }">
-                                    {{text.title}} - {{text.description }}
-                                </router-link>
-                                <a style="float: right;" @click="del(text.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#"><button type="button" class="btn btn-warning btn-sm">Delete</button></a>
-                                <router-link :to="{ name: 'text.edit', params: {id: text.id} }">
-                                    <a style="float: right;" v-show="role==='Admin' || role==='Module Tutor'" href="edit"><button type="button" class="btn btn-primary btn-sm">Edit</button></a>
-                                </router-link>
-                            </li>
-                        </ul><br/>
-                        <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
-                    </div>
-                </card>
-                <card class="col-lg-5 col-md-5 col-sm-12 ml-2">
-                    <PDFViewer :fileName="fileName" :path="path"/>
-                </card>
-
-            </div>
-            <div v-else>
-                <card>
-                    <h5 class="card-header d-flex justify-content-between align-items-center">
-                        Title: {{title}} - Description: {{description}}
-                        <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
-                    </h5>
-
-                    <div class="wrapper mt-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="col-xs-3">
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
                                 <input type="search" v-model="searchQuery" class="form-control" placeholder="Search..."
                                        aria-label="Search" />
-                            </div>
-                            <a style="float: right;" @click="manageQuiz()"><button class="btn btn-success" v-if="role!=='Student'">+ Manage Quizzes</button></a>
-                            <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'text.create' }">
-                                <button class="btn btn-success" v-if="role!=='Student'">+ Add text</button>
-                            </router-link>
                         </div>
                         <h1 style="text-align: center;" class="mt-4" v-if="!texts || !texts.length">
                             This textbook has no texts!
@@ -83,6 +46,9 @@
             </div>
             <sweet-modal ref="success" icon="success">
                 {{successMessage}}
+            </sweet-modal>
+            <sweet-modal ref="viewFullTextbook" width="100%">
+                    <PDFViewer :fileName="fileName" :path="path"/>
             </sweet-modal>
             <sweet-modal ref="manageQuiz">
                 <select class="form-control" v-model="quizTextSelected">
@@ -146,7 +112,7 @@
             PDFViewer,
         },
         created() {
-            this.fileName =`/api/textbook/pdf/${this.$route.params.id}`
+            this.fileName =`/api/textbook/pdf/${this.$route.params.id}`;
             axios.get(`/api/textbook/${this.$route.params.id}`)
                 .then(response => {
                     if(response.data.Error !== undefined){

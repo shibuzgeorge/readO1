@@ -14,6 +14,8 @@ export default [
 
     { path: '/yearGroup', name: 'yearGroup', component: page('yearGroup.vue') },
 
+    { path: '/readingQuizScores', name: 'readingQuizScores', component: page('readingQuizScores.vue') },
+
     { path: '/extensiveReading', name: 'extensiveReading.index', component: page('extensiveReading/index.vue') },
     { path: '/extensiveReading/view/:id', name: 'extensiveReading.show', component: page('extensiveReading/view.vue') },
     { path: '/extensiveReading/create', name: 'extensiveReading.create', component: page('extensiveReading/create.vue') },
@@ -38,6 +40,7 @@ export default [
     { path: '/text/edit', name: 'text.edit', component: page('text/edit.vue') },
 
     { path: '/admin/users', name: 'admin.users', component: page('admin/users.vue') },
+    { path: '/admin/users/create', name: 'admin.users.create', component: page('admin/create.vue') },
     { path: '/admin/users/edit/:id', name: 'admin.users.edit', component: page('admin/edit.vue') },
     { path: '/admin/users/update/:id', name: 'admin.users.update', component: page('admin/edit.vue') },
 

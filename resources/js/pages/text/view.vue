@@ -8,9 +8,6 @@
             <div class="d-flex justify-content-between align-items-center">
                 Description: {{description}}
                 <a style="float: right;" @click="manageQuiz()"><button class="btn btn-success" v-if="role==='Admin'|| role==='Module Tutor'">Edit Quiz</button></a>
-                <router-link :to="{ name: 'quiz.show', params: {id: $route.params.id} }">
-                    <button class="btn btn-success" v-if="role==='Student'">Finished Reading?</button>
-                </router-link>
                 <router-link :to="{ name: 'text.edit', params: {id: $route.params.id} }">
                     <button class="btn btn-success" v-if="role==='Admin'|| role==='Module Tutor'">Edit</button>
                 </router-link>
@@ -19,6 +16,7 @@
 
         <br/>
         <div v-if="file">
+            <h5 v-if="role==='Student'" style="text-align: center">Attempt Number: {{attempt_num+1}} <div v-if="attempt_num!==0"> <br/>Last time taken to complete: {{last_time_taken}}</div></h5>
             <div style="width: 100%; text-align: center;" >
                 <label style="text-align: center;">View PDF: <input type="radio" v-model="selection" value="pdf"></label>
                 <label>Text view: <input type="radio" v-model="selection" value="text"></label>
@@ -35,6 +33,14 @@
             <div v-show="selection === 'speedreading'">
                 <SpeedReader :text=text />
 
+            </div>
+            <div class="card-footer fixed-bottom">
+                <div class="justify-content-between align-items-center">
+                <!--<router-link :to="{ name: 'quiz.show', params: {id: $route.params.id} }">-->
+                <button class="btn btn-success" style="float:right;" @click="finishedReading(formattedElapsedTime)" v-if="role==='Student'">Finished Reading?</button>
+                <!--</router-link>-->
+                <b v-if="role==='Student'">Time taken: {{formattedElapsedTime}}</b>
+                </div>
             </div>
         </div>
         <div v-else>
@@ -61,6 +67,7 @@
     import PDFViewer from '~/components/PDFViewer';
     import ManageQuiz from "../../components/ManageQuiz";
     import { mapGetters } from 'vuex'
+    import Swal from 'sweetalert2';
     export default {
         middleware: 'auth',
         components:{
@@ -68,9 +75,17 @@
             SpeedReader,
             PDFViewer,
         },
-        computed: mapGetters({
-            role: 'auth/role'
-        }),
+        computed: {
+            ...mapGetters({
+                           role: 'auth/role'
+            }),
+            formattedElapsedTime() {
+                const date = new Date(null);
+                date.setSeconds(this.elapsedTime / 1000);
+                const utc = date.toUTCString();
+                return utc.substr(utc.indexOf(":") - 2, 8);
+            }
+        },
         data: () => ({
             isLoaded: false,
             title: '',
@@ -83,11 +98,14 @@
             path: '/lib/pdf/web/viewer.html',
             successMessage: '',
             text_id: '',
-
+            elapsedTime: 0,
+            timer: undefined,
+            attempt_num: 0,
+            last_time_taken: '',
         }),
         created() {
-            this.fileName =`/api/text/pdf/${this.$route.params.id}`
-            let self = this
+            this.fileName =`/api/text/pdf/${this.$route.params.id}`;
+            let self = this;
             axios.get(`/api/text/${this.$route.params.id}`)
                 .then(response => {
                     if(response.data.Error !== undefined){
@@ -108,11 +126,64 @@
                 //handle error
                 console.log(response);
             });
+
+            //Gets attempt number of previous attempts for a user for a particular text.
+            axios.get(`/api/text/getAttempt/${this.$route.params.id}`)
+                .then(response => {
+                    if(Object.keys(response.data).length){
+                        this.attempt_num = response.data.attempt;
+                        this.last_time_taken = response.data.time_taken;
+                    }else{
+                        this.attempt_num = 0;
+                    }
+
+                }).catch(function (response) {
+                //handle error
+                console.log(response);
+            });
+
+            this.timer = setInterval(() => {
+                this.elapsedTime += 1000;
+            }, 1000);
         },
         methods:{
             manageQuiz(){
                 this.text_id = parseInt(this.$route.params.id);
                 this.$refs.manageQuiz.open();
+            },
+            async finishedReading(data) {
+                let self = this;
+                clearInterval(self.timer);
+                Swal.fire({
+                    title: 'Are you sure you\'ve finished reading?',
+                    html: "Time taken: "+ data + "<br /> Continue to access the quiz or otherwise continue reading",
+                    type: 'warning',
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Enter Quiz',
+                    denyButtonText: `Continue Reading`,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                }).then(function (result) {
+                    if (result.value) {
+                        self.$router.push({ name: 'quiz.show', params: {id: self.$route.params.id} });
+                        axios.post('/api/text/saveAttempt', {
+                            time: data,
+                            attempt_num: self.attempt_num +1,
+                            text_id: self.$route.params.id,
+                        }).then(response =>{
+                            console.log(response);
+                        })
+                            .catch(error => {
+                                console.log(error.response)
+                            });
+                    }else{
+                        self.timer = setInterval(() => {
+                            self.elapsedTime += 1000;
+                        }, 1000);
+                    }
+                });
+
             },
         }
     }

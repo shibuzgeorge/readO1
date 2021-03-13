@@ -13,6 +13,6 @@ class QuestionsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Question::class, 10)->create();
+        factory(Question::class, 20)->create();
     }
 }

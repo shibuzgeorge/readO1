@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Module;
 use App\Role;
+use App\Textbook;
 use App\YearGroup;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -52,12 +53,13 @@ class ModuleController extends Controller
      */
     public function create()
     {
-
         $modules = Module::with('yearGroup')->get();
+        $unassigned = Textbook::doesntHave('modules')->doesntHave('extensiveReadingCategories')->get();
         $year_groups = YearGroup::all();
         return response()->json([
             'modules' => $modules,
-            'year_groups'=> $year_groups
+            'year_groups'=> $year_groups,
+            'unassigned' => $unassigned
         ]);
     }
 
@@ -69,12 +71,20 @@ class ModuleController extends Controller
      */
     public function store(Request $request)
     {
-        Module::create(['name' => $request->module_name, 'module_code' => $request->module_code, 'year_group_id' => $request->module_year]);
+        $module = Module::create([
+            'name' => $request->module_name,
+            'module_code' => $request->module_code,
+            'year_group_id' => $request->module_year
+        ]);
+
+        $module->textbooks()->sync($request->checked);
         return response()->json(['Success' => 'Successfully Created!']);
     }
 
     /**
-     * Returns all users which are assigned to a module associated to the module_id
+     * Returns all users which are assigned to a module associated to the module_id.
+     * Only Module Tutors with the module assigned have access and any module for an Admin.
+     * Students are unauthorized.
      *
      * @param $module_id
      * @return \Illuminate\Http\JsonResponse
@@ -82,9 +92,21 @@ class ModuleController extends Controller
      */
     public function getUsersForModule($module_id)
     {
-
-        $modules = Module::findOrFail($module_id);
-        $users = $modules->users()->get();
+        $user = Auth::user();
+        $user_role = $user->role;
+        if($user_role->name === 'Admin'){
+            $modules = Module::findOrFail($module_id);
+            $users = $modules->users()->get();
+        } else{
+            $modules = $user->modules()->find($module_id);
+            if($modules != null){
+                $users = $modules->users()->get();
+            } else {
+                return response()->json([
+                    'Error' => 'Permission Denied'
+                ]);
+            }
+        }
         return response()->json($users);
     }
 
@@ -184,6 +206,10 @@ class ModuleController extends Controller
     {
         $m = Module::find($module_id);
 
+        if($m == null) {
+            return response()->json(['Error' => 'Module not found!']);
+        }
+
         if(Auth::user()->role->name != 'Admin'){
             $checkIfUserHasPermissionToView = Auth::user()->modules()->find($module_id);
             if($checkIfUserHasPermissionToView != null){
@@ -193,22 +219,20 @@ class ModuleController extends Controller
                     'code' => $m->module_code,
                     'textbooks' => $textbook
                 ]);
-            }else{
+            }
+            else {
                 return response()->json(['Error' => 'Permission denied to view module!']);
             }
-        }else{
-            if($m != null){
+        }
+         else {
                 $textbook = $m->textbooks()->get();
                 return response()->json([
                     'name' => $m->name,
                     'code' => $m->module_code,
                     'textbooks' => $textbook
                 ]);
-            } else {
-                return response()->json(['Error' => 'Module not found!']);
             }
         }
-    }
 
     /**
      * Displays the edit form for a module associated to the module_id passed.
@@ -219,16 +243,26 @@ class ModuleController extends Controller
      */
     public function edit($module_id)
     {
+        $checkIfUserHasPermissionToEdit = Auth::user()->modules()->find($module_id);
+
+        if(Auth::user()->role->name != 'Admin' && $checkIfUserHasPermissionToEdit == null){
+            return response()->json(['Error' => 'Permission denied to edit module!']);
+        }
+
         $m = Module::with('yearGroup')->find($module_id);
-        if($m != null) {
+        if($m == null) {
+            return response()->json(['Error' => 'Module not found!']);
+        }
+        $textbooks = $m->textbooks()->get();
+        $unassigned = Textbook::doesntHave('modules')->doesntHave('extensiveReadingCategories')->get();
+
             return response()->json([
                 'name' => $m->name,
                 'code' => $m->module_code,
                 'year' => $m->yearGroup,
+                'textbooks' => $textbooks,
+                'unassigned' => $unassigned
             ]);
-        }else{
-            return response()->json(['Error' => 'Module not found!']);
-        }
     }
 
     /**
@@ -245,7 +279,7 @@ class ModuleController extends Controller
         $m->module_code = $request->module_code;
         $m->year_group_id = $request->module_year;
         $m->save();
-
+        $m->textbooks()->sync($request->checked);
         return response()->json(['Success' => 'Successfully Updated!']);
     }
 

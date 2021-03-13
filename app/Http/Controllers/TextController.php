@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\ExtensiveReadingCategory;
+use App\ModuleTextbook;
+use App\ReadingSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Spatie\PdfToText;
@@ -226,6 +228,107 @@ class TextController extends Controller
             return response()->json(['Error' => 'Permission denied to delete text!']);
         }
         return response()->json($text);
+    }
+
+    /**
+     * Saves the attempt of the reading to the database.
+     * @param Request $request
+     */
+    public function saveAttempt(Request $request){
+
+            //data that will be inserted into new row in reading sessions table
+            $data = [
+                'text_id' => $request->input('text_id'),
+                'user_id' => Auth::user()->id,
+                'attempt_number' => $request->input('attempt_num'),
+                'time_taken' =>$request->input('time')
+            ];
+            //create a reading session using the POST data
+            ReadingSession::create($data);
+
+    }
+
+    /**
+     * Gets the attempt of the reading for a particular text for a user to the database.
+     * @param $text_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAttempt($text_id)
+    {
+        $last_attempt = ReadingSession::where('text_id',$text_id)->where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
+
+        if($last_attempt!= null){
+            return response()->json([
+                'attempt' => $last_attempt->attempt_number,
+                'time_taken' => $last_attempt->time_taken
+            ]);
+        }else{
+            return response()->json(null);
+        }
+    }
+
+    /**
+     * Gets all the attempts for a user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllAttemptsForCurrentUser()
+    {
+        if(Auth::user()->role->name === 'Admin'){
+            $attempts = ReadingSession::with('text.textbook')->with('user')->get();
+            $textbooks = ReadingSession::with('text.textbook')->get()->unique('text.textbook')->pluck('text.textbook');
+
+        }else if(Auth::user()->role->name === 'Module Tutor') {
+
+            $tb = Auth::user()->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks')->toArray();
+            $tb = call_user_func_array('array_merge', $tb);
+
+            $test = collect($tb)->pluck('id');
+            $attempts = ReadingSession::with('text.textbook')
+                ->whereHas('text.textbook', function($query) use ($test){
+                    $query->whereIn('id',$test);
+                })
+                ->with('user')->get();
+            $textbooks = $tb;
+        } else{
+            $attempts = ReadingSession::where('user_id', auth()->user()->id)->with('text.textbook')->get();
+            $textbooks = ReadingSession::where('user_id', auth()->user()->id)->with('text.textbook')->get()->unique('text.textbook')->pluck('text.textbook');
+        }
+
+        return response()->json([
+            'attempts' => $attempts,
+            'textbooks' => $textbooks
+        ]);
+
+    }
+
+    /**
+     * Gets the last 5 attempts for the user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     *
+     */
+    public function getLast5attempts()
+    {
+        if(Auth::user()->role->name === 'Admin'){
+            $last5 = ReadingSession::with('text.textbook')->with('user')
+                ->orderBy('id', 'desc')->take(5)->get();
+        }else if(Auth::user()->role->name === 'Module Tutor') {
+            $textbooks = Auth::user()->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks')->toArray();
+            $textbooks = call_user_func_array('array_merge', $textbooks);
+            $test = collect($textbooks)->pluck('id');
+            $last5 = ReadingSession::with('text.textbook')->with('user')
+                ->whereHas('text.textbook', function($query) use ($test){
+                    $query->whereIn('id',$test);
+                })
+                ->orderBy('id', 'desc')->take(5)->get();
+        }else{
+            $last5 = ReadingSession::with('text.textbook')
+                ->where('user_id', auth()->user()->id)
+                ->orderBy('id', 'desc')->take(5)->get();
+        }
+        return response()->json($last5);
     }
 
     /**

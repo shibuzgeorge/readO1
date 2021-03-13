@@ -301,9 +301,9 @@ class TextbookController extends Controller
     private function checkPermission($textbook_id)
     {
         $module = Module::whereHas(
-            'textbooks', function($q) use($textbook_id) {
-            $q->where('textbook_id', $textbook_id);
-        })->first();
+        'textbooks', function($q) use($textbook_id) {
+        $q->where('textbook_id', $textbook_id);
+    })->first();
 
         $extensiveReading = ExtensiveReadingCategory::whereHas(
             'textbooks', function($q) use($textbook_id) {

@@ -61,6 +61,7 @@
 
 <script>
     import axios from 'axios'
+    import Swal from 'sweetalert2'
     export default {
         data: () => ({
             usersPaginated: [],
@@ -96,22 +97,46 @@
 
         },
         created() {
-            axios.get('/api/users')
-                .then(response => {
-                    this.isLoaded = true;
-                    this.users = response.data.users;
-                    this.roles = response.data.roles;
-
-                }).catch(error => {
-                console.log(error.response)
-            });
+            this.refreshData();
         },
         methods: {
             async del(data) {
-                // Submit the form to delete a user.
-                axios.delete(`/api/admin/users/${data}`).then(response => {
-                    window.location.reload();
+                let self = this;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    html: "Do you really want to delete the user?<br />" +
+                    "All information and data related to the user will be deleted also",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                }).then(function (result) {
+                    if (result.value) {
+                        // Submit the form to delete a user.
+                        axios.delete(`/api/admin/users/${data}`).then(response => {
+                            Swal.fire(
+                                'Deleted!',
+                                'The user has been deleted.',
+                                'success'
+                            ).then(function () {
+                                self.refreshData();
+                            });
+                        })
+                    }
                 })
+            },
+            refreshData(){
+                this.isLoaded = false;
+                axios.get('/api/users')
+                    .then(response => {
+                        this.users = response.data.users;
+                        this.roles = response.data.roles;
+                        this.isLoaded = true;
+
+                    }).catch(error => {
+                    console.log(error.response)
+                });
             },
             onChangePage(pageOfItems) {
                 this.usersPaginated = pageOfItems;
