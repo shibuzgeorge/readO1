@@ -13,52 +13,71 @@
                   :options="quizChartOptions"/>
         <div class="row">
             <div class="col-md-6">
-                <div v-if="list_of_reading_attempts.length !==0">
-                <h5>Current Reading Sessions:</h5>
-                <ul v-for="(textbooks, name) in list_of_reading_attempts">
-                    <router-link :to="{ name: 'textbook.show', params: {id: textbooks[Object.keys(textbooks)[0]][0].text.textbook_id} }">
-                    <li>Textbook:  {{name}}</li>
-                    </router-link>
-                        <ul v-for="(texts, name) in textbooks">
-                            <router-link :to="{ name: 'text.show', params: {id: texts[0].text_id} }">
-                            <li>Text: {{name}}</li>
+                Reading Sessions
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th v-if="role==='Admin' || role==='Module Tutor'" scope="col">User</th>
+                        <th scope="col">Attempt Number</th>
+                        <th scope="col">Textbook</th>
+                        <th scope="col">Text</th>
+                        <th scope="col">Time Taken</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="attempt1 in last5ReadingAttempts">
+                        <td v-if="role==='Admin' || role==='Module Tutor'">{{attempt1.user.name}}</td>
+                        <td>{{attempt1.attempt_number}}</td>
+                        <td>
+                            <router-link :to="{ name: 'textbook.show', params: {id: attempt1.text.textbook.id} }">
+                                {{attempt1.text.textbook.title}}
                             </router-link>
-                            <ul>
-                                <li v-for="(attempt, index) in texts">
-                                    Attempt Number: {{attempt.attempt_number}}
-                                    Time taken: {{attempt.time_taken}}
-                                </li>
-                            </ul>
-                        </ul>
-                  </ul>
-                </div>
+                        </td>
+                        <td>
+                            <router-link :to="{ name: 'text.show', params: {id: attempt1.text.id} }">
+                                {{attempt1.text.title}}
+                            </router-link>
+                        </td>
+                        <td>{{attempt1.time_taken}}</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="col-md-6">
-                <div v-if="list_of_quiz_scores.length !==0">
-                    <h5>Attempted Quiz Scores:</h5>
-                    <ul v-for="(textbooks, name) in list_of_quiz_scores">
-                        <router-link :to="{ name: 'textbook.show', params: {id: textbooks[Object.keys(textbooks)[0]][Object.keys(textbooks[Object.keys(textbooks)[0]])[0]][0].quiz.text.textbook_id} }">
-                        <li> Textbook:  {{name}}</li>
-                        </router-link>
-                        <ul v-for="(texts, name) in textbooks">
-                            <router-link :to="{ name: 'text.show', params: {id: texts[Object.keys(texts)[0]][0].quiz.text_id} }">
-                            <li>Text: {{name}}</li>
+                Quiz Attempts
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th v-if="role==='Admin' || role==='Module Tutor'" scope="col">User</th>
+                        <th scope="col">Attempt Number</th>
+                        <th scope="col">Textbook</th>
+                        <th scope="col">Text</th>
+                        <th scope="col">Score</th>
+                        <th scope="col">View Results</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="attempt1 in last5QuizAttempts">
+                        <td v-if="role==='Admin' || role==='Module Tutor'">{{attempt1.user.name}}</td>
+                        <td>{{attempt1.attempt_number}}</td>
+                        <td>
+                            <router-link :to="{ name: 'textbook.show', params: {id: attempt1.quiz.text.textbook.id} }">
+                                {{attempt1.quiz.text.textbook.title}}
                             </router-link>
-                            <ul v-for="(quizzes, quiz_id, index) in texts">
-                            <router-link :to="{ name: 'quiz.show', params: {id: quizzes[0].quiz.text_id} }">
-                            <li>Quiz Version: {{index+1}}</li>
+                        </td>
+                        <td>
+                            <router-link :to="{ name: 'text.show', params: {id: attempt1.quiz.text.id} }">
+                            {{attempt1.quiz.text.title}}
                             </router-link>
-                                <ul v-for="user_attempt in quizzes">
-                                    <li>
-                                        Attempt Number: {{user_attempt.attempt_number}}
-                                        Score: {{user_attempt.score}}
-                                        <button class="btn btn-success" v-on:click="getResults(user_attempt.id)">View results</button>
-                                    </li>
-                                </ul>
-                           </ul>
-                        </ul>
-                    </ul>
-                </div>
+                        </td>
+                        <td>{{attempt1.score}}/{{attempt1.quiz.max_points}}</td>
+                        <td><button class="btn btn-success" v-on:click="getResults(attempt1.id)">View results</button></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <router-link :to="{ name: 'readingQuizScores' }">
+                    View all time and quiz scores
+                </router-link>
             </div>
         </div>
 
@@ -92,11 +111,11 @@
         }),
     },
     data: () => ({
-         isLoaded: false,
+        isLoaded: false,
         fileName: '',
         path: '/lib/pdf/web/viewer.html',
-        list_of_reading_attempts: [],
-        list_of_quiz_scores: [],
+        last5QuizAttempts: [],
+        last5ReadingAttempts: [],
          quizChartData: [
              ['Attempt', 'Quiz Score', 'Time taken'],
              ['1', 1, [0,1,13]],
@@ -122,26 +141,18 @@
 
     }),
     created() {
-        axios.get(`/api/text/getAllAttemptsForCurrentUser/`)
+        axios.get(`/api/quiz/getLast5attempts/`)
             .then(response => {
-                if(Object.keys(response.data).length){
-                    this.list_of_reading_attempts = response.data;
-                }else{
-                    this.list_of_reading_attempts = [];
-                }
+                    this.last5QuizAttempts = response.data;
 
             }).catch(function (response) {
             //handle error
             console.log(response);
         });
 
-        axios.get(`/api/quiz/getAllAttemptsForCurrentUser/`)
+        axios.get(`/api/text/getLast5attempts/`)
             .then(response => {
-                if(Object.keys(response.data).length){
-                    this.list_of_quiz_scores = response.data;
-                }else{
-                    this.list_of_quiz_scores = [];
-                }
+                this.last5ReadingAttempts = response.data;
                 this.isLoaded = true;
             }).catch(function (response) {
             //handle error

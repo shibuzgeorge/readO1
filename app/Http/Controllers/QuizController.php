@@ -8,6 +8,7 @@ use App\Quiz;
 use App\Text;
 use App\UserQuizScore;
 use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 
@@ -100,21 +101,47 @@ class QuizController extends Controller
      */
     public function getAllAttemptsForCurrentUser()
     {
-        $attempts = UserQuizScore::where('user_id', auth()->user()->id)->with('quiz.text.textbook')->get()
-            ->groupBy(['quiz.text.textbook.title', 'quiz.text.title', 'quiz.id']);
+        if(Auth::user()->role->name === 'Admin'){
+            $attempts = UserQuizScore::with('quiz.text.textbook')->with('user')
+                ->get();
+            $textbooks = UserQuizScore::with('quiz.text.textbook')->get()->unique('quiz.text.textbook')->pluck('quiz.text.textbook');
+        }else if(Auth::user()->role->name === 'Module Tutor') {
 
-        return response()->json($attempts);
+            $textbooks = Auth::user()->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks')->toArray();
+            $textbooks = call_user_func_array('array_merge', $textbooks);
+
+            $test = collect($textbooks)->pluck('id');
+            $attempts = UserQuizScore::with('quiz.text.textbook')->with('user')
+                ->whereHas('quiz.text.textbook', function($query) use ($test){
+                    $query->whereIn('id',$test);
+                })->get();
+
+        } else{
+            $attempts = UserQuizScore::where('user_id', auth()->user()->id)->with('quiz.text.textbook')->get();
+            $textbooks = UserQuizScore::where('user_id', auth()->user()->id)->with('quiz.text.textbook')->get()->unique('quiz.text.textbook')->pluck('quiz.text.textbook');
+
+
+        }
+
+        return response()->json([
+            'attempts' => $attempts,
+            'textbooks' => $textbooks
+        ]);
 
     }
 
     /**
-     * Gets the last attempt for a particular quiz for a user to the database.
+     * Gets the last attempt for a particular quiz for a text for a user to the database.
      * @param $quiz_id
      * @return \Illuminate\Http\JsonResponse
      */
     public function getAttempt($quiz_id)
     {
-        $last_attempt = UserQuizScore::where('quiz_id',$quiz_id)->where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
+        $last_attempt = UserQuizScore::whereHas('quiz', function ($query) use($quiz_id) {
+        return $query->where('text_id', Quiz::where('id', $quiz_id)->first()->text_id);
+        })->where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
+
         if($last_attempt!= null){
             return response()->json([
                 'attempt' => $last_attempt->attempt_number,
@@ -255,6 +282,36 @@ class QuizController extends Controller
     }
 
     /**
+     * Gets the last 5 attempts for the user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     *
+     */
+    public function getLast5attempts()
+    {
+        if(Auth::user()->role->name === 'Admin'){
+            $last5 = UserQuizScore::with('quiz.text.textbook')->with('user')
+                ->orderBy('id', 'desc')->take(5)->get();
+        }else if(Auth::user()->role->name === 'Module Tutor') {
+            $textbooks = Auth::user()->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks')->toArray();
+            $textbooks = call_user_func_array('array_merge', $textbooks);
+            $test = collect($textbooks)->pluck('id');
+            $last5 = UserQuizScore::with('quiz.text.textbook')->with('user')
+                ->whereHas('quiz.text.textbook', function($query) use ($test){
+                    $query->whereIn('id',$test);
+                })
+                ->orderBy('id', 'desc')->take(5)->get();
+        }else{
+            $last5 = UserQuizScore::with('quiz.text.textbook')
+                ->where('user_id', auth()->user()->id)
+                ->orderBy('id', 'desc')->take(5)->get();
+        }
+
+        return response()->json($last5);
+    }
+
+    /**
      *
      * Returns a header for PDF download.
      * Downloads the PDF of the results based on the quiz_id passed in.
@@ -265,7 +322,11 @@ class QuizController extends Controller
      */
     public function getResultPDF($id)
     {
-        $quiz = UserQuizScore::where('id', $id)->where('user_id', auth()->user()->id)->first();
+        if(Auth::user()->role->name === 'Admin' ){
+            $quiz = UserQuizScore::where('id', $id)->first();
+        }else{
+            $quiz = UserQuizScore::where('id', $id)->where('user_id', auth()->user()->id)->first();
+        }
 
         if ($quiz == null) {
             return response()->json(['Error' => 'Quiz results not found!']);

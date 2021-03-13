@@ -14,6 +14,8 @@ export default [
 
     { path: '/yearGroup', name: 'yearGroup', component: page('yearGroup.vue') },
 
+    { path: '/readingQuizScores', name: 'readingQuizScores', component: page('readingQuizScores.vue') },
+
     { path: '/extensiveReading', name: 'extensiveReading.index', component: page('extensiveReading/index.vue') },
     { path: '/extensiveReading/view/:id', name: 'extensiveReading.show', component: page('extensiveReading/view.vue') },
     { path: '/extensiveReading/create', name: 'extensiveReading.create', component: page('extensiveReading/create.vue') },

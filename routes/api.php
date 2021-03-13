@@ -37,12 +37,14 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::resource('/yearGroup', 'YearGroupController');
 
+    Route::get('/text/getLast5attempts', 'TextController@getLast5attempts');
     Route::get('/text/getAllAttemptsForCurrentUser', 'TextController@getAllAttemptsForCurrentUser');
     Route::resource('/text', 'TextController');
     Route::get('/text/pdf/{textbook_id}', 'TextController@pdf');
     Route::post('/text/saveAttempt', 'TextController@saveAttempt');
     Route::get('/text/getAttempt/{text_id}', 'TextController@getAttempt');
 
+    Route::get('/quiz/getLast5attempts', 'QuizController@getLast5attempts');
     Route::get('/quiz/getAllAttemptsForCurrentUser', 'QuizController@getAllAttemptsForCurrentUser');
     Route::get('/quiz/getAttempt/{quiz_id}', 'QuizController@getAttempt');
     Route::get('/quiz/getResultPDF/{quiz_id}', 'QuizController@getResultPDF');
