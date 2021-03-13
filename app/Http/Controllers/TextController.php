@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\ExtensiveReadingCategory;
+use App\ModuleTextbook;
 use App\ReadingSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -272,11 +273,62 @@ class TextController extends Controller
      */
     public function getAllAttemptsForCurrentUser()
     {
+        if(Auth::user()->role->name === 'Admin'){
+            $attempts = ReadingSession::with('text.textbook')->with('user')->get();
+            $textbooks = ReadingSession::with('text.textbook')->get()->unique('text.textbook')->pluck('text.textbook');
 
-        $attempts = ReadingSession::where('user_id', auth()->user()->id)->with('text.textbook')->get()->groupBy(['text.textbook.title', 'text.title']);
+        }else if(Auth::user()->role->name === 'Module Tutor') {
 
-        return response()->json($attempts);
+            $tb = Auth::user()->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks')->toArray();
+            $tb = call_user_func_array('array_merge', $tb);
 
+            $test = collect($tb)->pluck('id');
+            $attempts = ReadingSession::with('text.textbook')
+                ->whereHas('text.textbook', function($query) use ($test){
+                    $query->whereIn('id',$test);
+                })
+                ->with('user')->get();
+            $textbooks = $tb;
+        } else{
+            $attempts = ReadingSession::where('user_id', auth()->user()->id)->with('text.textbook')->get();
+            $textbooks = ReadingSession::where('user_id', auth()->user()->id)->with('text.textbook')->get()->unique('text.textbook')->pluck('text.textbook');
+        }
+
+        return response()->json([
+            'attempts' => $attempts,
+            'textbooks' => $textbooks
+        ]);
+
+    }
+
+    /**
+     * Gets the last 5 attempts for the user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     *
+     */
+    public function getLast5attempts()
+    {
+        if(Auth::user()->role->name === 'Admin'){
+            $last5 = ReadingSession::with('text.textbook')->with('user')
+                ->orderBy('id', 'desc')->take(5)->get();
+        }else if(Auth::user()->role->name === 'Module Tutor') {
+            $textbooks = Auth::user()->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks')->toArray();
+            $textbooks = call_user_func_array('array_merge', $textbooks);
+            $test = collect($textbooks)->pluck('id');
+            $last5 = ReadingSession::with('text.textbook')->with('user')
+                ->whereHas('text.textbook', function($query) use ($test){
+                    $query->whereIn('id',$test);
+                })
+                ->orderBy('id', 'desc')->take(5)->get();
+        }else{
+            $last5 = ReadingSession::with('text.textbook')
+                ->where('user_id', auth()->user()->id)
+                ->orderBy('id', 'desc')->take(5)->get();
+        }
+        return response()->json($last5);
     }
 
     /**
