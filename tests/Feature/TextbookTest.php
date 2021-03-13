@@ -662,12 +662,6 @@ class TextbookTest extends TestCase
             'title' => $findTextbook1->title,
             'description' => $findTextbook1->description,
         ]);
-
-        //Checks if the extensive_reading_category_id is not associated to the textbook_id
-        $this->assertDatabaseMissing('extensive_reading_category_textbook', [
-            'extensive_reading_category_id' => $randomExtensiveReadingCategory->id,
-            'textbook_id' => $findTextbook1->id,
-        ]);
     }
 
     /**
