@@ -428,11 +428,6 @@ class TextbookTest extends TestCase
             'description' => $findTextbook1->description,
         ]);
 
-        //Checks if the module_id is not associated to the textbook_id
-        $this->assertDatabaseMissing('module_textbook', [
-            'module_id' => $randomModule->id,
-            'textbook_id' => $findTextbook1->id,
-        ]);
     }
 
     /**
