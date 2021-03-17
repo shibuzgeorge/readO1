@@ -8,6 +8,12 @@
         <div class="search-wrapper"><br/>
             <input type="search" v-model="searchQuery" class="form-control col-lg-4" placeholder="Search by title or description..."
                    aria-label="Search" />
+            <select class="form-control col-lg-3 ml-2" v-model="filterByModule">
+                <option>Filter by textbook...</option>
+                <option v-for="textbook in list_of_textbooks" :value="textbook.title" :key="textbook.title">
+                    {{ textbook.title }}
+                </option>
+            </select>
         </div>
         <div class="wrapper">
             <div class="row">
