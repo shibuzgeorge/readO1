@@ -39,7 +39,10 @@ class TextbookController extends Controller
         $user_role = $user->role->name;
         if($user_role === 'Admin'){
             $textbooks = Textbook::all();
+            $modules = Module::has('textbooks')->get();
         }else{
+
+            $modules = $user->modules()->has('textbooks')->get();
 
             $moduleTextbooks = $user->modules()->has('textbooks')->
             with('textbooks')->get()->pluck('textbooks');
@@ -48,9 +51,16 @@ class TextbookController extends Controller
             with('textbooks')->get()->pluck('textbooks');
 
             $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+
             $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
         }
-        return response()->json($textbooks);
+        $extensiveReadingCategories = ExtensiveReadingCategory::has('textbooks')->get();
+
+        return response()->json([
+           'textbooks' => $textbooks,
+            'modules' => $modules,
+            'extensiveReadingCategories' => $extensiveReadingCategories
+        ]);
     }
 
     /**

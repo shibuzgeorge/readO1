@@ -5,18 +5,25 @@
         <h5 id="title">Library</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
         </div>
-        <div class="search-wrapper"><br/>
-            <input type="search" v-model="searchQuery" class="form-control col-lg-4" placeholder="Search by title or description..."
+        <div class="form-inline d-flex justify-content-between align-items-center">
+            <input type="search" v-model="searchQuery" class="form-control" placeholder="Search by title or description..."
                    aria-label="Search" />
-            <select class="form-control col-lg-3 ml-2" v-model="filterByModule">
-                <option>Filter by textbook...</option>
-                <option v-for="textbook in list_of_textbooks" :value="textbook.title" :key="textbook.title">
-                    {{ textbook.title }}
+            <select class="form-control col-lg-3 ml-2" v-model="filterByModule" v-on:change="resetExtensiveReadingCategoryFilter()">
+                <option>Filter by module...</option>
+                <option v-for="module in modules" :value="module.id" :key="module.id">
+                    {{ module.name }}
+                </option>
+            </select>
+
+            <select class="form-control col-lg-3 ml-2" v-model="filterByExtensiveReadingCategory"  v-on:change="resetModulesFilter()">
+                <option>Filter by extensive reading category...</option>
+                <option v-for="category in extensiveReadingCategories" :value="category.id" :key="category.id">
+                    {{ category.name }}
                 </option>
             </select>
         </div>
         <div class="wrapper">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div v-for="textbook in textbooksPaginated" class="card col-sm-3 ml-4 mt-4">
                     <div class="card-body">
                         <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
@@ -49,7 +56,11 @@
         data: () => ({
             isLoaded: false,
             textbooks: [],
+            filterByModule: 'Filter by module...',
+            filterByExtensiveReadingCategory: 'Filter by extensive reading category...',
             textbooksPaginated: [],
+            extensiveReadingCategories: [],
+            modules: [],
             loadingColor: "black",
             searchQuery: null,
             sizePage: 9,
@@ -59,13 +70,30 @@
                 role: 'auth/role'
             }),
             resultQuery() {
+                if (this.searchQuery && this.filterByModule !== 'Filter by module...') {
+                    return this.textbooks.filter(item => item.pivot.module_id === this.filterByModule &&
+                         this.searchQuery.toLowerCase().split(' ').every(
+                            v => item.title.toLowerCase().includes(v) ||
+                                item.description.toLowerCase().includes(v))
+                    )
+                }else if (this.searchQuery && this.filterByExtensiveReadingCategory !== 'Filter by extensive reading category...') {
+                    return this.textbooks.filter(item => item.pivot.extensive_reading_category_id === this.filterByExtensiveReadingCategory &&
+                        this.searchQuery.toLowerCase().split(' ').every(
+                            v => item.title.toLowerCase().includes(v) ||
+                                item.description.toLowerCase().includes(v))
+                    )
+                }else
                 if (this.searchQuery) {
                     return this.textbooks.filter((item) => {
                         return this.searchQuery.toLowerCase().split(' ').every(
                             v => item.title.toLowerCase().includes(v) ||
                                 item.description.toLowerCase().includes(v))
                     })
-                }else {
+                }else if (this.filterByModule !== 'Filter by module...') {
+                    return  this.textbooks.filter(item => item.pivot.module_id === this.filterByModule);
+                }else if (this.filterByExtensiveReadingCategory !== 'Filter by extensive reading category...') {
+                    return  this.textbooks.filter(item => item.pivot.extensive_reading_category_id === this.filterByExtensiveReadingCategory);
+                } else{
                     return this.textbooks;
                 }
             }
@@ -75,7 +103,9 @@
             axios.get('api/textbook/')
                 .then(response => {
                     this.isLoaded = true;
-                    this.textbooks = response.data
+                    this.textbooks = response.data.textbooks
+                    this.modules = response.data.modules
+                    this.extensiveReadingCategories = response.data.extensiveReadingCategories
 
                 }).catch(error => {
                 console.log(error.response)
@@ -108,6 +138,12 @@
             onChangePage(pageOfItems) {
                 this.textbooksPaginated = pageOfItems;
             },
+            resetExtensiveReadingCategoryFilter(){
+                this.filterByExtensiveReadingCategory = 'Filter by extensive reading category...';
+            },
+            resetModulesFilter(){
+                this.filterByModule = 'Filter by module...';
+            }
         }
 
     }
