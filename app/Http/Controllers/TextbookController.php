@@ -40,9 +40,15 @@ class TextbookController extends Controller
         if($user_role === 'Admin'){
             $textbooks = Textbook::all();
         }else{
-            $textbooks = $user->modules()->has('textbooks')->
-            with('textbooks')->get()->pluck('textbooks')->toArray();
-            $textbooks = call_user_func_array('array_merge', $textbooks);
+
+            $moduleTextbooks = $user->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+
+            $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+
+            $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+            $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
         }
         return response()->json($textbooks);
     }
