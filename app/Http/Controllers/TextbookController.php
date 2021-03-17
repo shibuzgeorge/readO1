@@ -38,23 +38,23 @@ class TextbookController extends Controller
         $user = Auth::user();
         $user_role = $user->role->name;
         if($user_role === 'Admin'){
-            $textbooks = Textbook::all();
-            $modules = Module::has('textbooks')->get();
+
+            $moduleTextbooks = Module::has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+            $modules = Module::has('textbooks')->with('textbooks')->get();
+
         }else{
-
             $modules = $user->modules()->has('textbooks')->get();
-
             $moduleTextbooks = $user->modules()->has('textbooks')->
             with('textbooks')->get()->pluck('textbooks');
 
-            $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
-            with('textbooks')->get()->pluck('textbooks');
-
-            $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
-
-            $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
         }
-        $extensiveReadingCategories = ExtensiveReadingCategory::has('textbooks')->get();
+        $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+        with('textbooks')->get()->pluck('textbooks');
+        $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+        $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
+
+        $extensiveReadingCategories = ExtensiveReadingCategory::has('textbooks')->with('textbooks')->get();
 
         return response()->json([
            'textbooks' => $textbooks,
