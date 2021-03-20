@@ -469,7 +469,7 @@ class ExtensiveReadingCategoryTest extends TestCase
         $extensive_reading_category_original = ExtensiveReadingCategory::inRandomOrder()->first();
 
         $extensive_reading_category_update = [
-            'name' => ExtensiveReadingCategory::inRandomOrder()->first()->name,
+            'name' => ExtensiveReadingCategory::where('id', '!=', $extensive_reading_category_original->id)->inRandomOrder()->first()->name,
             'description' => 'This is a test to see if you can update an extensive reading category with name already used'
         ];
 
