@@ -62,6 +62,187 @@ class ModuleTest extends TestCase
     }
 
     /**
+     * A test to create a module with Module Name already used
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_module_with_name_already_used_authorised()
+    {
+        $module = [
+            'module_name' => $extensive_reading_category_original = Module::inRandomOrder()->first()->name,
+            'module_code' => 'CS37788',
+            'module_year' => YearGroup::find(1)->id
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/module', $module)
+            ->assertJson([
+                "errors" => [
+                    "module_name" => ["The module name has already been taken."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('modules', [
+            'name' => $module['module_name'],
+            'module_code' => $module['module_code'],
+            'year_group_id' => $module['module_year']
+        ]);
+    }
+
+    /**
+     * A test to create a module with no name for Module Name
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_module_with_no_name_authorised()
+    {
+        $module = [
+            'module_name' => '',
+            'module_code' => 'CS37788',
+            'module_year' => YearGroup::find(1)->id
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/module', $module)
+            ->assertJson([
+                "errors" => [
+                    "module_name" => ["The module name field is required."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('modules', [
+            'name' => $module['module_name'],
+            'module_code' => $module['module_code'],
+            'year_group_id' => $module['module_year']
+        ]);
+    }
+
+    /**
+     * A test to create a module with Module Code already used
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_module_with_module_code_already_used_authorised()
+    {
+        $module = [
+            'module_name' => 'testing1234',
+            'module_code' => $extensive_reading_category_original = Module::inRandomOrder()->first()->module_code,
+            'module_year' => YearGroup::find(1)->id
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/module', $module)
+            ->assertJson([
+                "errors" => [
+                    "module_code" => ["The module code has already been taken."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('modules', [
+            'name' => $module['module_name'],
+            'module_code' => $module['module_code'],
+            'year_group_id' => $module['module_year']
+        ]);
+    }
+
+    /**
+     * A test to create a module with no Module Code (empty)
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_module_with_no_module_code_authorised()
+    {
+        $module = [
+            'module_name' => 'testing1234',
+            'module_code' => '',
+            'module_year' => YearGroup::find(1)->id
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/module', $module)
+            ->assertJson([
+                "errors" => [
+                    "module_code" => ["The module code field is required."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('modules', [
+            'name' => $module['module_name'],
+            'module_code' => $module['module_code'],
+            'year_group_id' => $module['module_year']
+        ]);
+    }
+
+    /**
+     * A test to create a module with no Module Year (empty)
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_module_with_no_module_year_authorised()
+    {
+        $module = [
+            'module_name' => 'testing1234',
+            'module_code' => 'CSTesting',
+            'module_year' => ''
+        ];
+
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/module', $module)
+            ->assertJson([
+                "errors" => [
+                    "module_year" => ["You have to choose a year!"]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('modules', [
+            'name' => $module['module_name'],
+            'module_code' => $module['module_code'],
+            'year_group_id' => $module['module_year']
+        ]);
+    }
+
+    /**
+     * A test to create a module with 'Please choose a year' (non-numeric) Module Year
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_module_with_non_numeric_module_year_authorised()
+    {
+        $module = [
+            'module_name' => 'testing1234',
+            'module_code' => 'CSTesting',
+            'module_year' => 'Please choose a year'
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/module', $module)
+            ->assertJson([
+                "errors" => [
+                    "module_year" => ["You have to choose a year!"]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('modules', [
+            'name' => $module['module_name'],
+            'module_code' => $module['module_code'],
+            'year_group_id' => $module['module_year']
+        ]);
+    }
+
+    /**
      * A test to create a module with 2 unassigned textbooks checked and authorised by logging in as an Admin
      *
      * @test
@@ -235,6 +416,193 @@ class ModuleTest extends TestCase
             'name' => 'updated module 2',
             'module_code' => 'CS3778878',
             'year_group_id' => YearGroup::find(3)->id
+        ]);
+    }
+
+    /**
+     * A test to update a module with Module Name already used
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_module_with_name_already_used_authorised()
+    {
+        $year_group = YearGroup::find(1);
+
+        $module = Module::create([
+            'name' => 'original module',
+            'module_code' => 'TS357755',
+            'year_group_id' => $year_group->id]);
+
+        $update_module = [
+            'module_name' => $extensive_reading_category_original = Module::where('id','!=', $module->id)
+                ->inRandomOrder()->first()->name,
+            'module_code' => 'TS357755',
+            'module_year' => $year_group->id
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->putJson('/api/module/'.$module->id, $update_module)
+            ->assertJson([
+                "errors" => [
+                    "module_name" => ["The module name has already been taken."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('modules', [
+            'name' => $update_module['module_name'],
+            'module_code' => $update_module['module_code'],
+            'year_group_id' => $update_module['module_year']
+        ]);
+    }
+
+    /**
+     * A test to update a module with no name for Module Name
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_module_with_no_name_authorised()
+    {
+        $year_group = YearGroup::find(1);
+
+        $module = Module::create([
+            'name' => 'original module',
+            'module_code' => 'TS357755',
+            'year_group_id' => $year_group->id]);
+
+        $update_module = [
+            'module_name' => '',
+            'module_code' => 'TS357755',
+            'module_year' => $year_group->id
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->putJson('/api/module/'.$module->id, $update_module)
+            ->assertJson([
+                "errors" => [
+                    "module_name" => ["The module name field is required."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('modules', [
+            'name' => $update_module['module_name'],
+            'module_code' => $update_module['module_code'],
+            'year_group_id' => $update_module['module_year']
+        ]);
+    }
+
+    /**
+     * A test to update a module with Module Code already used
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_module_with_module_code_already_used_authorised()
+    {
+        $year_group = YearGroup::find(1);
+
+        $module = Module::create([
+            'name' => 'original module',
+            'module_code' => 'TS357755',
+            'year_group_id' => $year_group->id]);
+
+        $update_module = [
+            'module_name' => 'update module',
+            'module_code' => $extensive_reading_category_original = Module::where('id','!=', $module->id)
+                ->inRandomOrder()->first()->module_code,
+            'module_year' => $year_group->id
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->putJson('/api/module/'.$module->id, $update_module)
+            ->assertJson([
+                "errors" => [
+                    "module_code" => ["The module code has already been taken."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('modules', [
+            'name' => $update_module['module_name'],
+            'module_code' => $update_module['module_code'],
+            'year_group_id' => $update_module['module_year']
+        ]);
+    }
+
+    /**
+     * A test to update a module with no Module Code (empty)
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_module_with_no_module_code_authorised()
+    {
+        $year_group = YearGroup::find(1);
+
+        $module = Module::create([
+            'name' => 'original module',
+            'module_code' => 'TS357755',
+            'year_group_id' => $year_group->id]);
+
+        $update_module = [
+            'module_name' => 'update module',
+            'module_code' => '',
+            'module_year' => $year_group->id
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->putJson('/api/module/'.$module->id, $update_module)
+            ->assertJson([
+                "errors" => [
+                    "module_code" => ["The module code field is required."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('modules', [
+            'name' => $update_module['module_name'],
+            'module_code' => $update_module['module_code'],
+            'year_group_id' => $update_module['module_year']
+        ]);
+    }
+
+    /**
+     * A test to update a module with no Module Year (empty)
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_module_with_no_module_year_authorised()
+    {
+        $year_group = YearGroup::find(1);
+
+        $module = Module::create([
+            'name' => 'original module',
+            'module_code' => 'TS357755',
+            'year_group_id' => $year_group->id]);
+
+        $update_module = [
+            'module_name' => 'update module',
+            'module_code' => 'CSTesting',
+            'module_year' => ''
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->putJson('/api/module/'.$module->id, $update_module)
+            ->assertJson([
+                "errors" => [
+                    "module_year" => ["You have to choose a year!"]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('modules', [
+            'name' => $update_module['module_name'],
+            'module_code' => $update_module['module_code'],
+            'year_group_id' => $update_module['module_year']
         ]);
     }
 

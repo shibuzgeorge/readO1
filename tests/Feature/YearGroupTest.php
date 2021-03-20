@@ -157,7 +157,6 @@ class YearGroupTest extends TestCase
             'name' => ''
         ];
 
-        //Creating same year group again
         $this->actingAs($this->adminUser)
             ->postJson('/api/yearGroup', $year_group)
             ->assertJsonFragment([
@@ -256,7 +255,7 @@ class YearGroupTest extends TestCase
         $new_year_group = [
             'edit_name' => YearGroup::find(2)->name
         ];
-        //Creating same year group again
+
         $this->actingAs($this->adminUser)
             ->putJson('/api/yearGroup/'.$year_group_original->id, $new_year_group)
             ->assertJsonFragment([
@@ -285,7 +284,7 @@ class YearGroupTest extends TestCase
         $new_year_group = [
             'edit_name' => ''
         ];
-        //Creating same year group again
+
         $this->actingAs($this->adminUser)
             ->putJson('/api/yearGroup/'.$year_group_original->id, $new_year_group)
             ->assertJsonFragment([
@@ -303,7 +302,7 @@ class YearGroupTest extends TestCase
     }
 
     /**
-     * A test to create a year group unauthorised by logging in as an Module Tutor or Student
+     * A test to update a year group unauthorised by logging in as an Module Tutor or Student
      *
      * @test
      * @return void

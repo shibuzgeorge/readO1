@@ -47,7 +47,7 @@ class YearGroupController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'edit_name' => 'required|unique:year_groups,name',
+            'edit_name' => 'required|unique:year_groups,name,'.$id,
         ]);
 
         $year_group = YearGroup::findorFail($id);
