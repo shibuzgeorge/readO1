@@ -4,6 +4,8 @@ import router from '~/router'
 import i18n from '~/plugins/i18n'
 import sweetmodal from '~/plugins/sweetmodal'
 import cliploader from '~/plugins/cliploader'
+import vueperslides from '~/plugins/carousel'
+import vueperslide from '~/plugins/carousel'
 import multiselect from '~/plugins/multiselect'
 import GChart from '~/plugins/GChart'
 import paginate from '~/plugins/paginate'
@@ -24,6 +26,8 @@ new Vue({
   sweetmodal,
   cliploader,
   paginate,
+  vueperslides,
+  vueperslide,
   multiselect,
   GChart,
   ...App,

@@ -5,6 +5,7 @@
         </div>
         <div>
             List of recent reading sessions:
+            <div v-if="list_of_reading_attempts.length > 0">
             <div class="form-inline d-flex justify-content-between align-items-center">
             <input class="form-control col-lg-4" type="search" v-model="searchReadingSessionQuery" placeholder="Search..."/>
             <select class="form-control col-lg-3 ml-2" v-model="filterByTextbook">
@@ -43,8 +44,12 @@
                 </tbody>
             </table>
             <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
-
+            </div>
+            <div v-else>
+                You have not completed any reading sessions, try going to the library to checkout some textbooks
+            </div>
             List of recent quiz attempts:
+            <div v-if="list_of_quiz_scores.length > 0">
             <div class="form-inline d-flex justify-content-between align-items-center">
                 <input class="form-control col-lg-4" type="search" v-model="searchQuizScoreQuery" placeholder="Search..."/>
                 <select class="form-control col-lg-3 ml-2" v-model="filterByTextbookQuiz">
@@ -85,7 +90,10 @@
                 </tbody>
             </table>
             <paginate style="display: flex; justify-content: center;" :items="resultQuery2" :pageSize="sizePage" @changePage="onChangePage2"></paginate>
-
+            </div>
+            <div v-else>
+                You have not completed any quizzes, try going to the library to checkout some textbooks and attempt a quiz at the end.
+            </div>
         </div>
         <sweet-modal ref="viewResults" width="100%">
             <PDFViewer :fileName="fileName" :path="path"/>
