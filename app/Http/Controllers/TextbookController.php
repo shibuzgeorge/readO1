@@ -63,6 +63,37 @@ class TextbookController extends Controller
         ]);
     }
 
+    public function getLast5recent(){
+        $user = Auth::user();
+        $user_role = $user->role->name;
+        if($user_role === 'Admin'){
+
+            $moduleTextbooks = Module::has('textbooks')->
+            with('textbooks')->whereHas(
+                'textbooks', function($q)  {
+                $q->orderBy('textbooks.id', 'desc')->take(5);
+            })->get()->take(5)->pluck('textbooks');
+
+        }else{
+            $moduleTextbooks = $user->modules()->has('textbooks')->
+            with('textbooks')->whereHas(
+                'textbooks', function($q)  {
+                $q->orderBy('textbooks.id', 'desc')->take(5);
+            })->get()->take(5)->pluck('textbooks');
+
+        }
+        $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+        with('textbooks')->whereHas(
+            'textbooks', function($q)  {
+            $q->orderBy('textbooks.id', 'desc')->take(5);
+        })->get()->take(5)->pluck('textbooks');
+        $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+        $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
+
+        return response()->json([
+            'textbooks' => $textbooks,
+        ]);
+    }
     /**
      * Displays the textbook associated to the textbook_id passed.
      * Checks to see if the user has the permission to view the textbook.

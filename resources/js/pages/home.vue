@@ -1,4 +1,4 @@
-<template>
+<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
   <card v-if="isLoaded">
     <div class="card-header d-flex justify-content-between align-items-center">
     <h5 id="title">Dashboard</h5>
@@ -8,6 +8,33 @@
 
         <h3>Welcome back - {{user.name}}</h3>
         <br>
+          Check out these recent added textbooks:
+          <vueper-slides
+                  class="no-shadow"
+                  :visible-slides="3"
+                  slide-multiple
+                  :gap="3"
+                  :touchable="false"
+                  :slide-ratio="1 / 4"
+                  :dragging-distance="200"
+                  :breakpoints="{ 800: { visibleSlides: 2, slideMultiple: 2 } }">
+              <vueper-slide v-for="textbook in textbooks" :key="i" :title="textbook.title">
+                  <template v-slot:content>
+                      <div class="card-body">
+                          <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
+                              <h5 class="card-title">{{textbook.title}}</h5>
+                              <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
+                          </router-link>
+                          <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
+                              <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
+                          </router-link>
+                          <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
+
+                      </div>
+          </template>
+              </vueper-slide>
+          </vueper-slides>
+
           <GChart type="LineChart"
                   :data="quizChartData"
                   :options="quizChartOptions"/>
@@ -138,6 +165,7 @@
                title: 'Attempt Number'
             },
         },
+        textbooks: [],
 
     }),
     created() {
@@ -157,6 +185,14 @@
             }).catch(function (response) {
             //handle error
             console.log(response);
+        });
+
+        axios.get('api/textbook/getLast5recent/')
+            .then(response => {
+                this.isLoaded = true;
+                this.textbooks = response.data.textbooks
+            }).catch(error => {
+            console.log(error.response)
         });
     },
     methods: {
