@@ -33,7 +33,7 @@ class YearGroupController extends Controller
      */
     public function edit($id)
     {
-        $year_group = YearGroup::find($id);
+        $year_group = YearGroup::findorFail($id);
         return response()->json($year_group);
     }
 
@@ -46,10 +46,14 @@ class YearGroupController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $year_group = YearGroup::find($id);
-        $year_group->name = $request->input('name');
+        $request->validate([
+            'edit_name' => 'required|unique:year_groups,name',
+        ]);
+
+        $year_group = YearGroup::findorFail($id);
+        $year_group->name = $request->input('edit_name');
         $year_group->save();
-        return response()->json(['Success' => 'Successfully Updated!']);
+        return response()->json(['Success' => 'Successfully updated the year group!']);
     }
 
     /**
@@ -60,7 +64,11 @@ class YearGroupController extends Controller
      */
     public function store(Request $request)
     {
-        YearGroup::create(['name' => $request->year_group]);
+        $request->validate([
+            'name' => 'required|unique:year_groups',
+        ]);
+
+        YearGroup::create(['name' => $request->name]);
         return response()->json(['Success' => 'Successfully created the year group!']);
     }
 
@@ -72,7 +80,7 @@ class YearGroupController extends Controller
      */
     public function destroy($id)
     {
-        $year_group = YearGroup::find($id);
+        $year_group = YearGroup::findorFail($id);
         $year_group->delete();
 
         return response()->json(['Success' => 'Successfully Deleted!']);
