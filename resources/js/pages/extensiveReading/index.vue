@@ -35,19 +35,29 @@
                         </div>
 
                     </div>
-
                     <hr>
-                    <div v-if="category.textbooks.length > 0" v-for="textbook in category.textbooks" class="card">
-                        <div class="card-body">
-                        <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
-                            <h5 class="card-title">{{textbook.title}}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
-                        </router-link>
-                        <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
-                            <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
-                        </router-link>
-                        </div>
-                    </div>
+                        <section>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div v-if="category.textbooks.length > 0" v-for="textbook in category.textbooks" class="col-md-4 mb-3 card">
+                                                <div class="card-body">
+                                                    <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
+                                                        <h5 class="card-title">{{textbook.title}}</h5>
+                                                        <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
+                                                    </router-link>
+                                                    <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
+                                                        <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
+                                                    </router-link>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
                     <div v-if="category.textbooks.length === 0">
                         No textbooks for this category
                     </div><hr>
@@ -62,7 +72,6 @@
         <clip-loader color="black"/>
     </div>
 </template>
-
 <script>
     import axios from 'axios'
     import { mapGetters } from 'vuex'
@@ -138,11 +147,8 @@
         metaInfo () {
             return { title: this.$t('home') }
         }
-
-
     }
 </script>
-
 <style scoped>
     .flexbox {
         display: flex;
@@ -154,4 +160,9 @@
     .flex-item{
         margin: auto;
     }
+    .slider{
+        overflow-x: scroll;
+        overflow-y: hidden;
+    }
+
 </style>

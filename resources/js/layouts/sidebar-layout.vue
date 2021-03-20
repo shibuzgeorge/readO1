@@ -19,6 +19,11 @@
                          class="list-group-item list-group-item-action bg-light"
                          active-class="active-class">Library
             </router-link>
+            <router-link :to="{ name: 'readingQuizScores' }"
+                         id="reading-sessions-quiz-scores-menu"
+                         class="list-group-item list-group-item-action bg-light"
+                         active-class="active-class">Reading Sessions and Quiz Scores
+            </router-link>
 
             <a id="extensive-reading-menu"
                class="btn collapsed list-group-item list-group-item-action bg-light"

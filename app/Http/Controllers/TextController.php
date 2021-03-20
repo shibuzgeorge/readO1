@@ -278,18 +278,21 @@ class TextController extends Controller
             $textbooks = ReadingSession::with('text.textbook')->get()->unique('text.textbook')->pluck('text.textbook');
 
         }else if(Auth::user()->role->name === 'Module Tutor') {
+            $moduleTextbooks = Auth::user()->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
 
-            $tb = Auth::user()->modules()->has('textbooks')->
-            with('textbooks')->get()->pluck('textbooks')->toArray();
-            $tb = call_user_func_array('array_merge', $tb);
+            $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
 
-            $test = collect($tb)->pluck('id');
-            $attempts = ReadingSession::with('text.textbook')
-                ->whereHas('text.textbook', function($query) use ($test){
-                    $query->whereIn('id',$test);
-                })
-                ->with('user')->get();
-            $textbooks = $tb;
+            $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+            $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
+            $allTextbookIds = collect($textbooks)->pluck('id');
+
+            $attempts = ReadingSession::with('text.textbook')->with('user')
+                ->whereHas('text.textbook', function($query) use ($allTextbookIds){
+                    $query->whereIn('id',$allTextbookIds);
+                })->get();
+            $textbooks = $attempts->unique('text.textbook')->pluck('text.textbook');
         } else{
             $attempts = ReadingSession::where('user_id', auth()->user()->id)->with('text.textbook')->get();
             $textbooks = ReadingSession::where('user_id', auth()->user()->id)->with('text.textbook')->get()->unique('text.textbook')->pluck('text.textbook');

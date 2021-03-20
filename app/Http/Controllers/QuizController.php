@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ExtensiveReadingCategory;
 use App\Option;
 use App\Question;
 use App\Quiz;
@@ -107,15 +108,21 @@ class QuizController extends Controller
             $textbooks = UserQuizScore::with('quiz.text.textbook')->get()->unique('quiz.text.textbook')->pluck('quiz.text.textbook');
         }else if(Auth::user()->role->name === 'Module Tutor') {
 
-            $textbooks = Auth::user()->modules()->has('textbooks')->
-            with('textbooks')->get()->pluck('textbooks')->toArray();
-            $textbooks = call_user_func_array('array_merge', $textbooks);
+            $moduleTextbooks = Auth::user()->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
 
-            $test = collect($textbooks)->pluck('id');
+            $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+
+            $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+            $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
+            $allTextbookIds = collect($textbooks)->pluck('id');
+
             $attempts = UserQuizScore::with('quiz.text.textbook')->with('user')
-                ->whereHas('quiz.text.textbook', function($query) use ($test){
-                    $query->whereIn('id',$test);
+                ->whereHas('quiz.text.textbook', function($query) use ($allTextbookIds){
+                    $query->whereIn('id',$allTextbookIds);
                 })->get();
+            $textbooks = $attempts->unique('quiz.text.textbook')->pluck('quiz.text.textbook');
 
         } else{
             $attempts = UserQuizScore::where('user_id', auth()->user()->id)->with('quiz.text.textbook')->get();
