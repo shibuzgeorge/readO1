@@ -71,6 +71,16 @@ class ModuleController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'module_name' => 'required|unique:modules,name',
+            'module_code' => 'required|unique:modules,module_code',
+            'module_year' => 'required|numeric'
+        ],
+        [
+        'module_year.required' => 'You have to choose a year!',
+        'module_year.numeric' => 'You have to choose a year!'
+        ]);
+
         $module = Module::create([
             'name' => $request->module_name,
             'module_code' => $request->module_code,
@@ -274,6 +284,16 @@ class ModuleController extends Controller
      */
     public function update(Request $request, $module_id)
     {
+        $request->validate([
+            'module_name' => 'required|unique:modules,name,'.$module_id,
+            'module_code' => 'required|unique:modules,module_code,'.$module_id,
+            'module_year' => 'required|numeric'
+        ],
+            [
+                'module_year.required' => 'You have to choose a year!',
+                'module_year.numeric' => 'You have to choose a year!'
+            ]);
+
         $m = Module::findOrFail($module_id);
         $m->name = $request->module_name;
         $m->module_code = $request->module_code;
