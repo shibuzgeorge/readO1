@@ -44,7 +44,7 @@ class TextbookController extends Controller
             $modules = Module::has('textbooks')->with('textbooks')->get();
 
         }else{
-            $modules = $user->modules()->has('textbooks')->get();
+            $modules = $user->modules()->has('textbooks')->with('textbooks')->get();
             $moduleTextbooks = $user->modules()->has('textbooks')->
             with('textbooks')->get()->pluck('textbooks');
 
