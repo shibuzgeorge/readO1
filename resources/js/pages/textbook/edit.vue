@@ -31,8 +31,22 @@
                     </multiselect>
                 </div>
                 <br/>
-                Update full textbook?:
+                <label>Update full textbook [optional]: (Format: PDF) - <i>A thumbnail will be generated automatically (Page 1 of PDF)</i></label>
                 <input class="form-control" type="file" id="file" ref="file" v-on:change="handleFileUpload()"/><br/>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch1" :checked="thumbnailOn" @click="thumbnailOn = !thumbnailOn">
+                    <label class="custom-control-label" for="customSwitch1">Turn thumbnail on or not</label>
+                </div>
+                <img v-if="thumbnailImage!==null" :src="'data:image/png;base64,'+thumbnailImage" width="100" height="100"/><br/>
+                <label>Update thumbnail [optional]: (Format: jpg, jpeg, png) - <i>Overrides thumbnail of PDF upload (if uploaded)</i></label>
+                <input class="form-control" type="file" id="thumbnail" :disabled="!thumbnailOn" ref="thumbnail" v-on:change="handleThumbnailUpload()"/><br/>
+
+                <div v-if="fileName!==''">
+                    <lable>Current PDF file uploaded:</lable>
+                <PDFViewer :fileName="fileName" :path="path" width="200" height="400"/>
+                </div>
+
+
             </div>
             <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
                 {{successMessage}}
@@ -54,9 +68,13 @@
 <script>
     import axios from 'axios'
     import Form from 'vform'
+    import PDFViewer from '~/components/PDFViewer';
 
     export default {
         middleware: 'admin_plus_module_tutor',
+        components:{
+            PDFViewer,
+        },
         name: "edit",
         data: () => ({
             isLoaded: false,
@@ -66,6 +84,11 @@
                 selected: [],
             }),
             file: '',
+            fileName: '',
+            thumbnailImage: '',
+            thumbnailOn: true,
+            thumbnail: '',
+            path: '/lib/pdf/web/viewer.html',
             successMessage: '',
             errorMessage: '',
             modules: [],
@@ -98,12 +121,13 @@
             axios.get('/api/extensiveReading/create')
                 .then(response => {
                     this.extensiveReadingCategories = response.data;
-                    this.isLoaded = true;
+
                 }).catch(function (response) {
                 //handle error
                 console.log(response);
             });
             let self = this
+
             axios.get(`/api/textbook/${this.$route.params.id}/edit`)
                 .then(response => {
                     if(response.data.Error !== undefined){
@@ -115,7 +139,18 @@
                         this.form.selected = response.data.selected;
                         this.originalSelected = response.data.selected;
                         this.section = response.data.section;
+                        this.thumbnailImage = response.data.thumbnailImage;
+                        if(this.thumbnailImage === null){
+                            this.thumbnailOn = false;
+                        }else{
+                            this.thumbnailOn = true;
+                        }
                         this.originalSection = response.data.section;
+                        if(response.data.file === true){
+                            this.fileName =`/api/textbook/pdf/${this.$route.params.id}`;
+                        }
+                        this.isLoaded = true;
+
                     }
                 }).catch(function (response) {
                 //handle error
@@ -128,6 +163,9 @@
             handleFileUpload(){
                 this.file = this.$refs.file.files[0];
             },
+            handleThumbnailUpload(){
+                this.thumbnail = this.$refs.thumbnail.files[0];
+            },
             async submit() {
                 this.form.busy = true;
                 let formData = new FormData();
@@ -135,6 +173,10 @@
                 /*
                     Add the form data we need to submit
                 */
+                if(!this.thumbnailOn){
+                    this.thumbnail = 'remove';
+                }
+                formData.append('thumbnail', this.thumbnail);
                 formData.append('file', this.file);
                 formData.append('title', this.form.title);
                 formData.append('description', this.form.description);

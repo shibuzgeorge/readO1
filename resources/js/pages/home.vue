@@ -1,4 +1,4 @@
-<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
+<template>
   <card v-if="isLoaded">
     <div class="card-header d-flex justify-content-between align-items-center">
     <h5 id="title">Dashboard</h5>
@@ -11,16 +11,21 @@
           Check out these recent added textbooks:
           <vueper-slides
                   class="no-shadow"
-                  :visible-slides="3"
+                  :visible-slides="2"
                   slide-multiple
                   :gap="3"
                   :touchable="false"
                   :slide-ratio="1 / 4"
                   :dragging-distance="200"
                   :breakpoints="{ 800: { visibleSlides: 2, slideMultiple: 2 } }">
-              <vueper-slide v-for="textbook in textbooks" :key="i" :title="textbook.title">
+
+              <vueper-slide class="card" v-for="textbook in textbooks" :key="textbook.id" :title="textbook.title">
                   <template v-slot:content>
-                      <div class="card-body">
+                        <div :class="{ 'row': textbook.thumbnail!==null }">
+                          <div v-if="textbook.thumbnail!==null" class="col-sm-5 d-flex justify-content-center">
+                          <img v-if="textbook.thumbnail!==null" :src="'data:image/png;base64,'+textbook.thumbnail" width="150" height="200"/>
+                          </div>
+                          <div :class="{ 'col-sm-7': textbook.thumbnail!==null }">
                           <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
                               <h5 class="card-title">{{textbook.title}}</h5>
                               <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
@@ -29,15 +34,12 @@
                               <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
                           </router-link>
                           <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
-
-                      </div>
-          </template>
+                          </div>
+                        </div>
+                  </template>
               </vueper-slide>
           </vueper-slides>
 
-          <GChart type="LineChart"
-                  :data="quizChartData"
-                  :options="quizChartOptions"/>
         <div class="row">
             <div class="col-md-6">
                 Reading Sessions
@@ -143,28 +145,6 @@
         path: '/lib/pdf/web/viewer.html',
         last5QuizAttempts: [],
         last5ReadingAttempts: [],
-         quizChartData: [
-             ['Attempt', 'Quiz Score', 'Time taken'],
-             ['1', 1, [0,1,13]],
-             ['2', 7, [0,1,3]],
-             ['3', 8, [0,0,50]],
-             ['4', 3, [0,0,25]]
-         ],
-        quizChartOptions: {
-            title: 'Latest quiz scores',
-            series: {
-                0: {targetAxisIndex: 0},
-                1: {targetAxisIndex: 1}
-            },
-            vAxes: {
-                // Adds titles to each axis.
-                0: {title: 'Score'},
-                1: {title: 'Time taken'}
-            },
-            hAxis: {
-               title: 'Attempt Number'
-            },
-        },
         textbooks: [],
 
     }),

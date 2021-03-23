@@ -7,8 +7,11 @@
                         Description: {{description}}
                         <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
                     </h5>
-
-                    <div class="wrapper mt-4">
+                    <div class="wrapper mt-4" :class="{ 'row': thumbnail!==null }">
+                        <div v-if="thumbnail!==null" class="col-sm-5 d-flex justify-content-center">
+                        <img  :src="'data:image/png;base64,'+thumbnail" width="300" height="500"/>
+                        </div>
+                        <div :class="{ 'col-sm-7': thumbnail!==null }">
                         <div>
                             <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'textbook.edit', params: {id: $route.params.id} }">
                                 <button class="btn btn-sm btn-primary" v-if="role!=='Student'">Edit</button>
@@ -41,6 +44,7 @@
                             </li>
                         </ul> <br/>
                         <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
+                        </div>
                     </div>
                 </card>
             </div>
@@ -86,6 +90,7 @@
             successMessage: '',
             file: true,
             fileName: '',
+            thumbnail: '',
             path: '/lib/pdf/web/viewer.html',
             searchQuery: null,
             sizePage: 9,
@@ -124,6 +129,7 @@
                         this.description = response.data.description;
                         this.texts = response.data.texts;
                         this.file = response.data.file;
+                        this.thumbnail = response.data.thumbnail;
                     }
 
                 }).catch(error => {

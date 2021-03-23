@@ -21,6 +21,7 @@
 
                 <div v-for="textbook in textbooksPaginated" class="card col-sm-3 ml-4 mt-4 align-items-center">
                 <div class="card-body">
+                    <img v-if="textbook.thumbnail!==null" :src="'data:image/png;base64,'+textbook.thumbnail" width="150" height="200"/>
                     <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
                     <h5 class="card-title">{{textbook.title}}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>

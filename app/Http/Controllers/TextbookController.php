@@ -7,6 +7,10 @@ use App\Module;
 use App\Textbook;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Spatie\PdfToImage\Pdf;
+use Illuminate\Support\Facades\File;
+use Org_Heigl\Ghostscript\Ghostscript;
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class TextbookController extends Controller
 {
@@ -120,6 +124,7 @@ class TextbookController extends Controller
                         'title' => $textbook->title,
                         'description' => $textbook->description,
                         'texts' => $texts,
+                        'thumbnail' => $textbook->thumbnail,
                         'file' => true
                     ]);
                 } else {
@@ -127,6 +132,7 @@ class TextbookController extends Controller
                         'title' => $textbook->title,
                         'description' => $textbook->description,
                         'texts' => $texts,
+                        'thumbnail' => $textbook->thumbnail,
                         'file' => false
                     ]);
                 }
@@ -192,8 +198,10 @@ class TextbookController extends Controller
                 return response()->json([
                     'title' => $textbook->title,
                     'description' => $textbook->description,
+                    'thumbnailImage' => $textbook->thumbnail,
                     'selected' => $selected,
                     'section' => $section,
+                    'file' => $textbook->file !== null ? true : false,
                 ]);
             } else {
                 return response()->json(['Error' => 'Permission denied to edit textbook!']);
@@ -233,14 +241,31 @@ class TextbookController extends Controller
     /**
      * Store a newly created textbook.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
+     * @throws \Spatie\PdfToImage\Exceptions\PdfDoesNotExist
+     * @throws \Spatie\PdfToImage\Exceptions\PageDoesNotExist
      */
     public function store(Request $request)
     {
         $file = null;
+        $thumbnail = null;
 
         if ($request->file('file')) {
             $file = base64_encode(file_get_contents($request->file('file')));
+        }
+        if($request->thumbnail === 'remove'){
+            $thumbnail = null;
+        } else if ($file!== null && !$request->file('thumbnail')) {
+            file_put_contents('file.pdf',  base64_decode($file));
+            Ghostscript::setGsPath("c:/Program Files/Git/mingw64/bin/gs.exe");
+            $pdf = new Pdf(public_path('file.pdf'));
+            $pdf->setPage(1)
+                ->saveImage( public_path('thumbnail.png'));
+            $thumbnail =  base64_encode(file_get_contents(public_path('thumbnail.png')));
+            File::delete('file.pdf');
+            File::delete('thumbnail.png');
+        } else if($request->file('thumbnail')){
+            $thumbnail = base64_encode(file_get_contents($request->file('thumbnail')));
         }
 
         //data that will be inserted into new row in textbook table
@@ -248,6 +273,7 @@ class TextbookController extends Controller
             'title' => $request->input('title'),
             'description' => $request->input('description'),
             'file' => $file,
+            'thumbnail' => $thumbnail,
         ];
 
         //create a textbook using the POST data
@@ -277,22 +303,44 @@ class TextbookController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @param $textbook_id
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Spatie\PdfToImage\Exceptions\PdfDoesNotExist
+     * @throws \Spatie\PdfToImage\Exceptions\PageDoesNotExist
+     * @throws \Exception
      */
     public function update(Request $request, $textbook_id)
     {
         $file = null;
+        $thumbnail = null;
         $textbook = Textbook::findOrFail($textbook_id);
         if ($request->file('file')) {
             $file = base64_encode(file_get_contents($request->file('file')));
             $textbook->file = $file;
         }
 
+        if($request->thumbnail === 'remove'){
+            $textbook->thumbnail = null;
+        }else if ($textbook->file!==null && !$request->file('thumbnail')) {
+
+            file_put_contents('file.pdf',  base64_decode($textbook->file));
+            Ghostscript::setGsPath("c:/Program Files/Git/mingw64/bin/gs.exe");
+            $pdf = new Pdf(public_path('file.pdf'));
+            $pdf->setPage(1)
+                ->saveImage( public_path('thumbnail.png'));
+            $thumbnail = base64_encode(file_get_contents(public_path('thumbnail.png')));
+            File::delete('file.pdf');
+            File::delete('thumbnail.png');
+            $textbook->thumbnail = $thumbnail;
+
+        }else if($request->file('thumbnail')){
+            $thumbnail = base64_encode(file_get_contents($request->file('thumbnail')));
+            $textbook->thumbnail = $thumbnail;
+        }
+
         $textbook->title = $request->input('title');
         $textbook->description = $request->input('description');
+
         $textbook->save();
-
         $selectedJson = $request->input('selected');
-
         $decoded_json = json_decode($selectedJson);
 
         if(str_contains($selectedJson,'[')){

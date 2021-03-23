@@ -24,8 +24,12 @@
         </div>
         <div class="wrapper">
             <div class="row justify-content-center">
-                <div v-for="textbook in textbooksPaginated" class="card col-sm-3 ml-4 mt-4">
-                    <div class="card-body">
+                <div v-for="textbook in textbooksPaginated" class="card col-sm-5 ml-4 mt-4">
+                    <div class="card-body" :class="{ 'row': textbook.thumbnail!==null }">
+                        <div v-if="textbook.thumbnail!==null" class="col-sm-5 d-flex justify-content-center">
+                        <img :src="'data:image/png;base64,'+textbook.thumbnail" width="150" height="200"/>
+                        </div>
+                        <div :class="{ 'col-sm-7': textbook.thumbnail!==null }">
                         <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
                             <h5 class="card-title">{{textbook.title}}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
@@ -34,7 +38,7 @@
                             <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
                         </router-link>
                         <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
-
+                        </div>
                     </div>
                 </div>
             </div><br/>

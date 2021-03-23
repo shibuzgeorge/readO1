@@ -30,8 +30,14 @@
                     </multiselect>
                 </div>
                 <br/>
-                <label>Upload full textbook: </label>
+                <label>Upload full textbook [optional]: (Format: PDF) - <i>A thumbnail will be generated automatically (Page 1 of PDF)</i></label>
                 <input class="form-control" type="file" id="file" ref="file" v-on:change="handleFileUpload()"/><br/>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch1" :checked="thumbnailOn" @click="thumbnailOn = !thumbnailOn">
+                    <label class="custom-control-label" for="customSwitch1">Turn thumbnail on or not</label>
+                </div>
+                <label>Upload thumbnail [optional]: (Format: jpg, jpeg, png) - <i>Overrides thumbnail of PDF upload (if uploaded)</i></label>
+                <input class="form-control" :disabled="!thumbnailOn" type="file" id="thumbnail" ref="thumbnail" v-on:change="handleThumbnailUpload()"/><br/>
             </div>
             <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
                 Successfully Uploaded
@@ -62,6 +68,8 @@
             modules: [],
             extensiveReadingCategories: [],
             file: '',
+            thumbnail: '',
+            thumbnailOn: true,
             moduleSelect: false,
             extensiveReadingSelect: false,
             section: '',
@@ -91,6 +99,9 @@
             handleFileUpload(){
                     this.file = this.$refs.file.files[0];
             },
+            handleThumbnailUpload(){
+                this.thumbnail = this.$refs.thumbnail.files[0];
+            },
             async submit() {
                 this.form.busy = true;
                 let formData = new FormData();
@@ -98,6 +109,10 @@
                 /*
                     Add the form data we need to submit
                 */
+                if(!this.thumbnailOn){
+                    this.thumbnail = 'remove';
+                }
+                formData.append('thumbnail', this.thumbnail);
                 formData.append('file', this.file);
                 formData.append('title', this.form.title);
                 formData.append('description', this.form.description);
