@@ -32,7 +32,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('extensiveReading/categories', 'ExtensiveReadingController@categories');
     Route::resource('/extensiveReading', 'ExtensiveReadingController');
 
-    Route::get('textbook/getLast5recent', 'TextbookController@getLast5recent');
+    Route::get('/textbook/getLast10recent', 'TextbookController@getLast10recent');
     Route::resource('/textbook', 'TextbookController');
     Route::get('textbook/pdf/{textbook_id}', 'TextbookController@pdf');
 

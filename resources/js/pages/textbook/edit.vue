@@ -42,13 +42,13 @@
                 <input class="form-control" type="file" id="thumbnail" :disabled="!thumbnailOn" ref="thumbnail" v-on:change="handleThumbnailUpload()"/><br/>
 
                 <div v-if="fileName!==''">
-                    <lable>Current PDF file uploaded:</lable>
+                    <label>Current PDF file uploaded:</label>
                 <PDFViewer :fileName="fileName" :path="path" width="200" height="400"/>
                 </div>
 
 
             </div>
-            <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
+            <sweet-modal ref="success" v-on:close="$router.push({name: 'textbook.show', params: {id: $route.params.id}})" icon="success">
                 {{successMessage}}
             </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">

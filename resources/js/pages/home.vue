@@ -8,7 +8,7 @@
 
         <h3>Welcome back - {{user.name}}</h3>
         <br>
-          Check out these recent added textbooks:
+          Check out these recently added textbooks:
           <vueper-slides
                   class="no-shadow"
                   :visible-slides="2"
@@ -161,16 +161,15 @@
         axios.get(`/api/text/getLast5attempts/`)
             .then(response => {
                 this.last5ReadingAttempts = response.data;
-                this.isLoaded = true;
             }).catch(function (response) {
             //handle error
             console.log(response);
         });
 
-        axios.get('api/textbook/getLast5recent/')
+        axios.get('api/textbook/getLast10recent/')
             .then(response => {
                 this.isLoaded = true;
-                this.textbooks = response.data.textbooks
+                this.textbooks = response.data.textbooks.slice(0, 10)
             }).catch(error => {
             console.log(error.response)
         });

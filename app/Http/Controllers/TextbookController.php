@@ -7,10 +7,7 @@ use App\Module;
 use App\Textbook;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Spatie\PdfToImage\Pdf;
 use Illuminate\Support\Facades\File;
-use Org_Heigl\Ghostscript\Ghostscript;
-use LynX39\LaraPdfMerger\Facades\PdfMerger;
 
 class TextbookController extends Controller
 {
@@ -67,33 +64,28 @@ class TextbookController extends Controller
         ]);
     }
 
-    public function getLast5recent(){
+    /**
+     *
+     * Gets the last 10 recent textbooks for all users.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     *
+     */
+    public function getLast10recent(){
         $user = Auth::user();
         $user_role = $user->role->name;
         if($user_role === 'Admin'){
-
-            $moduleTextbooks = Module::has('textbooks')->
-            with('textbooks')->whereHas(
-                'textbooks', function($q)  {
-                $q->orderBy('textbooks.id', 'desc')->take(5);
-            })->get()->take(5)->pluck('textbooks');
-
+            $textbooks = Textbook::orderBy('id', 'desc')->take(10)->get();
         }else{
             $moduleTextbooks = $user->modules()->has('textbooks')->
-            with('textbooks')->whereHas(
-                'textbooks', function($q)  {
-                $q->orderBy('textbooks.id', 'desc')->take(5);
-            })->get()->take(5)->pluck('textbooks');
-
+            with('textbooks')->get()->pluck('textbooks');
+            $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+            $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+            $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
+            $textbooks_id = collect($textbooks)->pluck('id');
+            $textbooks = Textbook::whereIn('id', $textbooks_id)->orderBy('id', 'desc')->take(10)->get();
         }
-        $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
-        with('textbooks')->whereHas(
-            'textbooks', function($q)  {
-            $q->orderBy('textbooks.id', 'desc')->take(5);
-        })->get()->take(5)->pluck('textbooks');
-        $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
-        $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
-
         return response()->json([
             'textbooks' => $textbooks,
         ]);
@@ -242,8 +234,7 @@ class TextbookController extends Controller
      * Store a newly created textbook.
      *
      * @param  \Illuminate\Http\Request $request
-     * @throws \Spatie\PdfToImage\Exceptions\PdfDoesNotExist
-     * @throws \Spatie\PdfToImage\Exceptions\PageDoesNotExist
+     * @throws \ImagickException
      */
     public function store(Request $request)
     {
@@ -256,14 +247,22 @@ class TextbookController extends Controller
         if($request->thumbnail === 'remove'){
             $thumbnail = null;
         } else if ($file!== null && !$request->file('thumbnail')) {
-            file_put_contents('file.pdf',  base64_decode($file));
-            Ghostscript::setGsPath("c:/Program Files/Git/mingw64/bin/gs.exe");
-            $pdf = new Pdf(public_path('file.pdf'));
-            $pdf->setPage(1)
-                ->saveImage( public_path('thumbnail.png'));
-            $thumbnail =  base64_encode(file_get_contents(public_path('thumbnail.png')));
-            File::delete('file.pdf');
-            File::delete('thumbnail.png');
+
+            file_put_contents(public_path('file.pdf'),  base64_decode($file));
+            $img = new \Imagick();
+            $img->setResolution(500,500);
+            $img->readImage(public_path('file.pdf[0]'));
+            $img->setIteratorIndex(0);
+            $img->setImageFormat('png');
+            $img->writeImage(public_path('thumb.png'));
+            $img->clear();
+            $img->destroy();
+            $thumbnail = base64_encode(file_get_contents(public_path('thumb.png')));
+
+            File::delete(public_path('file.pdf'));
+            File::delete(public_path('thumb.png'));
+
+
         } else if($request->file('thumbnail')){
             $thumbnail = base64_encode(file_get_contents($request->file('thumbnail')));
         }
@@ -303,8 +302,6 @@ class TextbookController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @param $textbook_id
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Spatie\PdfToImage\Exceptions\PdfDoesNotExist
-     * @throws \Spatie\PdfToImage\Exceptions\PageDoesNotExist
      * @throws \Exception
      */
     public function update(Request $request, $textbook_id)
@@ -317,18 +314,22 @@ class TextbookController extends Controller
             $textbook->file = $file;
         }
 
-        if($request->thumbnail === 'remove'){
+        if($request->thumbnail == 'remove'){
             $textbook->thumbnail = null;
         }else if ($textbook->file!==null && !$request->file('thumbnail')) {
 
-            file_put_contents('file.pdf',  base64_decode($textbook->file));
-            Ghostscript::setGsPath("c:/Program Files/Git/mingw64/bin/gs.exe");
-            $pdf = new Pdf(public_path('file.pdf'));
-            $pdf->setPage(1)
-                ->saveImage( public_path('thumbnail.png'));
-            $thumbnail = base64_encode(file_get_contents(public_path('thumbnail.png')));
-            File::delete('file.pdf');
-            File::delete('thumbnail.png');
+            file_put_contents(public_path('file.pdf'),  base64_decode($textbook->file));
+            $img = new \Imagick();
+            $img->setResolution(500,500);
+            $img->readImage(public_path('file.pdf[0]'));
+            $img->setIteratorIndex(0);
+            $img->setImageFormat('png');
+            $img->writeImage(public_path('thumb.png'));
+            $img->clear();
+            $img->destroy();
+            $thumbnail = base64_encode(file_get_contents(public_path('thumb.png')));
+            File::delete(public_path('file.pdf'));
+            File::delete(public_path('thumb.png'));
             $textbook->thumbnail = $thumbnail;
 
         }else if($request->file('thumbnail')){
