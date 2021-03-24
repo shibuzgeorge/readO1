@@ -316,7 +316,7 @@ class TextbookController extends Controller
 
         if($request->thumbnail == 'remove'){
             $textbook->thumbnail = null;
-        }else if ($textbook->file!==null && !$request->file('thumbnail')) {
+        }else if ($textbook->file!==null && $request->thumbnail == 'autoGenerate' && $request->thumbnail !== 'remove') {
 
             file_put_contents(public_path('file.pdf'),  base64_decode($textbook->file));
             $img = new \Imagick();

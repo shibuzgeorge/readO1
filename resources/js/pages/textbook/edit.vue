@@ -37,6 +37,12 @@
                     <input type="checkbox" class="custom-control-input" id="customSwitch1" :checked="thumbnailOn" @click="thumbnailOn = !thumbnailOn">
                     <label class="custom-control-label" for="customSwitch1">Turn thumbnail on or not</label>
                 </div>
+
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch2" :disabled="!thumbnailOn" :checked="autoGenerateThumbnailOn" @click="autoGenerateThumbnailOn = !autoGenerateThumbnailOn">
+                    <label class="custom-control-label" for="customSwitch2">Use auto generate thumbnail</label>
+                </div>
+
                 <img v-if="thumbnailImage!==null" :src="'data:image/png;base64,'+thumbnailImage" width="100" height="100"/><br/>
                 <label>Update thumbnail [optional]: (Format: jpg, jpeg, png) - <i>Overrides thumbnail of PDF upload (if uploaded)</i></label>
                 <input class="form-control" type="file" id="thumbnail" :disabled="!thumbnailOn" ref="thumbnail" v-on:change="handleThumbnailUpload()"/><br/>
@@ -88,6 +94,7 @@
             thumbnailImage: '',
             thumbnailOn: true,
             thumbnail: '',
+            autoGenerateThumbnailOn: true,
             path: '/lib/pdf/web/viewer.html',
             successMessage: '',
             errorMessage: '',
@@ -175,6 +182,9 @@
                 */
                 if(!this.thumbnailOn){
                     this.thumbnail = 'remove';
+                }
+                if(this.autoGenerateThumbnailOn){
+                    this.thumbnail = 'autoGenerate';
                 }
                 formData.append('thumbnail', this.thumbnail);
                 formData.append('file', this.file);

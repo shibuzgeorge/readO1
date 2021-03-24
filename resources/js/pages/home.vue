@@ -127,7 +127,7 @@
     import axios from 'axios'
     import { mapGetters } from 'vuex'
     import PDFViewer from '~/components/PDFViewer';
-
+    import Swal from 'sweetalert2';
     export default {
     middleware: 'auth',
         components:{
@@ -178,6 +178,28 @@
         getResults(id){
             this.fileName ='/api/quiz/getResultPDF/'+id;
             this.$refs.viewResults.open()
+        },
+        async del(data) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you really want to delete the textbook?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+            }).then(function (result) {
+                if (result.value) {
+                    Swal.fire(
+                        'Deleted!',
+                        'The textbook has been deleted.',
+                        'success'
+                    );
+                    axios.delete(`/api/textbook/${data}`).then(response => {
+                        window.location.reload();
+                    })
+                }
+            });
         }
     }
 }
