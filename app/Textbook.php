@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Textbook extends Model
 {
     protected $fillable = [
-        'title', 'description', 'file',
+        'title', 'description', 'file', 'thumbnail'
     ];
     /**
      * The attributes that should be hidden for arrays.
@@ -15,7 +15,7 @@ class Textbook extends Model
      * @var array
      */
     protected $hidden = [
-        'file',
+        'file'
     ];
 
     /**

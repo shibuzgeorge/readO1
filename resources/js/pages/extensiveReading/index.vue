@@ -37,25 +37,49 @@
                     </div>
                     <hr>
                         <section>
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="row">
-                                            <div v-if="category.textbooks.length > 0" v-for="textbook in category.textbooks" class="col-md-4 mb-3 card">
-                                                <div class="card-body">
-                                                    <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
-                                                        <h5 class="card-title">{{textbook.title}}</h5>
-                                                        <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
-                                                    </router-link>
-                                                    <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
-                                                        <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
-                                                    </router-link>
-                                                </div>
+                            <vueper-slides
+                                    class="no-shadow"
+                                    :visible-slides="2"
+                                    slide-multiple
+                                    :gap="3"
+                                    :touchable="false"
+                                    :slide-ratio="1 / 4"
+                                    :dragging-distance="200"
+                                    :breakpoints="{ 800: { visibleSlides: 2, slideMultiple: 2 } }">
+
+                                <vueper-slide class="card" v-for="textbook in category.textbooks" :key="textbook.id" :title="textbook.title">
+                                    <template v-slot:content>
+                                        <div :class="{ 'row': textbook.thumbnail!==null }">
+                                            <div v-if="textbook.thumbnail!==null" class="col-sm-5 d-flex justify-content-center">
+                                                <img v-if="textbook.thumbnail!==null" :src="'data:image/png;base64,'+textbook.thumbnail" width="150" height="200"/>
+                                            </div>
+                                            <div :class="{ 'col-sm-7': textbook.thumbnail!==null }">
+                                                <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
+                                                    <h5 class="card-title">{{textbook.title}}</h5>
+                                                    <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
+                                                </router-link>
+                                                <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
+                                                    <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
+                                                </router-link>
+                                                <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
+                                    </template>
+                                </vueper-slide>
+                            </vueper-slides>
+
+                                            <!--<div v-if="category.textbooks.length > 0" v-for="textbook in category.textbooks" class="col-md-4 mb-3 card">-->
+                                                <!--<div class="card-body">-->
+                                                    <!--<router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">-->
+                                                        <!--<h5 class="card-title">{{textbook.title}}</h5>-->
+                                                        <!--<h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>-->
+                                                    <!--</router-link>-->
+                                                    <!--<router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">-->
+                                                        <!--<a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>-->
+                                                    <!--</router-link>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+
                         </section>
 
                     <div v-if="category.textbooks.length === 0">
