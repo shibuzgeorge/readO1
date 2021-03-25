@@ -241,6 +241,31 @@ class TextbookController extends Controller
         $file = null;
         $thumbnail = null;
 
+        if($request->thumbnail === 'remove'){
+            $request->validate([
+                'title' => 'required|unique:textbooks,title,',
+                'description' => 'required',
+                'selected' => 'required',
+                'section' => 'required',
+                'file' => 'nullable|mimes:pdf',
+            ],
+                [
+                    'selected.required' => 'You have to choose a module or an extensive reading category!',
+                ]);
+        } else{
+            $request->validate([
+                'title' => 'required|unique:textbooks,title,',
+                'description' => 'required',
+                'selected' => 'required',
+                'section' => 'required',
+                'file' => 'nullable|mimes:pdf',
+                'thumbnail' => 'nullable|mimes:jpeg,jpg,png,gif'
+            ],
+                [
+                    'selected.required' => 'You have to choose a module or an extensive reading category!',
+                ]);
+        }
+
         if ($request->file('file')) {
             $file = base64_encode(file_get_contents($request->file('file')));
         }
@@ -308,6 +333,32 @@ class TextbookController extends Controller
     {
         $file = null;
         $thumbnail = null;
+
+        if($request->thumbnail === 'remove' || $request->thumbnail === 'autoGenerate'){
+            $request->validate([
+                'title' => 'required|unique:textbooks,title,'.$textbook_id,
+                'description' => 'required',
+                'selected' => 'required',
+                'section' => 'required',
+                'file' => 'nullable|mimes:pdf',
+            ],
+                [
+                    'selected.required' => 'You have to choose a module or an extensive reading category!',
+                ]);
+        } else{
+            $request->validate([
+                'title' => 'required|unique:textbooks,title,'.$textbook_id,
+                'description' => 'required',
+                'selected' => 'required',
+                'section' => 'required',
+                'file' => 'nullable|mimes:pdf',
+                'thumbnail' => 'nullable|mimes:jpeg,jpg,png,gif'
+            ],
+                [
+                    'selected.required' => 'You have to choose a module or an extensive reading category!',
+                ]);
+        }
+
         $textbook = Textbook::findOrFail($textbook_id);
         if ($request->file('file')) {
             $file = base64_encode(file_get_contents($request->file('file')));
@@ -316,7 +367,7 @@ class TextbookController extends Controller
 
         if($request->thumbnail == 'remove'){
             $textbook->thumbnail = null;
-        }else if ($textbook->file!==null && $request->thumbnail == 'autoGenerate' && $request->thumbnail !== 'remove') {
+        }else if ($textbook->file!==null && $request->thumbnail == 'autoGenerate') {
 
             file_put_contents(public_path('file.pdf'),  base64_decode($textbook->file));
             $img = new \Imagick();
