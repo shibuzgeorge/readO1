@@ -241,7 +241,7 @@ class TextbookController extends Controller
         $file = null;
         $thumbnail = null;
 
-        if($request->thumbnail === 'remove' || $request->thumbnail === 'autoGenerate'){
+        if($request->thumbnail === 'remove'){
             $request->validate([
                 'title' => 'required|unique:textbooks,title,',
                 'description' => 'required',
