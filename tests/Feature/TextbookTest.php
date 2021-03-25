@@ -658,6 +658,235 @@ class TextbookTest extends TestCase
             ]);
     }
 
+    /**
+     * A test to create a textbook with no title
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_textbook_with_no_title_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => '',
+            'description' => 'This is a test for create a new textbook with no title',
+            'section' => 'module',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/textbook', $textbook)
+            ->assertJson([
+                "errors" => [
+                    "title" => ["The title field is required."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to create a textbook with title already exist
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_textbook_with_title_already_exist_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $findTextbook = Textbook::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => $findTextbook->title,
+            'description' => 'This is a test for create a textbook with title already exist',
+            'section' => 'module',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/textbook/', $textbook)
+            ->assertJson([
+                "errors" => [
+                    "title" => ["The title has already been taken."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to create a textbook with no description.
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_textbook_with_no_description_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => 'This is a test for no description',
+            'description' => '',
+            'section' => 'module',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/textbook', $textbook)
+            ->assertJson([
+                "errors" => [
+                    "description" => ["The description field is required."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to create a textbook with invalid file upload.
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_textbook_with_invalid_file_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => 'This is a test for invalid file upload',
+            'description' => 'This is a test for creating a textbook which is not a PDF',
+            'file' =>  new UploadedFile(public_path('/readingMaterial/thumbnail.png'), 'thumbnail.png', 'image/png', null,  true),
+            'section' => 'module',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/textbook', $textbook)
+            ->assertJson([
+                "errors" => [
+                    "file" => ["The file must be a file of type: pdf."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to create a textbook with invalid thumbnail upload.
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_textbook_with_invalid_thumbnail_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => 'This is a test for invalid thumbnail upload',
+            'description' => 'This is a test for creating a textbook which is not a png,jpg,jpeg,gif',
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'thumbnail' => new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'section' => 'module',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/textbook', $textbook)
+            ->assertJson([
+                "errors" => [
+                    "thumbnail" => ["The thumbnail must be a file of type: jpeg, jpg, png, gif."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to create a textbook with no section selected.
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_textbook_with_no_section_selected_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => 'This is a test for no section selected',
+            'description' => 'This is a test for no section selected (e.g. module/extensive reading)',
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'section' => '',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/textbook', $textbook)
+            ->assertJson([
+                "errors" => [
+                    "section" => ["The section field is required."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to create a textbook with no selected module or extensive reading category
+     *
+     * @test
+     * @return void
+     */
+    public function test_create_a_textbook_with_no_selected_module_or_extensive_reading_category_authorised()
+    {
+
+        $textbook = [
+            'title' => 'This is a test for no section selected',
+            'description' => 'This is a test for no section selected (e.g. module/extensive reading)',
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'section' => 'module',
+            'selected' => ''
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->postJson('/api/textbook', $textbook)
+            ->assertJson([
+                "errors" => [
+                    "selected" => ["You have to choose a module or an extensive reading category!"]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
 
     /**
      * A test to create a textbook to a module authorised by logging in as an Admin and Module Tutor
@@ -1201,6 +1430,248 @@ class TextbookTest extends TestCase
             'thumbnail' => base64_encode(file_get_contents(public_path('/readingMaterial/thumbnail.png')))
         ]);
 
+    }
+
+    /**
+     * A test to update a textbook with no title
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_textbook_with_no_title_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $findTextbook = Textbook::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => '',
+            'description' => 'This is a test for update a textbook with no title',
+            'section' => 'module',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->patchJson('/api/textbook/'.$findTextbook->id, $textbook)
+            ->assertJson([
+                "errors" => [
+                    "title" => ["The title field is required."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to update a textbook with title already exist.
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_textbook_with_title_already_exist_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $findTextbook = Textbook::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => $findTextbook->title,
+            'description' => 'This is a test for update a textbook with title already exist',
+            'section' => 'module',
+            'selected' => $randomModule->toJson()
+        ];
+        $findTextbook2 = Textbook::where('id', '!=', $findTextbook->id)->inRandomOrder()->first();
+
+        $this->actingAs($this->adminUser)
+            ->patchJson('/api/textbook/'.$findTextbook2->id, $textbook)
+            ->assertJson([
+                "errors" => [
+                    "title" => ["The title has already been taken."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to update a textbook with no description.
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_textbook_with_no_description_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $findTextbook = Textbook::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => 'This is a test for no description',
+            'description' => '',
+            'section' => 'module',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->patchJson('/api/textbook/'.$findTextbook->id, $textbook)
+            ->assertJson([
+                "errors" => [
+                    "description" => ["The description field is required."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to update a textbook with invalid file upload.
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_textbook_with_invalid_file_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $findTextbook = Textbook::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => 'This is a test for invalid file upload',
+            'description' => 'This is a test for creating a textbook which is not a PDF',
+            'file' =>  new UploadedFile(public_path('/readingMaterial/thumbnail.png'), 'thumbnail.png', 'image/png', null,  true),
+            'section' => 'module',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->patchJson('/api/textbook/'.$findTextbook->id, $textbook)
+            ->assertJson([
+                "errors" => [
+                    "file" => ["The file must be a file of type: pdf."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to update a textbook with invalid thumbnail upload.
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_textbook_with_invalid_thumbnail_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $findTextbook = Textbook::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => 'This is a test for invalid thumbnail upload',
+            'description' => 'This is a test for creating a textbook which is not a png,jpg,jpeg,gif',
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'thumbnail' => new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'section' => 'module',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->patchJson('/api/textbook/'.$findTextbook->id, $textbook)
+            ->assertJson([
+                "errors" => [
+                    "thumbnail" => ["The thumbnail must be a file of type: jpeg, jpg, png, gif."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to update a textbook with no section selected.
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_textbook_with_no_section_selected_authorised()
+    {
+        $randomModule = Module::inRandomOrder()->first();
+
+        $findTextbook = Textbook::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => 'This is a test for no section selected',
+            'description' => 'This is a test for no section selected (e.g. module/extensive reading)',
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'section' => '',
+            'selected' => $randomModule->toJson()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->patchJson('/api/textbook/'.$findTextbook->id, $textbook)
+            ->assertJson([
+                "errors" => [
+                    "section" => ["The section field is required."]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
+    }
+
+    /**
+     * A test to update a textbook with no selected module or extensive reading category
+     *
+     * @test
+     * @return void
+     */
+    public function test_update_a_textbook_with_no_selected_module_or_extensive_reading_category_authorised()
+    {
+        $findTextbook = Textbook::inRandomOrder()->first();
+
+        $textbook = [
+            'title' => 'This is a test for no section selected',
+            'description' => 'This is a test for no section selected (e.g. module/extensive reading)',
+            'file' =>  new UploadedFile(public_path('/readingMaterial/example.pdf'), 'example.pdf', 'application/pdf', null,  true),
+            'section' => 'module',
+            'selected' => ''
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->patchJson('/api/textbook/'.$findTextbook->id, $textbook)
+            ->assertJson([
+                "errors" => [
+                    "selected" => ["You have to choose a module or an extensive reading category!"]],
+                "message" => "The given data was invalid."
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('textbooks', [
+            'title' => $textbook['title'],
+            'description' => $textbook['description'],
+        ]);
     }
 
     /**
