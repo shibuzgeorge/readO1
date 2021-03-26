@@ -70,7 +70,8 @@
                 <has-error :form="form" field="selected" /><br/>
 
                 Upload a text [required] [Format - PDF only]
-                <input class="form-control" type="file" id="file"  :class="{ 'is-invalid': form.errors.has('file') }" ref="file" v-on:change="handleFileUpload()"/><br/>
+                <input class="form-control" type="file" id="file"  :class="{ 'is-invalid': form.errors.has('file') }" ref="file" v-on:change="handleFileUpload()"/>
+                <has-error :form="form" field="file" /><br/>
             </div>
             <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
                 Successfully Uploaded

@@ -5,8 +5,9 @@
             <h5 id="title">Edit text/document</h5>
                 <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
             </div>
+            <div :class="{ 'row': fileName!=='' }">
+                <div class="form-check mt-4" :class="{ 'col-sm-7': fileName!=='' }">
             <form @submit.prevent="submit" @keydown="form.onKeydown($event)" enctype="multipart/form-data">
-                <div class="form-check mt-4">
                     <label>Title:           </label> <input class="form-control" v-model="form.title" type="text" :class="{ 'is-invalid': form.errors.has('title') }" value=""/>
                     <has-error :form="form" field="title" /><br/>
                     <label>Description:     </label> <input class="form-control" v-model="form.description" type="text" value="" :class="{ 'is-invalid': form.errors.has('description') }"/>
@@ -70,16 +71,22 @@
                     </div>
                     <has-error :form="form" field="selected" /><br/>
 
-                    Update a text [Format - PDF only]
-                    <input class="form-control" type="file" id="file"  :class="{ 'is-invalid': form.errors.has('file') }" ref="file" v-on:change="handleFileUpload()"/><br/>
-                </div>
+                    Update the text [Format - PDF only]
+                    <input class="form-control" type="file" id="file"  :class="{ 'is-invalid': form.errors.has('file') }" ref="file" v-on:change="handleFileUpload()"/>
+                    <has-error :form="form" field="file" /><br/>
                 <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
                     {{successMessage}}
                 </sweet-modal>
                 <v-button class="form-control" :loading="form.busy" type="success">
-                    Edit
+                    Update
                 </v-button>
             </form>
+                </div>
+                <div class="form-check mt-4 col-sm-5" v-if="fileName!==''">
+                    <label>Current text uploaded:</label>
+                    <PDFViewer :fileName="fileName" :path="path" width="200" height="400"/>
+                </div>
+            </div>
         </card>
     </div>
     <div v-else>
@@ -93,18 +100,30 @@
 <script>
     import axios from 'axios'
     import Form from 'vform'
+    import PDFViewer from '~/components/PDFViewer';
 
     export default {
         middleware: 'admin_plus_module_tutor',
         name: "edit",
+        components:{
+            PDFViewer,
+        },
         data: () => ({
             isLoaded: false,
+            fileName: '',
             form: new Form({
                 title: '',
                 description: '',
                 selected: [],
                 file: '',
             }),
+            watch:{
+                section: function(){
+                    if(this.section===''){
+                        this.form.selected = [];
+                    }
+                }
+            },
             successMessage: '',
             errorMessage: '',
 
@@ -112,6 +131,7 @@
             selectedOption: [],
             isModuleLoaded: true,
             extensiveReadingTextbooks: [],
+            path: '/lib/pdf/web/viewer.html',
             yearGroup: [],
             year_group: [],
             modules: [],
@@ -157,6 +177,8 @@
                             this.selectedOption.push('Extensive Reading Category: ' + this.selectedExtensiveReadingCategory.name);
                             this.extensiveReadingTextbooks = this.selectedExtensiveReadingCategory.textbooks;
                         }
+                            this.fileName =`/api/text/pdf/${this.$route.params.id}`;
+
 
                     }
                 }).catch(function (response) {
@@ -195,6 +217,7 @@
                 this.form.selected = [];
             },
             goBack(section){
+                this.form.selected = [];
                 this.section = section;
                 this.selectedOption.pop();
             },
