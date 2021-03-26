@@ -64,8 +64,8 @@ class TextTest extends TestCase
     {
         $unAssignedModuleModuleTutorText = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->moduleTutorUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $this->actingAs($this->moduleTutorUser)
             ->getJson('/api/text/'.$unAssignedModuleModuleTutorText->id)
@@ -73,8 +73,8 @@ class TextTest extends TestCase
 
         $unAssignedModuleStudentText = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $this->actingAs($this->studentUser)
             ->getJson('/api/text/'.$unAssignedModuleStudentText->id)
@@ -122,8 +122,8 @@ class TextTest extends TestCase
     {
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->moduleTutorUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $decoded = base64_decode($text->file);
         file_put_contents(public_path('file.pdf'), $decoded);
@@ -156,8 +156,8 @@ class TextTest extends TestCase
     {
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $decoded = base64_decode($text->file);
         file_put_contents(public_path('file.pdf'), $decoded);
@@ -211,8 +211,8 @@ class TextTest extends TestCase
     {
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->moduleTutorUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $file_contents = base64_decode($text->file);
 
@@ -236,8 +236,8 @@ class TextTest extends TestCase
     {
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $file_contents = base64_decode($text->file);
 
@@ -261,8 +261,8 @@ class TextTest extends TestCase
     {
         $textModuleTutorDenied = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $this->actingAs($this->moduleTutorUser)
             ->getJson('/api/text/pdf/'.$textModuleTutorDenied->id)
@@ -270,8 +270,8 @@ class TextTest extends TestCase
 
         $textStudentDenied = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $this->actingAs($this->studentUser)
             ->getJson('/api/text/pdf/'.$textStudentDenied->id)
