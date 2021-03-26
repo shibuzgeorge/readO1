@@ -150,8 +150,13 @@ class TextController extends Controller
 
             if ($checkIfUserHasPermissionToView) {
                     $decoded = base64_decode($text->file);
-                    file_put_contents('file.pdf', $decoded);
-                    $pdftext = base64_encode(PdfToText\Pdf::getText('file.pdf', public_path('pdftotext/pdftotext.exe')));
+                    file_put_contents(public_path('file.pdf'), $decoded);
+                //Checks operating system if it is windows or not
+                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                    $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf'), public_path('pdftotext/pdftotext.exe')));
+                } else {
+                    $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf')));
+                }
                     File::delete('file.pdf');
                     return response()->json([
                         'title' => $text->title,

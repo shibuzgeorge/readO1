@@ -8,6 +8,7 @@ use App\Textbook;
 use App\Module;
 use App\User;
 use App\YearGroup;
+use Spatie\PdfToText;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
@@ -88,7 +89,18 @@ class TextTest extends TestCase
      */
     public function test_show_a_text_admin_authorised()
     {
-        $text = Text::whereNotNull('file')->inRandomOrder()->first();
+        $text = Text::inRandomOrder()->first();
+
+        $decoded = base64_decode($text->file);
+        file_put_contents(public_path('file.pdf'), $decoded);
+
+        //Checks operating system if it is windows or not
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf'), public_path('pdftotext/pdftotext.exe')));
+        } else {
+            $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf')));
+        }
+        File::delete('file.pdf');
 
         $this->actingAs($this->adminUser)
             ->getJson('/api/text/'.$text->id)
@@ -96,6 +108,7 @@ class TextTest extends TestCase
             ->assertJson([
                 'title' => $text->title,
                 'description' => $text->description,
+                'text' => $pdftext
             ]);
     }
 
@@ -110,7 +123,18 @@ class TextTest extends TestCase
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->moduleTutorUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->whereNotNull('file')->inRandomOrder()->first();
+            ->texts()->inRandomOrder()->first();
+
+        $decoded = base64_decode($text->file);
+        file_put_contents(public_path('file.pdf'), $decoded);
+
+        //Checks operating system if it is windows or not
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf'), public_path('pdftotext/pdftotext.exe')));
+        } else {
+            $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf')));
+        }
+        File::delete('file.pdf');
 
         $this->actingAs($this->moduleTutorUser)
             ->getJson('/api/text/'.$text->id)
@@ -118,6 +142,7 @@ class TextTest extends TestCase
             ->assertJson([
                 'title' => $text->title,
                 'description' => $text->description,
+                'text' => $pdftext
             ]);
     }
 
@@ -132,7 +157,18 @@ class TextTest extends TestCase
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->whereNotNull('file')->inRandomOrder()->first();
+            ->texts()->inRandomOrder()->first();
+
+        $decoded = base64_decode($text->file);
+        file_put_contents(public_path('file.pdf'), $decoded);
+
+        //Checks operating system if it is windows or not
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf'), public_path('pdftotext/pdftotext.exe')));
+        } else {
+            $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf')));
+        }
+        File::delete('file.pdf');
 
         $this->actingAs($this->studentUser)
             ->getJson('/api/text/'.$text->id)
@@ -140,6 +176,7 @@ class TextTest extends TestCase
             ->assertJson([
                 'title' => $text->title,
                 'description' => $text->description,
+                'text' => $pdftext
             ]);
     }
 
@@ -150,7 +187,7 @@ class TextTest extends TestCase
      */
     public function test_pdf_download_admin_authorised()
     {
-        $text = Text::whereNotNull('file')->inRandomOrder()->first();
+        $text = Text::inRandomOrder()->first();
 
         $file_contents = base64_decode($text->file);
 
@@ -175,7 +212,7 @@ class TextTest extends TestCase
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->moduleTutorUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->whereNotNull('file')->inRandomOrder()->first();
+            ->texts()->inRandomOrder()->first();
 
         $file_contents = base64_decode($text->file);
 
@@ -200,7 +237,7 @@ class TextTest extends TestCase
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->whereNotNull('file')->inRandomOrder()->first();
+            ->texts()->inRandomOrder()->first();
 
         $file_contents = base64_decode($text->file);
 
@@ -225,7 +262,7 @@ class TextTest extends TestCase
         $textModuleTutorDenied = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->whereNotNull('file')->inRandomOrder()->first();
+            ->texts()->inRandomOrder()->first();
 
         $this->actingAs($this->moduleTutorUser)
             ->getJson('/api/text/pdf/'.$textModuleTutorDenied->id)
@@ -234,7 +271,7 @@ class TextTest extends TestCase
         $textStudentDenied = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->whereNotNull('file')->inRandomOrder()->first();
+            ->texts()->inRandomOrder()->first();
 
         $this->actingAs($this->studentUser)
             ->getJson('/api/text/pdf/'.$textStudentDenied->id)
