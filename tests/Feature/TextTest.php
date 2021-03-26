@@ -89,7 +89,7 @@ class TextTest extends TestCase
      */
     public function test_show_a_text_admin_authorised()
     {
-        $text = Text::where('file','!=', null)->inRandomOrder()->first();
+        $text = Text::where('file','!=', 'null')->inRandomOrder()->first();
 
         $decoded = base64_decode($text->file);
         file_put_contents(public_path('file.pdf'), $decoded);
@@ -116,7 +116,7 @@ class TextTest extends TestCase
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->moduleTutorUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->where('file','!=', null)->inRandomOrder()->first();
+            ->texts()->where('file','!=', 'null')->inRandomOrder()->first();
 
         $decoded = base64_decode($text->file);
         file_put_contents(public_path('file.pdf'), $decoded);
@@ -143,7 +143,7 @@ class TextTest extends TestCase
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->where('file','!=', null)->inRandomOrder()->first();
+            ->texts()->where('file','!=', 'null')->inRandomOrder()->first();
 
         $decoded = base64_decode($text->file);
         file_put_contents(public_path('file.pdf'), $decoded);
@@ -166,7 +166,7 @@ class TextTest extends TestCase
      */
     public function test_pdf_download_admin_authorised()
     {
-        $text = Text::where('file', '!=', null)->inRandomOrder()->first();
+        $text = Text::where('file', '!=', 'null')->inRandomOrder()->first();
 
         $file_contents = base64_decode($text->file);
 
@@ -191,7 +191,7 @@ class TextTest extends TestCase
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->moduleTutorUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->where('file','!=', null)->inRandomOrder()->first();
+            ->texts()->where('file','!=', 'null')->inRandomOrder()->first();
 
         $file_contents = base64_decode($text->file);
 
@@ -216,7 +216,7 @@ class TextTest extends TestCase
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->where('file','!=', null)->inRandomOrder()->first();
+            ->texts()->where('file','!=', 'null')->inRandomOrder()->first();
 
         $file_contents = base64_decode($text->file);
 
@@ -241,7 +241,7 @@ class TextTest extends TestCase
         $textModuleTutorDenied = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->where('file','!=', null)->inRandomOrder()->first();
+            ->texts()->where('file','!=', 'null')->inRandomOrder()->first();
 
         $this->actingAs($this->moduleTutorUser)
             ->getJson('/api/text/pdf/'.$textModuleTutorDenied->id)
@@ -250,7 +250,7 @@ class TextTest extends TestCase
         $textStudentDenied = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->where('file','!=', null)->inRandomOrder()->first();;
+            ->texts()->where('file','!=', 'null')->inRandomOrder()->first();;
 
         $this->actingAs($this->studentUser)
             ->getJson('/api/text/pdf/'.$textStudentDenied->id)
