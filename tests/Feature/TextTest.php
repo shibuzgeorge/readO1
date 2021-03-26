@@ -93,7 +93,7 @@ class TextTest extends TestCase
 
         $decoded = base64_decode($text->file);
         file_put_contents(public_path('file.pdf'), $decoded);
-        $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf'), public_path('pdftotext/pdftotext.exe')));
+        $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf')));
         File::delete(public_path('file.pdf'));
         $this->actingAs($this->adminUser)
             ->getJson('/api/text/'.$text->id)
@@ -120,7 +120,7 @@ class TextTest extends TestCase
 
         $decoded = base64_decode($text->file);
         file_put_contents(public_path('file.pdf'), $decoded);
-        $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf'), public_path('pdftotext/pdftotext.exe')));
+        $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf')));
         File::delete(public_path('file.pdf'));
         $this->actingAs($this->moduleTutorUser)
             ->getJson('/api/text/'.$text->id)
@@ -147,7 +147,7 @@ class TextTest extends TestCase
 
         $decoded = base64_decode($text->file);
         file_put_contents(public_path('file.pdf'), $decoded);
-        $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf'), public_path('pdftotext/pdftotext.exe')));
+        $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf')));
         File::delete(public_path('file.pdf'));
         $this->actingAs($this->studentUser)
             ->getJson('/api/text/'.$text->id)
