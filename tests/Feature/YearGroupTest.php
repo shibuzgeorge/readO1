@@ -88,6 +88,34 @@ class YearGroupTest extends TestCase
             ->assertStatus(403);
     }
 
+    /**
+     * A test to check the data for the modules for a particular year group
+     *
+     * @test
+     * @return void
+     */
+    public function test_get_modules_for_year_group()
+    {
+        $year_group = YearGroup::has('module.textbooks')->inRandomOrder()->first();
+        $admin = [
+        'modules' => $year_group->module()->has('textbooks')->with('textbooks')->get()
+        ];
+        $module_ids = $this->moduleTutorUser->modules()->get()->pluck('id');
+        $module_tutor = [
+            'modules' => $modules = $year_group->module()->whereIn('modules.id', $module_ids)->has('textbooks')->with('textbooks')->get()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/yearGroup/getModulesForYearGroup/'.$year_group->id)
+            ->assertJson($admin['modules']->toArray())
+            ->assertStatus(200);
+
+        $this->actingAs($this->moduleTutorUser)
+            ->getJson('/api/yearGroup/getModulesForYearGroup/'.$year_group->id)
+            ->assertJson($module_tutor['modules']->toArray())
+            ->assertStatus(200);
+
+    }
 
     /**
      * A test to create a year group authorised by logging in as an Admin

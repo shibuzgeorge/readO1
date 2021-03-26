@@ -300,7 +300,7 @@ class TextbookTest extends TestCase
     }
 
     /**
-     * A test to check data for viewing a textbook with a full textbook file uploaded as a Module Tutor
+     * A test to check data for viewing a textbook with a full textbook file uploaded as a Student
      *
      * @test
      * @return void
