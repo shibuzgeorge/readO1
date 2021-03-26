@@ -30,8 +30,9 @@ jobs:
       run: |
         mkdir -p database
         touch database/database.sqlite
-    - name: Add permission for pdftotext.exe
-      run: chmod u+x /home/runner/work/readO1/readO1/public/pdftotext/pdftotext.exe
+    - name: Add permission for pdftotext.exe and install wine
+      run: sudo apt-get install wine
+           chmod u+x /home/runner/work/readO1/readO1/public/pdftotext/pdftotext.exe
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
         DB_CONNECTION: sqlite

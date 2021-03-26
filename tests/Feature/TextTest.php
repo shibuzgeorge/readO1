@@ -7,6 +7,7 @@ use App\Text;
 use App\Textbook;
 use App\Module;
 use App\User;
+use App\YearGroup;
 use Illuminate\Support\Facades\File;
 use Spatie\PdfToText;
 use Illuminate\Http\UploadedFile;
@@ -287,16 +288,24 @@ class TextTest extends TestCase
      */
     public function test_edit_page_admin_module_authorised()
     {
-        $text = Text::inRandomOrder()->first();
+        $text = Text::has('textbook.modules')->inRandomOrder()->first();
         $textbook = Textbook::find($text->textbook_id);
+        $yearGroup = YearGroup::has('module.textbooks')->get();
+        $extensiveReadingCategories = ExtensiveReadingCategory::has('textbooks')->with('textbooks')->get();
+        $year_group = $textbook->modules()->first()->yearGroup()->first();
 
         $this->actingAs($this->adminUser)
             ->getJson('/api/text/'.$text->id.'/edit')
             ->assertJson([
                 'title' => $text->title,
                 'description' => $text->description,
-                'file' => $text->file,
+                'selected' => $textbook->toArray(),
+                'section' => 'moduleTextbook',
+                'year_group' => $year_group->toArray(),
+                'selectedModule' => $textbook->modules()->with('textbooks')->first()->toArray(),
                 'textbook' => $textbook->toArray(),
+                'yearGroup' => $yearGroup->toArray(),
+                'extensiveReadingCategories' => $extensiveReadingCategories->toArray()
             ]);
     }
 }
