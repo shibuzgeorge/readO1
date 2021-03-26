@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\YearGroup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class YearGroupController extends Controller
 {
@@ -35,6 +36,27 @@ class YearGroupController extends Controller
     {
         $year_group = YearGroup::findorFail($id);
         return response()->json($year_group);
+    }
+
+    /**
+     * Returns all modules for a particular year group
+     *
+     * @param $year_group_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getModulesForYearGroup($year_group_id)
+    {
+        $user = Auth::user();
+        $user_role = $user->role;
+        if($user_role->name === 'Admin'){
+            $yearGroup = YearGroup::findOrFail($year_group_id);
+            $modules = $yearGroup->module()->has('textbooks')->with('textbooks')->get();
+        } else{
+            $module_ids = $user->modules()->get()->pluck('id');
+            $year = YearGroup::findOrFail($year_group_id);
+            $modules = $year->module()->whereIn('modules.id', $module_ids)->has('textbooks')->with('textbooks')->get();
+        }
+        return response()->json($modules);
     }
 
     /**

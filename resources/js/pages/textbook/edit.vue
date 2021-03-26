@@ -210,7 +210,6 @@
                         this.$refs.success.open();
                     })
                     .catch(error => {
-                        this.form.selected = JSON.parse(this.form.selected)
                         console.log(error.response)
                     });
             }

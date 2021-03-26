@@ -37,9 +37,9 @@
                                 <router-link :to="{ name: 'text.show', params: {id: text.id} }">
                                     {{text.title}} - {{text.description }}
                                 </router-link>
-                                <a style="float: right;" @click="del(text.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#"><button type="button" class="btn btn-warning btn-sm">Delete</button></a>
+                                <a style="float: right;" @click="del(text.id)" v-show="role==='Admin' || role==='Module Tutor'"><button type="button" class="btn btn-warning btn-sm">Delete</button></a>
                                 <router-link :to="{ name: 'text.edit', params: {id: text.id} }">
-                                    <a style="float: right;" v-show="role==='Admin' || role==='Module Tutor'" href="edit"><button type="button" class="btn btn-primary btn-sm">Edit</button></a>
+                                    <a style="float: right;" v-show="role==='Admin' || role==='Module Tutor'" ><button type="button" class="btn btn-primary btn-sm">Edit</button></a>
                                 </router-link>
                             </li>
                         </ul> <br/>

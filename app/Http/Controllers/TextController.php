@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\ExtensiveReadingCategory;
-use App\ModuleTextbook;
 use App\ReadingSession;
+use App\YearGroup;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Spatie\PdfToText;
@@ -38,48 +38,65 @@ class TextController extends Controller
      */
     public function create()
     {
-        $user = Auth::user();
-        $user_role = $user->role;
 
-        if($user_role->name === 'Admin'){
-            $textbooks = Textbook::all();
-            return response()->json($textbooks);
-        }else {
-            $textbooks = $user->modules()->has('textbooks')->
-            with('textbooks')->get()->pluck('textbooks')->toArray();
-            $textbooks = call_user_func_array('array_merge', $textbooks);
-            return response()->json($textbooks);
+        $user = Auth::user();
+        $user_role = $user->role->name;
+        if($user_role === 'Admin'){
+            $yearGroup = YearGroup::has('module.textbooks')->get();
+        }else{
+            $module_ids = $user->modules()->get()->pluck('id');
+            $yearGroup = YearGroup::has('module.textbooks')->
+           whereHas('module', function ($query) use ($module_ids){
+                $query->whereIn('modules.id', $module_ids);
+            })->get();
         }
+        $extensiveReadingCategories = ExtensiveReadingCategory::has('textbooks')->with('textbooks')->get();
+
+        return response()->json([
+            'yearGroup' => $yearGroup,
+            'extensiveReadingCategories' => $extensiveReadingCategories
+        ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created text in storage.
      *
      * @param  \Illuminate\Http\Request $request
      * @return void
      */
     public function store(Request $request)
     {
-
         $file = null;
+        $request->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'selected' => 'required',
+            'section' => 'required',
+            'file' => 'required|mimes:pdf',
+        ],
+            [
+                'selected.required' => 'You have to choose a textbook to upload a text into!',
+            ]);
 
         if ($request->file('file')) {
             $file = base64_encode(file_get_contents($request->file('file')));
         }
+        $selectedJson = $request->input('selected');
 
+        $decoded_json = json_decode($selectedJson);
 
-        //data that will be inserted into new row in document table
+        $id = collect($decoded_json->id)[0];
+
+        //data that will be inserted into new row in texts table
         $data = [
             'title' => $request->input('title'),
             'description' => $request->input('description'),
             'file' => $file,
-            'textbook_id' => $request->input('textbook_id')
-
+            'textbook_id' => $id,
         ];
 
-        //create a document using the POST data
+        //create a text using the POST data
         Text::create($data);
-
     }
 
     /**
@@ -92,7 +109,7 @@ class TextController extends Controller
      */
     public function pdf($id)
     {
-        //find textbook
+        //find text
         $text = Text::find($id);
 
         if ($text == null) {
@@ -112,7 +129,7 @@ class TextController extends Controller
                 ->header('Content-Disposition', 'inline; filename="example.pdf"')
                 ->header('Content-Transfer-Encoding', 'binary');
         } else {
-            return response()->json(['Error' => 'Permission denied to download textbook!']);
+            return response()->json(['Error' => 'Permission denied to download the text!']);
         }
     }
 
@@ -132,25 +149,22 @@ class TextController extends Controller
             $checkIfUserHasPermissionToView = $this->checkPermission($text->textbook_id);
 
             if ($checkIfUserHasPermissionToView) {
-                if ($text->file != null) {
                     $decoded = base64_decode($text->file);
-                    file_put_contents('file.pdf', $decoded);
-                    $path = 'c:/Program Files/Git/mingw64/bin/pdftotext';
-                    $pdftext = base64_encode(PdfToText\Pdf::getText('file.pdf', $path));
+                    file_put_contents(public_path('file.pdf'), $decoded);
+                //Checks operating system if it is windows or not
+                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                    $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf'), public_path('pdftotext/pdftotext.exe')));
+                } else {
+                    $pdftext = base64_encode(PdfToText\Pdf::getText(public_path('file.pdf')));
+                }
                     File::delete('file.pdf');
                     return response()->json([
                         'title' => $text->title,
                         'description' => $text->description,
                         'text' => $pdftext,
                     ]);
-                } else {
-                    return response()->json([
-                        'title' => $text->title,
-                        'description' => $text->description,
-                    ]);
-                }
             } else {
-                return response()->json(['Error' => 'Permission not allowed to view the text']);
+                return response()->json(['Error' => 'Permission denied to view the text!']);
             }
 
     }
@@ -164,21 +178,58 @@ class TextController extends Controller
      */
     public function edit($id)
     {
+        $user = Auth::user();
+        $user_role = $user->role->name;
+
         $text = Text::find($id);
         if($text != null) {
             $checkIfUserHasPermissionToEdit = $this->checkPermission($text->textbook_id);
             if($checkIfUserHasPermissionToEdit){
+
+                if($user_role === 'Admin'){
+                    $yearGroup = YearGroup::has('module.textbooks')->get();
+                }else{
+                    $module_ids = $user->modules()->get()->pluck('id');
+                    $yearGroup = YearGroup::has('module.textbooks')->
+                    whereHas('module', function ($query) use ($module_ids){
+                        $query->whereIn('modules.id', $module_ids);
+                    })->get();
+                }
+                $extensiveReadingCategories = ExtensiveReadingCategory::has('textbooks')->with('textbooks')->get();
+
                 $textbook = Textbook::find($text->textbook_id);
-                return response()->json([
-                    'title' => $text->title,
-                    'description' => $text->description,
-                    'file' => $text->file,
-                    'textbook' => $textbook,
-                ]);
+                if($textbook->extensiveReadingCategories()->count()>0){
+
+                    return response()->json([
+                        'title' => $text->title,
+                        'description' => $text->description,
+                        'selected' => $textbook,
+                        'section' => 'extensiveReadingTextbook',
+                        'selectedExtensiveReadingCategory' => $textbook->extensiveReadingCategories()->with('textbooks')->first(),
+                        'textbook' => $textbook,
+                        'yearGroup' => $yearGroup,
+                        'extensiveReadingCategories' => $extensiveReadingCategories
+                    ]);
+                }else{
+
+                    $year_group = $textbook->modules()->first()->yearGroup()->first();
+                    return response()->json([
+                        'title' => $text->title,
+                        'description' => $text->description,
+                        'selected' => $textbook,
+                        'section' => 'moduleTextbook',
+                        'year_group' => $year_group,
+                        'selectedModule' => $textbook->modules()->with('textbooks')->first(),
+                        'textbook' => $textbook,
+                        'yearGroup' => $yearGroup,
+                        'extensiveReadingCategories' => $extensiveReadingCategories
+                    ]);
+                }
+
+
             }else{
                 return response()->json(['Error' => 'Permission denied to edit the text!']);
             }
-
         }
         else{
             return response()->json(['Error' => 'Textbook not found!']);
@@ -195,6 +246,18 @@ class TextController extends Controller
     public function update(Request $request, $id)
     {
         $file = null;
+
+        $request->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'selected' => 'required',
+            'section' => 'required',
+            'file' => 'required|mimes:pdf',
+        ],
+            [
+                'selected.required' => 'You have to choose a textbook to upload a text into!',
+            ]);
+
         $t = Text::find($id);
         if ($request->file('file')) {
             $file = base64_encode(file_get_contents($request->file('file')));
