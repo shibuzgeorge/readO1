@@ -1,12 +1,13 @@
 <template>
-    <div v-if="isLoaded">
+    <div class="container-fluid" v-if="isLoaded">
     <card>
         <div class="card-header d-flex justify-content-between align-items-center">
         <h5 id="title">Edit textbook</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
         </div>
+        <div :class="{ 'row': fileName!=='' }">
+            <div class="form-check mt-4" :class="{ 'col-sm-7': fileName!=='' }">
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)" enctype="multipart/form-data">
-            <div class="form-check mt-4">
                 <label>Title:           </label> <input class="form-control" v-model="form.title" type="text" :class="{ 'is-invalid': form.errors.has('title') }" value=""/>
                 <has-error :form="form" field="title" /><br/>
                 <label>Description:     </label> <input class="form-control" v-model="form.description" type="text" :class="{ 'is-invalid': form.errors.has('description') }" value=""/>
@@ -16,7 +17,7 @@
                     <label>Select a section to upload:</label><br/>
 
                     <button @click="section='module'" type="button" class="btn btn-sm btn-primary">Module</button>
-                    Or <button @click="form.section='extensiveReading'" type="button" class="btn btn-sm btn-primary">Extensive Reading</button>
+                    Or <button @click="section='extensiveReading'" type="button" class="btn btn-sm btn-primary">Extensive Reading</button>
                 </div>
 
                 <div v-show="section==='module'">Choose module(s) <button @click="section=''" type="button" class="float-right btn btn-sm btn-warning">Change section X</button>
@@ -52,18 +53,20 @@
                 <label>Update thumbnail [optional]: (Format: jpg, jpeg, png) - <i>Overrides thumbnail of PDF upload (if uploaded)</i></label>
                 <input class="form-control" type="file" id="thumbnail" :class="{ 'is-invalid': form.errors.has('thumbnail') }" :disabled="!thumbnailOn" ref="thumbnail" v-on:change="handleThumbnailUpload()"/><br/>
                 <has-error :form="form" field="thumbnail" /><br/>
-                <div v-if="fileName!==''">
-                    <label>Current PDF file uploaded:</label>
-                <PDFViewer :fileName="fileName" :path="path" width="200" height="400"/>
-                </div>
-            </div>
+                <v-button class="form-control" :loading="form.busy" type="success">
+                    Update
+                </v-button>
+
             <sweet-modal ref="success" v-on:close="$router.push({name: 'textbook.show', params: {id: $route.params.id}})" icon="success">
                 {{successMessage}}
             </sweet-modal>
-            <v-button class="form-control" :loading="form.busy" type="success">
-                Edit
-            </v-button>
         </form>
+            </div>
+            <div class="form-check mt-4 col-sm-5" v-if="fileName!==''">
+                <label>Current Full Textbook PDF file uploaded:</label>
+                <PDFViewer :fileName="fileName" :path="path" width="200" height="400"/>
+            </div>
+        </div>
     </card>
     </div>
 <div v-else>

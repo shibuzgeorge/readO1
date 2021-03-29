@@ -245,24 +245,26 @@ class TextbookController extends Controller
             $request->validate([
                 'title' => 'required|unique:textbooks,title,',
                 'description' => 'required',
-                'selected' => 'required',
+                'selected' => ["required" , "not_in:[]"],
                 'section' => 'required',
                 'file' => 'nullable|mimes:pdf',
             ],
                 [
                     'selected.required' => 'You have to choose a module or an extensive reading category!',
+                    'selected.not_in' => 'You have to choose a module or an extensive reading category!',
                 ]);
         } else{
             $request->validate([
                 'title' => 'required|unique:textbooks,title,',
                 'description' => 'required',
-                'selected' => 'required',
+                'selected' => ["required" , "not_in:[]"],
                 'section' => 'required',
                 'file' => 'nullable|mimes:pdf',
                 'thumbnail' => 'nullable|mimes:jpeg,jpg,png,gif'
             ],
                 [
                     'selected.required' => 'You have to choose a module or an extensive reading category!',
+                    'selected.not_in' => 'You have to choose a module or an extensive reading category!',
                 ]);
         }
 
@@ -338,24 +340,26 @@ class TextbookController extends Controller
             $request->validate([
                 'title' => 'required|unique:textbooks,title,'.$textbook_id,
                 'description' => 'required',
-                'selected' => 'required',
+                'selected' => ["required" , "not_in:[]"],
                 'section' => 'required',
                 'file' => 'nullable|mimes:pdf',
             ],
                 [
                     'selected.required' => 'You have to choose a module or an extensive reading category!',
+                    'selected.not_in' => 'You have to choose a module or an extensive reading category!',
                 ]);
         } else{
             $request->validate([
                 'title' => 'required|unique:textbooks,title,'.$textbook_id,
                 'description' => 'required',
-                'selected' => 'required',
+                'selected' => ["required" , "not_in:[]"],
                 'section' => 'required',
                 'file' => 'nullable|mimes:pdf',
                 'thumbnail' => 'nullable|mimes:jpeg,jpg,png,gif'
             ],
                 [
                     'selected.required' => 'You have to choose a module or an extensive reading category!',
+                    'selected.not_in' => 'You have to choose a module or an extensive reading category!',
                 ]);
         }
 

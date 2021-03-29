@@ -70,12 +70,13 @@ class TextController extends Controller
         $request->validate([
             'title' => 'required',
             'description' => 'required',
-            'selected' => 'required',
+            'selected' => ["required" , "not_in:[]"],
             'section' => 'required',
             'file' => 'required|mimes:pdf',
         ],
             [
                 'selected.required' => 'You have to choose a textbook to upload a text into!',
+                'selected.not_in' => 'You have to choose a textbook to upload a text into!',
             ]);
 
         if ($request->file('file')) {
@@ -250,12 +251,13 @@ class TextController extends Controller
         $request->validate([
             'title' => 'required',
             'description' => 'required',
-            'selected' => 'required',
+            'selected' => ["required" , "not_in:[]"],
             'section' => 'required',
-            'file' => 'required|mimes:pdf',
+            'file' => 'nullable|mimes:pdf',
         ],
             [
                 'selected.required' => 'You have to choose a textbook to upload a text into!',
+                'selected.not_in' => 'You have to choose a textbook to upload a text into!',
             ]);
 
         $t = Text::find($id);
@@ -264,9 +266,15 @@ class TextController extends Controller
             $t->file = $file;
         }
 
+        $selectedJson = $request->input('selected');
+
+        $decoded_json = json_decode($selectedJson);
+
+        $id = collect($decoded_json->id)[0];
+
         $t->title = $request->input('title');
         $t->description = $request->input('description');
-        $t->textbook_id = $request->input('textbook_id');
+        $t->textbook_id = $id;
         $t->save();
 
         return response()->json([
