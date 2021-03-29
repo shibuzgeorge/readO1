@@ -8,15 +8,18 @@
                 </div>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
             <div class="form-check mt-4">
-                <label>Module Name:           </label> <input class="form-control" v-model="form.module_name" name="name" type="text" value="" required/><br/>
-                <label>Module Code:     </label> <input class="form-control" v-model="form.module_code" name="code" type="text" value="" required/><br/>
+                <label>Module Name:           </label> <input class="form-control" v-model="form.module_name" :class="{ 'is-invalid': form.errors.has('module_name') }" name="name" type="text" value=""/>
+                <has-error :form="form" field="module_name" /><br/>
+                <label>Module Code:     </label> <input class="form-control" v-model="form.module_code" :class="{ 'is-invalid': form.errors.has('module_code') }" name="code" type="text" value=""/>
+                <has-error :form="form" field="module_code" /><br/>
                 <label>Module Year Group:     </label>
-                <select class="form-control" name="year_group" v-model="form.module_year">
+                <select class="form-control" name="year_group" :class="{ 'is-invalid': form.errors.has('module_year') }" v-model="form.module_year">
                     <option>Please select a year group</option>
                     <option v-for="year in year_groups" :value="year.id" :key="year.id">
                         {{ year.name }}
                     </option>
-                </select><br/>
+                </select>
+                <has-error :form="form" field="module_year" /><br/>
                 <div v-if="form.unassigned.length > 0">
                     <label>Want to add of these unassigned textbooks?     </label>
                 <div>
@@ -29,7 +32,7 @@
                 </div>
                 </div>
             </div>
-            <sweet-modal ref="success" v-on:close="$router.push({name: 'module.index' , query: { page: 'last' }})" icon="success">
+            <sweet-modal ref="success" v-on:close="$router.push({name: 'module.index'})" icon="success">
                 {{successMessage}}
             </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">
@@ -87,12 +90,8 @@
         },
         methods:{
             async submit() {
-                await axios.post('/api/module', {
-                    module_name: this.form.module_name,
-                    module_code: this.form.module_code,
-                    module_year: this.form.module_year,
-                    checked: this.form.checked,
-                })
+                this.form.busy = true;
+                await this.form.post('/api/module')
                     .then(response => {
                         this.successMessage = response.data.Success;
                         this.$refs.success.open();

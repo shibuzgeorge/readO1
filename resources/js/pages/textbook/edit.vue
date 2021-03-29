@@ -1,14 +1,18 @@
 <template>
-    <div v-if="isLoaded">
+    <div class="container-fluid" v-if="isLoaded">
     <card>
         <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 id="title">Edit textbook/document</h5>
+        <h5 id="title">Edit textbook</h5>
             <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
         </div>
+        <div :class="{ 'row': fileName!=='' }">
+            <div class="form-check mt-4" :class="{ 'col-sm-7': fileName!=='' }">
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)" enctype="multipart/form-data">
-            <div class="form-check mt-4">
-                <label>Title:           </label> <input class="form-control" v-model="form.title" type="text" value="" required/><br/>
-                <label>Description:     </label> <input class="form-control" v-model="form.description" type="text" value="" required/><br/>
+                <label>Title:           </label> <input class="form-control" v-model="form.title" type="text" :class="{ 'is-invalid': form.errors.has('title') }" value=""/>
+                <has-error :form="form" field="title" /><br/>
+                <label>Description:     </label> <input class="form-control" v-model="form.description" type="text" :class="{ 'is-invalid': form.errors.has('description') }" value=""/>
+                <has-error :form="form" field="description" /><br/>
+                <div class="form-control"  style="display:none;" :class="{ 'is-invalid': form.errors.has('selected') } " ></div>
                 <div v-show="section===''">
                     <label>Select a section to upload:</label><br/>
 
@@ -30,17 +34,39 @@
                                  :close-on-select="true">
                     </multiselect>
                 </div>
+                <has-error :form="form" field="selected" />
                 <br/>
-                Update full textbook?:
-                <input class="form-control" type="file" id="file" ref="file" v-on:change="handleFileUpload()"/><br/>
-            </div>
-            <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
+                <label>Update full textbook [optional]: (Format: PDF) - <i>A thumbnail will be generated automatically (Page 1 of PDF)</i></label>
+                <input class="form-control" type="file" id="file" ref="file" :class="{ 'is-invalid': form.errors.has('file') }" v-on:change="handleFileUpload()"/><br/>
+                <has-error :form="form" field="file" />
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch1" :checked="thumbnailOn" @click="thumbnailOn = !thumbnailOn">
+                    <label class="custom-control-label" for="customSwitch1">Turn thumbnail on or not</label>
+                </div>
+
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch2" :disabled="!thumbnailOn" :checked="autoGenerateThumbnailOn" @click="autoGenerateThumbnailOn = !autoGenerateThumbnailOn">
+                    <label class="custom-control-label" for="customSwitch2">Use auto generate thumbnail</label>
+                </div>
+
+                <img v-if="thumbnailImage!==null" :src="'data:image/png;base64,'+thumbnailImage" width="100" height="100"/><br/>
+                <label>Update thumbnail [optional]: (Format: jpg, jpeg, png) - <i>Overrides thumbnail of PDF upload (if uploaded)</i></label>
+                <input class="form-control" type="file" id="thumbnail" :class="{ 'is-invalid': form.errors.has('thumbnail') }" :disabled="!thumbnailOn" ref="thumbnail" v-on:change="handleThumbnailUpload()"/><br/>
+                <has-error :form="form" field="thumbnail" /><br/>
+                <v-button class="form-control" :loading="form.busy" type="success">
+                    Update
+                </v-button>
+
+            <sweet-modal ref="success" v-on:close="$router.push({name: 'textbook.show', params: {id: $route.params.id}})" icon="success">
                 {{successMessage}}
             </sweet-modal>
-            <v-button class="form-control" :loading="form.busy" type="success">
-                Edit
-            </v-button>
         </form>
+            </div>
+            <div class="form-check mt-4 col-sm-5" v-if="fileName!==''">
+                <label>Current Full Textbook PDF file uploaded:</label>
+                <PDFViewer :fileName="fileName" :path="path" width="200" height="400"/>
+            </div>
+        </div>
     </card>
     </div>
 <div v-else>
@@ -54,9 +80,13 @@
 <script>
     import axios from 'axios'
     import Form from 'vform'
+    import PDFViewer from '~/components/PDFViewer';
 
     export default {
         middleware: 'admin_plus_module_tutor',
+        components:{
+            PDFViewer,
+        },
         name: "edit",
         data: () => ({
             isLoaded: false,
@@ -64,12 +94,18 @@
                 title: '',
                 description: '',
                 selected: [],
+                thumbnail: '',
+                file: '',
             }),
-            file: '',
+            section: '',
+            fileName: '',
+            thumbnailImage: '',
+            thumbnailOn: true,
+            autoGenerateThumbnailOn: true,
+            path: '/lib/pdf/web/viewer.html',
             successMessage: '',
             errorMessage: '',
             modules: [],
-            section: '',
             originalSelected: [],
             extensiveReadingCategories: '',
             originalSection: '',
@@ -98,12 +134,13 @@
             axios.get('/api/extensiveReading/create')
                 .then(response => {
                     this.extensiveReadingCategories = response.data;
-                    this.isLoaded = true;
+
                 }).catch(function (response) {
                 //handle error
                 console.log(response);
             });
             let self = this
+
             axios.get(`/api/textbook/${this.$route.params.id}/edit`)
                 .then(response => {
                     if(response.data.Error !== undefined){
@@ -115,7 +152,18 @@
                         this.form.selected = response.data.selected;
                         this.originalSelected = response.data.selected;
                         this.section = response.data.section;
+                        this.thumbnailImage = response.data.thumbnailImage;
+                        if(this.thumbnailImage === null){
+                            this.thumbnailOn = false;
+                        }else{
+                            this.thumbnailOn = true;
+                        }
                         this.originalSection = response.data.section;
+                        if(response.data.file === true){
+                            this.fileName =`/api/textbook/pdf/${this.$route.params.id}`;
+                        }
+                        this.isLoaded = true;
+
                     }
                 }).catch(function (response) {
                 //handle error
@@ -126,26 +174,39 @@
         },
         methods: {
             handleFileUpload(){
-                this.file = this.$refs.file.files[0];
+                this.form.file = this.$refs.file.files[0];
+            },
+            handleThumbnailUpload(){
+                this.form.thumbnail = this.$refs.thumbnail.files[0];
             },
             async submit() {
+
                 this.form.busy = true;
                 let formData = new FormData();
 
                 /*
                     Add the form data we need to submit
                 */
-                formData.append('file', this.file);
+                if (this.autoGenerateThumbnailOn) {
+                    this.form.thumbnail = 'autoGenerate';
+                }
+                if (!this.thumbnailOn) {
+                    this.form.thumbnail = 'remove';
+                }
+                formData.append('thumbnail', this.form.thumbnail);
+                formData.append('file', this.form.file);
                 formData.append('title', this.form.title);
                 formData.append('description', this.form.description);
-                formData.append('selected', JSON.stringify(this.form.selected));
                 formData.append('section', this.section);
+                formData.append('selected', JSON.stringify(this.form.selected));
                 formData.append('_method', 'PATCH');
-                await axios.post(`/api/textbook/${this.$route.params.id}`,formData,
-                    {
-                        headers: {'Content-Type': 'multipart/form-data'
-                        }
-                    })
+
+                await this.form.submit('post', `/api/textbook/${this.$route.params.id}`,{
+                    // Transform form data to FormData
+                    transformRequest: [function (data, headers) {
+                       return formData
+                    }]
+                })
                     .then(response => {
                         this.form.busy = false;
                         this.successMessage = response.data.Success;

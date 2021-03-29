@@ -24,7 +24,7 @@
             </div>
 
             <PDFViewer :fileName="fileName" :path="path" v-show="selection === 'pdf'"/>
-            <div v-show="selection === 'text'" style="font-family: sans-serif; font-size: 35px;">
+            <div v-show="selection === 'text'" style="font-family: sans-serif; font-size: 25px;">
             <pre>
                 {{text}}
             </pre>

@@ -6,14 +6,17 @@
         </div>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
             <div class="form-check mt-4">
-                <label>Module Name:           </label> <input class="form-control" v-model="form.module_name" type="text" value="" required/><br/>
-                <label>Module Code:     </label> <input class="form-control" v-model="form.module_code" type="text" value="" required/><br/>
+                <label>Module Name:          </label> <input class="form-control" v-model="form.module_name" :class="{ 'is-invalid': form.errors.has('module_name') }" name="name" type="text" value=""/>
+                <has-error :form="form" field="module_name" /><br/>
+                <label>Module Code:     </label> <input class="form-control" v-model="form.module_code" :class="{ 'is-invalid': form.errors.has('module_code') }" name="code" type="text" value=""/>
+                <has-error :form="form" field="module_code" /><br/>
                 <label>Module Year Group:     </label>
-                <select class="form-control" v-model="form.module_year">
+                <select class="form-control" v-model="form.module_year" :class="{ 'is-invalid': form.errors.has('module_year') }">
                     <option v-for="year in year_groups" :value="year.id" :key="year.id">
                         {{ year.name }}
                     </option>
-                </select><br/>
+                </select>
+                <has-error :form="form" field="module_year" /><br/>
                 <div v-if="form.textbooks.length > 0">
                 <label>Current Textbooks:     </label>
                 <ul>

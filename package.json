@@ -34,6 +34,7 @@
     "vue-multiselect": "^2.1.6",
     "vue-router": "^3.4.9",
     "vue-spinner": "^1.0.4",
+    "vueperslides": "^2.13.0",
     "vuex": "^3.6.0",
     "vuex-router-sync": "^5.0.0"
   },

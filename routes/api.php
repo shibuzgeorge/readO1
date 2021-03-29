@@ -32,9 +32,11 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('extensiveReading/categories', 'ExtensiveReadingController@categories');
     Route::resource('/extensiveReading', 'ExtensiveReadingController');
 
+    Route::get('/textbook/getLast10recent', 'TextbookController@getLast10recent');
     Route::resource('/textbook', 'TextbookController');
     Route::get('textbook/pdf/{textbook_id}', 'TextbookController@pdf');
 
+    Route::get('/yearGroup/getModulesForYearGroup/{year_group_id}', 'YearGroupController@getModulesForYearGroup');
     Route::resource('/yearGroup', 'YearGroupController');
 
     Route::get('/text/getLast5attempts', 'TextController@getLast5attempts');
@@ -58,8 +60,6 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::get('/user', 'Auth\UserController@current');
     Route::get('/user/role', 'Auth\UserController@checkRole');
-
-
 
     Route::patch('settings/profile', 'Settings\ProfileController@update');
     Route::patch('settings/password', 'Settings\PasswordController@update');

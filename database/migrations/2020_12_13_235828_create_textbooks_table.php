@@ -21,6 +21,7 @@ class CreateTextbooksTable extends Migration
             $table->timestamps();
         });
         DB::statement('ALTER TABLE textbooks ADD COLUMN file LONGBLOB DEFAULT NULL');
+        DB::statement('ALTER TABLE textbooks ADD COLUMN thumbnail LONGBLOB DEFAULT NULL');
     }
 
     /**

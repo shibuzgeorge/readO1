@@ -8,7 +8,9 @@
         </div>
         <form @submit.prevent="submit" @keydown="form.onKeydown($event)">
             <div class="form-check mt-4">
-                <label>Add Year Group:           </label> <input class="form-control" v-model="form.year_group" type="text" value="" required/><br/>
+                <label>Add Year Group:           </label> <input class="form-control" v-model="form.name" :class="{ 'is-invalid': form.errors.has('name') }" type="text" value=""/>
+                <has-error :form="form" field="name" />
+                <br/>
             </div>
 
             <v-button class="form-control" :loading="form.busy" type="success">
@@ -19,10 +21,11 @@
             {{successMessage}}
         </sweet-modal>
 
-        <sweet-modal ref="test">
+        <sweet-modal ref="test" v-on:close="form.errors.clear()">
             <form @submit.prevent="editYearGroup()" @keydown="form.onKeydown($event)">
                 <div class="form-check mt-4">
-                    <label>Edit year group name:           </label> <input class="form-control" v-model="form.edit_name" type="text" value="" required/><br/>
+                    <label>Edit year group name:           </label> <input class="form-control" v-model="form.edit_name" type="text" :class="{ 'is-invalid': form.errors.has('edit_name') }" value=""/>
+                    <has-error :form="form" field="edit_name" /><br/>
                 </div>
 
                 <v-button class="form-control" :loading="form.busy" type="success">
@@ -59,7 +62,7 @@
         data: () => ({
             isLoaded: false,
             form: new Form({
-                year_group: '',
+                name: '',
                 edit_name: '',
 
             }),
@@ -80,9 +83,7 @@
         },
         methods: {
             async submit() {
-                await axios.post('/api/yearGroup', {
-                    year_group: this.form.year_group,
-                })
+                await this.form.post('/api/yearGroup')
                     .then(response => {
                         this.successMessage = response.data.Success;
                         this.$refs.success.open();
@@ -97,10 +98,7 @@
                 this.$refs.test.open();
             },
             async editYearGroup() {
-                let formData = new FormData();
-                formData.append('name', this.form.edit_name);
-                formData.append('_method', 'PATCH');
-                await axios.post(`/api/yearGroup/${this.edit_id}`, formData)
+                await this.form.patch(`/api/yearGroup/${this.edit_id}`)
                     .then(response => {
                         this.successMessage = response.data.Success;
                         this.$refs.test.close();

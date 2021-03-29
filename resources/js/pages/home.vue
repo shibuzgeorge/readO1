@@ -8,9 +8,38 @@
 
         <h3>Welcome back - {{user.name}}</h3>
         <br>
-          <GChart type="LineChart"
-                  :data="quizChartData"
-                  :options="quizChartOptions"/>
+          Check out these recently added textbooks:
+          <vueper-slides
+                  class="no-shadow"
+                  :visible-slides="2"
+                  slide-multiple
+                  :gap="3"
+                  :touchable="false"
+                  :slide-ratio="1 / 4"
+                  :dragging-distance="200"
+                  :breakpoints="{ 800: { visibleSlides: 2, slideMultiple: 2 } }">
+
+              <vueper-slide class="card" v-for="textbook in textbooks" :key="textbook.id" :title="textbook.title">
+                  <template v-slot:content>
+                        <div :class="{ 'row': textbook.thumbnail!==null }">
+                          <div v-if="textbook.thumbnail!==null" class="col-sm-5 d-flex justify-content-center">
+                          <img v-if="textbook.thumbnail!==null" :src="'data:image/png;base64,'+textbook.thumbnail" width="150" height="200"/>
+                          </div>
+                          <div :class="{ 'col-sm-7': textbook.thumbnail!==null }">
+                          <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
+                              <h5 class="card-title">{{textbook.title}}</h5>
+                              <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
+                          </router-link>
+                          <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
+                              <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
+                          </router-link>
+                          <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
+                          </div>
+                        </div>
+                  </template>
+              </vueper-slide>
+          </vueper-slides>
+
         <div class="row">
             <div class="col-md-6">
                 Reading Sessions
@@ -98,7 +127,7 @@
     import axios from 'axios'
     import { mapGetters } from 'vuex'
     import PDFViewer from '~/components/PDFViewer';
-
+    import Swal from 'sweetalert2';
     export default {
     middleware: 'auth',
         components:{
@@ -116,28 +145,7 @@
         path: '/lib/pdf/web/viewer.html',
         last5QuizAttempts: [],
         last5ReadingAttempts: [],
-         quizChartData: [
-             ['Attempt', 'Quiz Score', 'Time taken'],
-             ['1', 1, [0,1,13]],
-             ['2', 7, [0,1,3]],
-             ['3', 8, [0,0,50]],
-             ['4', 3, [0,0,25]]
-         ],
-        quizChartOptions: {
-            title: 'Latest quiz scores',
-            series: {
-                0: {targetAxisIndex: 0},
-                1: {targetAxisIndex: 1}
-            },
-            vAxes: {
-                // Adds titles to each axis.
-                0: {title: 'Score'},
-                1: {title: 'Time taken'}
-            },
-            hAxis: {
-               title: 'Attempt Number'
-            },
-        },
+        textbooks: [],
 
     }),
     created() {
@@ -153,16 +161,45 @@
         axios.get(`/api/text/getLast5attempts/`)
             .then(response => {
                 this.last5ReadingAttempts = response.data;
-                this.isLoaded = true;
             }).catch(function (response) {
             //handle error
             console.log(response);
+        });
+
+        axios.get('api/textbook/getLast10recent/')
+            .then(response => {
+                this.isLoaded = true;
+                this.textbooks = response.data.textbooks.slice(0, 10)
+            }).catch(error => {
+            console.log(error.response)
         });
     },
     methods: {
         getResults(id){
             this.fileName ='/api/quiz/getResultPDF/'+id;
             this.$refs.viewResults.open()
+        },
+        async del(data) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you really want to delete the textbook?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+            }).then(function (result) {
+                if (result.value) {
+                    Swal.fire(
+                        'Deleted!',
+                        'The textbook has been deleted.',
+                        'success'
+                    );
+                    axios.delete(`/api/textbook/${data}`).then(response => {
+                        window.location.reload();
+                    })
+                }
+            });
         }
     }
 }

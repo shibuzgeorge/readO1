@@ -7,6 +7,7 @@ use App\Module;
 use App\Textbook;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class TextbookController extends Controller
 {
@@ -38,15 +39,57 @@ class TextbookController extends Controller
         $user = Auth::user();
         $user_role = $user->role->name;
         if($user_role === 'Admin'){
-            $textbooks = Textbook::all();
+
+            $moduleTextbooks = Module::has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+            $modules = Module::has('textbooks')->with('textbooks')->get();
+
         }else{
-            $textbooks = $user->modules()->has('textbooks')->
-            with('textbooks')->get()->pluck('textbooks')->toArray();
-            $textbooks = call_user_func_array('array_merge', $textbooks);
+            $modules = $user->modules()->has('textbooks')->with('textbooks')->get();
+            $moduleTextbooks = $user->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+
         }
-        return response()->json($textbooks);
+        $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+        with('textbooks')->get()->pluck('textbooks');
+        $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+        $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
+
+        $extensiveReadingCategories = ExtensiveReadingCategory::has('textbooks')->with('textbooks')->get();
+
+        return response()->json([
+           'textbooks' => $textbooks,
+            'modules' => $modules,
+            'extensiveReadingCategories' => $extensiveReadingCategories
+        ]);
     }
 
+    /**
+     *
+     * Gets the last 10 recent textbooks for all users.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     *
+     */
+    public function getLast10recent(){
+        $user = Auth::user();
+        $user_role = $user->role->name;
+        if($user_role === 'Admin'){
+            $textbooks = Textbook::orderBy('id', 'desc')->take(10)->get();
+        }else{
+            $moduleTextbooks = $user->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+            $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+            $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+            $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
+            $textbooks_id = collect($textbooks)->pluck('id');
+            $textbooks = Textbook::whereIn('id', $textbooks_id)->orderBy('id', 'desc')->take(10)->get();
+        }
+        return response()->json([
+            'textbooks' => $textbooks,
+        ]);
+    }
     /**
      * Displays the textbook associated to the textbook_id passed.
      * Checks to see if the user has the permission to view the textbook.
@@ -73,6 +116,7 @@ class TextbookController extends Controller
                         'title' => $textbook->title,
                         'description' => $textbook->description,
                         'texts' => $texts,
+                        'thumbnail' => $textbook->thumbnail,
                         'file' => true
                     ]);
                 } else {
@@ -80,6 +124,7 @@ class TextbookController extends Controller
                         'title' => $textbook->title,
                         'description' => $textbook->description,
                         'texts' => $texts,
+                        'thumbnail' => $textbook->thumbnail,
                         'file' => false
                     ]);
                 }
@@ -145,8 +190,10 @@ class TextbookController extends Controller
                 return response()->json([
                     'title' => $textbook->title,
                     'description' => $textbook->description,
+                    'thumbnailImage' => $textbook->thumbnail,
                     'selected' => $selected,
                     'section' => $section,
+                    'file' => $textbook->file !== null ? true : false,
                 ]);
             } else {
                 return response()->json(['Error' => 'Permission denied to edit textbook!']);
@@ -186,14 +233,65 @@ class TextbookController extends Controller
     /**
      * Store a newly created textbook.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
+     * @throws \ImagickException
      */
     public function store(Request $request)
     {
         $file = null;
+        $thumbnail = null;
+
+        if($request->thumbnail === 'remove'){
+            $request->validate([
+                'title' => 'required|unique:textbooks,title,',
+                'description' => 'required',
+                'selected' => ["required" , "not_in:[]"],
+                'section' => 'required',
+                'file' => 'nullable|mimes:pdf',
+            ],
+                [
+                    'selected.required' => 'You have to choose a module or an extensive reading category!',
+                    'selected.not_in' => 'You have to choose a module or an extensive reading category!',
+                ]);
+        } else{
+            $request->validate([
+                'title' => 'required|unique:textbooks,title,',
+                'description' => 'required',
+                'selected' => ["required" , "not_in:[]"],
+                'section' => 'required',
+                'file' => 'nullable|mimes:pdf',
+                'thumbnail' => 'nullable|mimes:jpeg,jpg,png,gif'
+            ],
+                [
+                    'selected.required' => 'You have to choose a module or an extensive reading category!',
+                    'selected.not_in' => 'You have to choose a module or an extensive reading category!',
+                ]);
+        }
 
         if ($request->file('file')) {
             $file = base64_encode(file_get_contents($request->file('file')));
+        }
+        if($request->thumbnail === 'remove'){
+            $thumbnail = null;
+        } else if ($file!== null && !$request->file('thumbnail')) {
+
+            file_put_contents(public_path('file.pdf'),  base64_decode($file));
+            $img = new \Imagick();
+            $img->setResolution(500,500);
+            $img->readImage(public_path('file.pdf[0]'));
+            $img->setIteratorIndex(0);
+            $img->setImageFormat('png');
+            $img->writeImage(public_path('thumb.png'));
+            $img->clear();
+            $img->destroy();
+            $thumbnail = base64_encode(file_get_contents(public_path('thumb.png')));
+
+            File::delete(public_path('file.pdf'));
+            File::delete(public_path('thumb.png'));
+
+
+        } else if($request->file('thumbnail')){
+            $thumbnail = base64_encode(file_get_contents($request->file('thumbnail')));
         }
 
         //data that will be inserted into new row in textbook table
@@ -201,6 +299,7 @@ class TextbookController extends Controller
             'title' => $request->input('title'),
             'description' => $request->input('description'),
             'file' => $file,
+            'thumbnail' => $thumbnail,
         ];
 
         //create a textbook using the POST data
@@ -230,22 +329,74 @@ class TextbookController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @param $textbook_id
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function update(Request $request, $textbook_id)
     {
         $file = null;
+        $thumbnail = null;
+
+        if($request->thumbnail === 'remove' || $request->thumbnail === 'autoGenerate'){
+            $request->validate([
+                'title' => 'required|unique:textbooks,title,'.$textbook_id,
+                'description' => 'required',
+                'selected' => ["required" , "not_in:[]"],
+                'section' => 'required',
+                'file' => 'nullable|mimes:pdf',
+            ],
+                [
+                    'selected.required' => 'You have to choose a module or an extensive reading category!',
+                    'selected.not_in' => 'You have to choose a module or an extensive reading category!',
+                ]);
+        } else{
+            $request->validate([
+                'title' => 'required|unique:textbooks,title,'.$textbook_id,
+                'description' => 'required',
+                'selected' => ["required" , "not_in:[]"],
+                'section' => 'required',
+                'file' => 'nullable|mimes:pdf',
+                'thumbnail' => 'nullable|mimes:jpeg,jpg,png,gif'
+            ],
+                [
+                    'selected.required' => 'You have to choose a module or an extensive reading category!',
+                    'selected.not_in' => 'You have to choose a module or an extensive reading category!',
+                ]);
+        }
+
         $textbook = Textbook::findOrFail($textbook_id);
         if ($request->file('file')) {
             $file = base64_encode(file_get_contents($request->file('file')));
             $textbook->file = $file;
         }
 
+        if($request->thumbnail == 'remove'){
+            $textbook->thumbnail = null;
+        }else if ($textbook->file!==null && $request->thumbnail == 'autoGenerate') {
+
+            file_put_contents(public_path('file.pdf'),  base64_decode($textbook->file));
+            $img = new \Imagick();
+            $img->setResolution(500,500);
+            $img->readImage(public_path('file.pdf[0]'));
+            $img->setIteratorIndex(0);
+            $img->setImageFormat('png');
+            $img->writeImage(public_path('thumb.png'));
+            $img->clear();
+            $img->destroy();
+            $thumbnail = base64_encode(file_get_contents(public_path('thumb.png')));
+            File::delete(public_path('file.pdf'));
+            File::delete(public_path('thumb.png'));
+            $textbook->thumbnail = $thumbnail;
+
+        }else if($request->file('thumbnail')){
+            $thumbnail = base64_encode(file_get_contents($request->file('thumbnail')));
+            $textbook->thumbnail = $thumbnail;
+        }
+
         $textbook->title = $request->input('title');
         $textbook->description = $request->input('description');
+
         $textbook->save();
-
         $selectedJson = $request->input('selected');
-
         $decoded_json = json_decode($selectedJson);
 
         if(str_contains($selectedJson,'[')){

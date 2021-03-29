@@ -80,6 +80,11 @@ class ExtensiveReadingController extends Controller
      */
     public function edit($id){
         $erc = ExtensiveReadingCategory::find($id);
+
+        if($erc == null) {
+            return response()->json(['Error' => 'Extensive Reading Category not found!']);
+        }
+
         $textbooks = $erc->textbooks()->get();
         $unassigned = Textbook::doesntHave('modules')->doesntHave('extensiveReadingCategories')->get();
 
@@ -121,6 +126,11 @@ class ExtensiveReadingController extends Controller
      */
     public function show($id){
         $erc = ExtensiveReadingCategory::find($id);
+
+        if($erc == null) {
+            return response()->json(['Error' => 'Extensive Reading Category not found!']);
+        }
+
         $textbooks = $erc->textbooks()->get();
         return response()->json([
             'name' => $erc->name,

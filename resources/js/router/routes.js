@@ -37,7 +37,7 @@ export default [
 
     { path: '/text/view/:id', name: 'text.show', component: page('text/view.vue') },
     { path: '/text/create', name: 'text.create', component: page('text/create.vue') },
-    { path: '/text/edit', name: 'text.edit', component: page('text/edit.vue') },
+    { path: '/text/edit/:id', name: 'text.edit', component: page('text/edit.vue') },
 
     { path: '/admin/users', name: 'admin.users', component: page('admin/users.vue') },
     { path: '/admin/users/create', name: 'admin.users.create', component: page('admin/create.vue') },
