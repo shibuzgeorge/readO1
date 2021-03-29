@@ -76,7 +76,7 @@ class TextController extends Controller
         ],
             [
                 'selected.required' => 'You have to choose a textbook to upload a text into!',
-                'selected.not_in' => 'You have to choose a module or an extensive reading category!',
+                'selected.not_in' => 'You have to choose a textbook to upload a text into!',
             ]);
 
         if ($request->file('file')) {
@@ -257,7 +257,7 @@ class TextController extends Controller
         ],
             [
                 'selected.required' => 'You have to choose a textbook to upload a text into!',
-                'selected.not_in' => 'You have to choose a module or an extensive reading category!',
+                'selected.not_in' => 'You have to choose a textbook to upload a text into!',
             ]);
 
         $t = Text::find($id);
