@@ -1458,7 +1458,7 @@ class TextTest extends TestCase
             'title' => $randomText->title,
             'description' => $randomText->description,
             'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf'))),
-            'textbook_id' => $randomModuleTextbook->id,
+            'textbook_id' => $randomText->textbook_id,
         ]);
     }
 
@@ -1495,7 +1495,7 @@ class TextTest extends TestCase
             'title' => $randomText->title,
             'description' => $randomText->description,
             'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf'))),
-            'textbook_id' => $randomExtensiveReadingTextbook->id,
+            'textbook_id' => $randomText->textbook_id,
         ]);
     }
 
@@ -1537,7 +1537,7 @@ class TextTest extends TestCase
             'title' => $randomText->title,
             'description' => $randomText->description,
             'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf'))),
-            'textbook_id' => $randomModuleTextbook->id,
+            'textbook_id' => $randomText->textbook_id,
         ]);
     }
 
@@ -1574,7 +1574,7 @@ class TextTest extends TestCase
             'title' => $randomText->title,
             'description' => $randomText->description,
             'file' => base64_encode(file_get_contents(public_path('/readingMaterial/example.pdf'))),
-            'textbook_id' => $randomExtensiveReadingTextbook->id,
+            'textbook_id' => $randomText->textbook_id,
         ]);
     }
 }
