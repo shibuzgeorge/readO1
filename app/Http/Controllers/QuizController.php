@@ -78,7 +78,7 @@ class QuizController extends Controller
                 ];})[0]);
 
         $attempt_number = $request->input('attempt_num');
-        $pdf = PDF::loadView('pdf', compact('quiz', 'totalPointsCollected', 'selectedOptions', 'attempt_number'));
+        $pdf = PDF::loadView('quiz_result_template', compact('quiz', 'totalPointsCollected', 'selectedOptions', 'attempt_number'));
         $pdf->save('quiz_result.pdf');
         $base64 = base64_encode(file_get_contents('quiz_result.pdf'));
         File::delete('quiz_result.pdf');
