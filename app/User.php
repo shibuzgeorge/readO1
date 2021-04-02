@@ -4,6 +4,7 @@ namespace App;
 
 use App\Notifications\AdminUserCreate;
 use App\Notifications\CustomPassword;
+use App\Notifications\QuizResult;
 use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -100,6 +101,18 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     {
 
         $this->notify(new AdminUserCreate($token));
+    }
+
+    /**
+     * @param $base64
+     * @param $text
+     * @param $textbook
+     * @return void
+     */
+    public function sendEmailQuizResult($base64, $text, $textbook)
+    {
+
+        $this->notify(new QuizResult($base64, $text, $textbook));
     }
 
     /**
