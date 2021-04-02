@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\ExtensiveReadingCategory;
+use App\ReadingSession;
 use App\Text;
 use App\Textbook;
 use App\Module;
 use App\User;
 use App\YearGroup;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Spatie\PdfToText;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\UploadedFile;
@@ -27,6 +29,7 @@ class TextTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware(ThrottleRequests::class);
         $this->artisan('db:seed');
         $this->adminUser = User::whereHas('role', function($q){
             $q->where('name', 'Admin');
@@ -1577,4 +1580,518 @@ class TextTest extends TestCase
             'textbook_id' => $randomText->textbook_id,
         ]);
     }
+
+    /**
+     * A test to delete a text authorised by logging in as an Admin.
+     *
+     * @test
+     * @return void
+     */
+    public function test_delete_a_text_admin_authorised()
+    {
+        $text = Text::inRandomOrder()->first();
+        $this->actingAs($this->adminUser)
+            ->deleteJson('/api/text/'.$text->id)
+            ->assertSuccessful()
+            ->assertStatus(200);
+
+        $this->assertDatabaseMissing('texts', [
+            'title' => $text->title,
+            'description' => $text->description,
+            'textbook_id' => $text->textbook_id,
+        ]);
+    }
+
+    /**
+     * A test to delete a text authorised by logging in as an Module Tutor.
+     *
+     * @test
+     * @return void
+     */
+    public function test_delete_a_text_module_tutor_authorised()
+    {
+        $text =  Module::has('textbooks.texts')->whereHas('users', function ($query){
+            $query->where('user_id', $this->moduleTutorUser->id);
+        })->first()->textbooks()->first()->texts()->first();
+
+        $this->actingAs($this->moduleTutorUser)
+            ->deleteJson('/api/text/'.$text->id)
+            ->assertSuccessful()
+            ->assertStatus(200);
+
+        $this->assertDatabaseMissing('texts', [
+            'title' => $text->title,
+            'description' => $text->description,
+            'textbook_id' => $text->textbook_id,
+        ]);
+    }
+
+    /**
+     * A test to delete a text permission denied by logging in as an Module Tutor.
+     *
+     * @test
+     * @return void
+     */
+    public function test_delete_a_text_module_tutor_permission_denied()
+    {
+        $text =  Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
+            $query->where('user_id', $this->moduleTutorUser->id);
+        })->first()->textbooks()->first()->texts()->first();
+
+        $this->actingAs($this->moduleTutorUser)
+            ->deleteJson('/api/text/'.$text->id)
+            ->assertJsonFragment(["Error" => "Permission denied to delete text!"]);
+
+        $this->assertDatabaseHas('texts', [
+            'title' => $text->title,
+            'description' => $text->description,
+            'textbook_id' => $text->textbook_id,
+        ]);
+    }
+
+    /**
+     * A test to delete a text unauthorised by logging in as a Student.
+     *
+     * @test
+     * @return void
+     */
+    public function test_delete_a_text_student_unauthorised()
+    {
+        $text = Text::inRandomOrder()->first();
+
+        $this->actingAs($this->studentUser)
+            ->deleteJson('/api/text/'.$text->id)
+            ->assertJsonFragment(["error" => "Unauthorized"])
+            ->assertStatus(403);
+
+        $this->assertDatabaseHas('texts', [
+            'title' => $text->title,
+            'description' => $text->description,
+            'textbook_id' => $text->textbook_id,
+        ]);
+    }
+
+    /**
+     * A test to delete a text id not found for Admins or Module Tutors
+     *
+     * @test
+     * @return void
+     */
+    public function test_delete_a_text_id_not_found()
+    {
+        $text = Text::inRandomOrder()->first();
+
+        $this->actingAs($this->adminUser)
+            ->deleteJson('/api/text/'.rand(9999, 10000))
+            ->assertStatus(404);
+
+        $this->assertDatabaseHas('texts', [
+            'title' => $text->title,
+            'description' => $text->description,
+            'textbook_id' => $text->textbook_id,
+        ]);
+
+        $this->actingAs($this->moduleTutorUser)
+            ->deleteJson('/api/text/'.rand(9999, 10000))
+            ->assertStatus(404);
+
+        $this->assertDatabaseHas('texts', [
+            'title' => $text->title,
+            'description' => $text->description,
+            'textbook_id' => $text->textbook_id,
+        ]);
+    }
+
+    /**
+     * A test to create a reading session as a student authorised
+     *
+     * @test
+     * @return void
+     */
+    public function test_save_attempt_student_authorised()
+    {
+        $text =  Module::has('textbooks.texts')->whereHas('users', function ($query){
+            $query->where('user_id', $this->studentUser->id);
+        })->first()->textbooks()->first()->texts()->first();
+
+        $attempt = [
+            'text_id' => $text->id,
+            'attempt_num' => 1,
+            'time' => '00:10:56'
+        ];
+
+        $this->actingAs($this->studentUser)
+            ->postJson('/api/text/saveAttempt', $attempt)
+            ->assertSuccessful()
+            ->assertJson(['Success' => 'Successfully saved the attempt!']);
+
+        $this->assertDatabaseHas('reading_sessions', [
+            'text_id' => $attempt['text_id'],
+            'user_id' => $this->studentUser->id,
+            'attempt_number' => $attempt['attempt_num'],
+            'time_taken' => $attempt['time']
+        ]);
+    }
+
+    /**
+     * A test to create a reading session as a student permission denied
+     *
+     * @test
+     * @return void
+     */
+    public function test_save_attempt_student_permission_denied()
+    {
+        $text =  Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
+            $query->where('user_id', $this->studentUser->id);
+        })->first()->textbooks()->first()->texts()->first();
+
+        $attempt = [
+            'text_id' => $text->id,
+            'attempt_num' => 1,
+            'time' => '00:10:56'
+        ];
+
+        $this->actingAs($this->studentUser)
+            ->postJson('/api/text/saveAttempt', $attempt)
+            ->assertJson(['Error' => 'Permission denied to delete text!']);
+
+        $this->assertDatabaseMissing('reading_sessions', [
+            'text_id' => $attempt['text_id'],
+            'user_id' => $this->studentUser->id,
+            'attempt_number' => $attempt['attempt_num'],
+            'time_taken' => $attempt['time']
+        ]);
+    }
+
+    /**
+     * A test to create a reading session as a student text not found.
+     *
+     * @test
+     * @return void
+     */
+    public function test_save_attempt_student_text_not_found()
+    {
+        $attempt = [
+            'text_id' => rand(9999, 10000),
+            'attempt_num' => 1,
+            'time' => '00:10:56'
+        ];
+
+        $this->actingAs($this->studentUser)
+            ->postJson('/api/text/saveAttempt', $attempt)
+            ->assertJson(['Error' => 'Text not found!']);
+
+        $this->assertDatabaseMissing('reading_sessions', [
+            'text_id' => $attempt['text_id'],
+            'user_id' => $this->studentUser->id,
+            'attempt_number' => $attempt['attempt_num'],
+            'time_taken' => $attempt['time']
+        ]);
+    }
+
+    /**
+     * A test to get attempt for a text as attempt one by making sure the response is null/empty
+     * as a student authorised.
+     *
+     * @test
+     * @return void
+     */
+    public function test_get_attempt_student_attempt_null_authorised()
+    {
+        $text = Module::has('textbooks.texts')->whereHas('users', function ($query) {
+            $query->where('user_id', $this->studentUser->id);
+        })->first()->textbooks()->first()->texts()->first();
+
+
+        //Check is JSON is null/empty as there is no attempt of the text.
+        $this->actingAs($this->studentUser)
+            ->getJson('/api/text/getAttempt/' . $text->id)
+            ->assertExactJson([]);
+
+    }
+    /**
+     * A test to get attempt for a text as attempt one by storing attempt one
+     * then getting the attempt to make sure the response is 1
+     * as a student authorised.
+     *
+     * @test
+     * @return void
+     */
+    public function test_get_attempt_student_attempt_one_authorised()
+    {
+        $text =  Module::has('textbooks.texts')->whereHas('users', function ($query){
+            $query->where('user_id', $this->studentUser->id);
+        })->first()->textbooks()->first()->texts()->first();
+
+        $attempt = [
+            'text_id' => $text->id,
+            'attempt_num' => 1,
+            'time' => '00:10:56'
+        ];
+
+        $this->actingAs($this->studentUser)
+            ->postJson('/api/text/saveAttempt', $attempt)
+            ->assertSuccessful()
+            ->assertJson(['Success' => 'Successfully saved the attempt!']);
+
+        //Check that the attempt number is 1 now.
+        $this->actingAs($this->studentUser)
+            ->getJson('/api/text/getAttempt/' . $text->id)
+            ->assertJson([
+                'attempt' => 1,
+                'time_taken' => $attempt['time']
+            ]);
+    }
+
+    /**
+     * A test to get all attempts as Admin.
+     * Admins can view any Students reading session attempts.
+     *
+     * @test
+     * @return void
+     */
+    public function test_get_all_attempts_admin()
+    {
+        for($i=0; $i<10; $i++){
+            $text =  Module::has('textbooks.texts')->whereHas('users', function ($query){
+                $query->where('user_id', $this->studentUser->id);
+            })->first()->textbooks()->first()->texts()->first();
+
+            $attempt = [
+                'text_id' => $text->id,
+                'attempt_num' => $i+1,
+                'time' => '00:10:56'
+            ];
+
+            $this->actingAs($this->studentUser)
+                ->postJson('/api/text/saveAttempt', $attempt)
+                ->assertSuccessful()
+                ->assertJson(['Success' => 'Successfully saved the attempt!']);
+        }
+
+        $attempts = ReadingSession::with('text.textbook')->with('user')->get();
+        $textbooks = ReadingSession::with('text.textbook')->get()->unique('text.textbook')->pluck('text.textbook');
+
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/text/getAllAttemptsForCurrentUser')
+            ->assertSuccessful()
+            ->assertJson([
+                'attempts' => $attempts->toArray(),
+                'textbooks' => $textbooks->toArray()
+            ]);
+    }
+
+    /**
+     * A test to get all attempts as a Module Tutor.
+     * Module Tutors can see Students reading session attempts to all extensive reading category
+     * and only the module students that are assigned to them.
+     *
+     * @test
+     * @return void
+     */
+    public function test_get_all_attempts_module_tutor()
+    {
+        for($i=0; $i<10; $i++){
+            $text =  Module::has('textbooks.texts')->whereHas('users', function ($query){
+                $query->where('user_id', $this->studentUser->id);
+            })->first()->textbooks()->first()->texts()->first();
+
+            $attempt = [
+                'text_id' => $text->id,
+                'attempt_num' => $i+1,
+                'time' => '00:10:56'
+            ];
+
+            $this->actingAs($this->studentUser)
+                ->postJson('/api/text/saveAttempt', $attempt)
+                ->assertSuccessful()
+                ->assertJson(['Success' => 'Successfully saved the attempt!']);
+        }
+
+        $moduleTextbooks = $this->moduleTutorUser->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+            $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+
+            $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+            $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
+            $allTextbookIds = collect($textbooks)->pluck('id');
+            $attempts = ReadingSession::with('text.textbook')->with('user')
+                ->whereHas('text.textbook', function($query) use ($allTextbookIds){
+                    $query->whereIn('id',$allTextbookIds);
+                })->get();
+
+            $textbooks = $attempts->unique('text.textbook')->pluck('text.textbook');
+
+        $this->actingAs($this->moduleTutorUser)
+            ->getJson('/api/text/getAllAttemptsForCurrentUser')
+            ->assertSuccessful()
+            ->assertJson([
+                'attempts' => $attempts->toArray(),
+                'textbooks' => $textbooks->toArray()
+            ]);
+    }
+
+    /**
+     * A test to get all attempts as a Student.
+     * Students can only see the reading session attempts they've done.
+     *
+     * @test
+     * @return void
+     */
+    public function test_get_all_attempts_student()
+    {
+        for($i=0; $i<10; $i++){
+            $text =  Module::has('textbooks.texts')->whereHas('users', function ($query){
+                $query->where('user_id', $this->studentUser->id);
+            })->first()->textbooks()->first()->texts()->first();
+
+            $attempt = [
+                'text_id' => $text->id,
+                'attempt_num' => $i+1,
+                'time' => '00:10:56'
+            ];
+
+            $this->actingAs($this->studentUser)
+                ->postJson('/api/text/saveAttempt', $attempt)
+                ->assertSuccessful()
+                ->assertJson(['Success' => 'Successfully saved the attempt!']);
+        }
+
+        $attempts = ReadingSession::where('user_id', $this->studentUser->id)->with('text.textbook')->get();
+        $textbooks = ReadingSession::where('user_id', $this->studentUser->id)->with('text.textbook')->get()->unique('text.textbook')->pluck('text.textbook');
+
+        $this->actingAs($this->studentUser)
+            ->getJson('/api/text/getAllAttemptsForCurrentUser')
+            ->assertSuccessful()
+            ->assertJson([
+                'attempts' => $attempts->toArray(),
+                'textbooks' => $textbooks->toArray()
+            ]);
+    }
+
+    /**
+     * A test to get last 5 attempts as Admin.
+     * Admins can view any last 5 students reading session attempts.
+     *
+     * @test
+     * @return void
+     */
+    public function test_get_last_5_attempts_admin()
+    {
+        for($i=0; $i<10; $i++){
+            $text =  Module::has('textbooks.texts')->whereHas('users', function ($query){
+                $query->where('user_id', $this->studentUser->id);
+            })->first()->textbooks()->first()->texts()->first();
+
+            $attempt = [
+                'text_id' => $text->id,
+                'attempt_num' => $i+1,
+                'time' => '00:10:56'
+            ];
+
+            $this->actingAs($this->studentUser)
+                ->postJson('/api/text/saveAttempt', $attempt)
+                ->assertSuccessful()
+                ->assertJson(['Success' => 'Successfully saved the attempt!']);
+        }
+
+        $last5 = ReadingSession::with('text.textbook')->with('user')->orderBy('id', 'desc')->take(5)->get();
+
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/text/getLast5attempts')
+            ->assertSuccessful()
+            ->assertJson(
+                $last5->toArray()
+            );
+    }
+
+    /**
+     * A test to get last 5 attempts as a Module Tutor.
+     * Module Tutors can see last 5 students reading session attempts to all extensive reading category
+     * and only the module students that are assigned to them.
+     *
+     * @test
+     * @return void
+     */
+    public function test_get_last_5_attempts_module_tutor()
+    {
+        for($i=0; $i<10; $i++){
+            $text =  Module::has('textbooks.texts')->whereHas('users', function ($query){
+                $query->where('user_id', $this->studentUser->id);
+            })->first()->textbooks()->first()->texts()->first();
+
+            $attempt = [
+                'text_id' => $text->id,
+                'attempt_num' => $i+1,
+                'time' => '00:10:56'
+            ];
+
+            $this->actingAs($this->studentUser)
+                ->postJson('/api/text/saveAttempt', $attempt)
+                ->assertSuccessful()
+                ->assertJson(['Success' => 'Successfully saved the attempt!']);
+        }
+
+        $moduleTextbooks = $this->moduleTutorUser->modules()->has('textbooks')->
+        with('textbooks')->get()->pluck('textbooks');
+
+        $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+        with('textbooks')->get()->pluck('textbooks');
+
+        $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+        $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
+        $allTextbookIds = collect($textbooks)->pluck('id');
+
+        $last5 = ReadingSession::with('text.textbook')->with('user')
+            ->whereHas('text.textbook', function($query) use ($allTextbookIds){
+                $query->whereIn('id',$allTextbookIds);
+            })->orderBy('id', 'desc')->take(5)->get();
+
+        $this->actingAs($this->moduleTutorUser)
+            ->getJson('/api/text/getLast5attempts')
+            ->assertSuccessful()
+            ->assertJson(
+                $last5->toArray()
+            );
+    }
+
+    /**
+     * A test to get all attempts as a Student.
+     * Students can only see the reading session attempts they've done.
+     *
+     * @test
+     * @return void
+     */
+    public function test_get_last_5_attempts_student()
+    {
+        for($i=0; $i<10; $i++){
+            $text =  Module::has('textbooks.texts')->whereHas('users', function ($query){
+                $query->where('user_id', $this->studentUser->id);
+            })->first()->textbooks()->first()->texts()->first();
+
+            $attempt = [
+                'text_id' => $text->id,
+                'attempt_num' => $i+1,
+                'time' => '00:10:56'
+            ];
+
+            $this->actingAs($this->studentUser)
+                ->postJson('/api/text/saveAttempt', $attempt)
+                ->assertSuccessful()
+                ->assertJson(['Success' => 'Successfully saved the attempt!']);
+        }
+
+        $last5 = ReadingSession::with('text.textbook')
+                ->where('user_id', auth()->user()->id)
+                ->orderBy('id', 'desc')->take(5)->get();
+
+        $this->actingAs($this->studentUser)
+            ->getJson('/api/text/getLast5attempts')
+            ->assertSuccessful()
+            ->assertJson(
+                $last5->toArray()
+            );
+    }
+
 }

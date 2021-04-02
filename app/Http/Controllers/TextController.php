@@ -304,9 +304,19 @@ class TextController extends Controller
     /**
      * Saves the attempt of the reading to the database.
      * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function saveAttempt(Request $request){
 
+        $text = Text::find($request->input('text_id'));
+
+        if ($text == null){
+            return response()->json(['Error' => 'Text not found!']);
+        }
+
+        $checkIfUserHasPermissionToSaveAttempt = $this->checkPermission($text->textbook_id);
+
+        if($checkIfUserHasPermissionToSaveAttempt) {
             //data that will be inserted into new row in reading sessions table
             $data = [
                 'text_id' => $request->input('text_id'),
@@ -316,7 +326,10 @@ class TextController extends Controller
             ];
             //create a reading session using the POST data
             ReadingSession::create($data);
-
+            return response()->json(['Success' => 'Successfully saved the attempt!']);
+        } else {
+            return response()->json(['Error' => 'Permission denied to delete text!']);
+        }
     }
 
     /**
@@ -388,15 +401,20 @@ class TextController extends Controller
             $last5 = ReadingSession::with('text.textbook')->with('user')
                 ->orderBy('id', 'desc')->take(5)->get();
         }else if(Auth::user()->role->name === 'Module Tutor') {
-            $textbooks = Auth::user()->modules()->has('textbooks')->
-            with('textbooks')->get()->pluck('textbooks')->toArray();
-            $textbooks = call_user_func_array('array_merge', $textbooks);
-            $test = collect($textbooks)->pluck('id');
+            $moduleTextbooks = Auth::user()->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+
+            $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+
+            $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+            $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
+            $allTextbookIds = collect($textbooks)->pluck('id');
+
             $last5 = ReadingSession::with('text.textbook')->with('user')
-                ->whereHas('text.textbook', function($query) use ($test){
-                    $query->whereIn('id',$test);
-                })
-                ->orderBy('id', 'desc')->take(5)->get();
+                ->whereHas('text.textbook', function($query) use ($allTextbookIds){
+                    $query->whereIn('id',$allTextbookIds);
+                })->orderBy('id', 'desc')->take(5)->get();
         }else{
             $last5 = ReadingSession::with('text.textbook')
                 ->where('user_id', auth()->user()->id)
