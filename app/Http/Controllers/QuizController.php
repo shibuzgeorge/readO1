@@ -7,6 +7,7 @@ use App\Option;
 use App\Question;
 use App\Quiz;
 use App\Text;
+use App\Textbook;
 use App\UserQuizScore;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +43,7 @@ class QuizController extends Controller
     }
 
     /**
-     * Returns the points the user collected from answering the quiz.
+     * Returns the points the user collected from answering the quiz and saves to the database.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -89,6 +90,11 @@ class QuizController extends Controller
             'result' => $base64,
             'score' => $totalPointsCollected
             ]);
+
+        //Sends email with attachment of the pdf result.
+        $text = Text::find($quiz_object->first()->text_id);
+        $textbook = Textbook::find($text->textbook_id);
+        auth()->user()->sendEmailQuizResult($base64, $text->title, $textbook->title);
 
         return response()->json([
             'totalPointsCollected' => $totalPointsCollected,
