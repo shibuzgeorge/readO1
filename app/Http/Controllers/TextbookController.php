@@ -451,7 +451,7 @@ class TextbookController extends Controller
      */
     private function checkPermission($textbook_id)
     {
-        $module = Module::whereHas(
+        $module = Auth::user()->modules()->whereHas(
         'textbooks', function($q) use($textbook_id) {
         $q->where('textbook_id', $textbook_id);
     })->first();
@@ -464,7 +464,7 @@ class TextbookController extends Controller
         if(Auth::user()->role->name === 'Admin'){
             return true;
         } else {
-            if(Auth::user()->modules()->find($module) !== null || $extensiveReading !== null){
+            if($module !== null || $extensiveReading !== null){
                 return true;
             }
         }
