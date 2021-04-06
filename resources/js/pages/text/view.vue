@@ -16,11 +16,20 @@
 
         <br/>
         <div v-if="file">
-            <h5 v-if="role==='Student'" style="text-align: center">Attempt Number: {{attempt_num+1}} <div v-if="attempt_num!==0"> <br/>Last time taken to complete: {{last_time_taken}}</div></h5>
-            <div style="width: 100%; text-align: center;" >
-                <label style="text-align: center;">View PDF: <input type="radio" v-model="selection" value="pdf"></label>
-                <label>Text view: <input type="radio" v-model="selection" value="text"></label>
-                <label>Speed reading: <input type="radio" v-model="selection" value="speedreading"></label>
+            <div v-if="role==='Student'" class="d-flex justify-content-between align-content-between">
+                 <button class="btn btn-sm btn-primary" @click="openGuide()" v-if="role==='Student'">Guide</button>
+                <h5>Attempt Number: {{attempt_num+1}}</h5> <div v-if="attempt_num===0">No previous attempts</div><div v-if="attempt_num!==0">Last time taken: {{last_time_taken}}</div>
+            </div>
+
+            <div v-if="role==='Student' && timer===undefined" style="margin-top: 100px; margin-bottom: 70px; margin-right: 80px;" class="d-flex justify-content-center align-items-center">
+                <button class="btn btn-success" @click="start" v-if="role==='Student'">Start</button>
+            </div>
+
+            <div v-if="timer !== undefined || role==='Admin' || role==='Module Tutor'">
+            <div style="text-align: center; margin-right: 100px;">
+                <label style="text-align: center;">Skimming: <input type="radio" v-model="selection" value="pdf"></label>
+                <label>Scanning: <input type="radio" v-model="selection" value="text"></label>
+                <label>Speed reading (wpm): <input type="radio" v-model="selection" value="speedreading"></label>
             </div>
 
             <PDFViewer :fileName="fileName" :path="path" v-show="selection === 'pdf'"/>
@@ -36,12 +45,11 @@
             </div>
             <div class="card-footer fixed-bottom">
                 <div class="justify-content-between align-items-center">
-                <!--<router-link :to="{ name: 'quiz.show', params: {id: $route.params.id} }">-->
                 <button class="btn btn-success" style="float:right;" @click="finishedReading(formattedElapsedTime)" v-if="role==='Student'">Finished Reading?</button>
-                <!--</router-link>-->
                 <b v-if="role==='Student'">Time taken: {{formattedElapsedTime}}</b>
                 </div>
             </div>
+        </div>
         </div>
         <div v-else>
             No file has been uploaded for this text
@@ -51,6 +59,12 @@
         </sweet-modal>
         <sweet-modal ref="manageQuiz">
                 <manage-quiz :text_id="text_id" :parent="3"></manage-quiz>
+        </sweet-modal>
+        <sweet-modal ref="tutorial" v-on:close="closeGuide()" title="ReadO(1) Guide" width="100%">
+            <sweet-modal-tab title="Skimming" id="tab1"><skimming></skimming></sweet-modal-tab>
+            <sweet-modal-tab title="Scanning" id="tab2"><scanning></scanning></sweet-modal-tab>
+            <sweet-modal-tab title="Speed read words per minute" id="tab3"><words-per-minute></words-per-minute></sweet-modal-tab>
+            <sweet-modal-tab title="Quiz" id="tab4"><quiz-guide></quiz-guide></sweet-modal-tab>
         </sweet-modal>
     </card>
     <div v-else>
@@ -66,14 +80,22 @@
     import SpeedReader from '~/components/SpeedReader';
     import PDFViewer from '~/components/PDFViewer';
     import ManageQuiz from "../../components/ManageQuiz";
+    import Skimming from "../../components/Skimming";
+    import Scanning from "../../components/Scanning";
     import { mapGetters } from 'vuex'
     import Swal from 'sweetalert2';
+    import WordsPerMinute from "../../components/WordsPerMinute";
+    import QuizGuide from "../../components/QuizGuide";
     export default {
         middleware: 'auth',
         components:{
+            QuizGuide,
+            WordsPerMinute,
+            Scanning,
             ManageQuiz,
             SpeedReader,
             PDFViewer,
+            Skimming,
         },
         computed: {
             ...mapGetters({
@@ -142,11 +164,26 @@
                 console.log(response);
             });
 
-            this.timer = setInterval(() => {
-                this.elapsedTime += 1000;
-            }, 1000);
         },
         methods:{
+            start(){
+                this.timer = setInterval(() => {
+                    this.elapsedTime += 1000;
+                }, 1000);
+            },
+            openGuide(){
+                this.$refs.tutorial.open();
+                let self = this;
+                clearInterval(self.timer);
+            },
+            closeGuide(){
+                let self = this;
+                if(self.timer!=undefined){
+                    self.timer = setInterval(() => {
+                        self.elapsedTime += 1000;
+                    }, 1000);
+                }
+            },
             manageQuiz(){
                 this.text_id = parseInt(this.$route.params.id);
                 this.$refs.manageQuiz.open();

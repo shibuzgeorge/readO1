@@ -46,7 +46,7 @@
 
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input" id="customSwitch2" :disabled="!thumbnailOn" :checked="autoGenerateThumbnailOn" @click="autoGenerateThumbnailOn = !autoGenerateThumbnailOn">
-                    <label class="custom-control-label" for="customSwitch2">Use auto generate thumbnail</label>
+                    <label class="custom-control-label" for="customSwitch2">Update auto generate thumbnail</label>
                 </div>
 
                 <img v-if="thumbnailImage!==null" :src="'data:image/png;base64,'+thumbnailImage" width="100" height="100"/><br/>
@@ -101,7 +101,7 @@
             fileName: '',
             thumbnailImage: '',
             thumbnailOn: true,
-            autoGenerateThumbnailOn: true,
+            autoGenerateThumbnailOn: false,
             path: '/lib/pdf/web/viewer.html',
             successMessage: '',
             errorMessage: '',
