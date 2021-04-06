@@ -9,39 +9,10 @@
         <b>The hop</b>: to lift fingers and make two bounced on each line to catch sections of three or four words and then move on.<br/>
         <b>The zig-zag</b>: to take the hand and cut the text in a diagonal motion for two or the line.<br/>
 
-        <vueper-slides
-                class="no-shadow"
-                :visible-slides="2"
-                slide-multiple
-                :gap="3"
-                :touchable="true"
-                :slide-ratio="1 / 4"
-                :dragging-distance="200"
-                :breakpoints="{ 800: { visibleSlides: 2, slideMultiple: 2 } }">
+        <br/>
+        How to use the application:
 
-            <vueper-slide class="card" key="1" title="Why is scanning useful?">
-                <template v-slot:content>
-                    <div>
-                    ..................
-                    </div>
-                </template>
-            </vueper-slide>
-                <vueper-slide class="card" key="2" title="How to effectively scan">
-                <template v-slot:content>
-                    <div>
-                      .................
-                    </div>
-                </template>
-            </vueper-slide>
-            <vueper-slide class="card" key="3" title="How to use scanning in the application">
-                <template v-slot:content>
-                    <div>
-                        .................
-                    </div>
-                </template>
-            </vueper-slide>
-        </vueper-slides>
-
+        <img src="/guide/guide3.png"/>
 
     </div>
 </template>

@@ -12,38 +12,10 @@
         6) Notice any italicized or bold face word or phrases<br/>
         7) Read the summary or last paragraph.<br/>
 
-        <vueper-slides
-                class="no-shadow"
-                :visible-slides="2"
-                slide-multiple
-                :gap="3"
-                :touchable="true"
-                :slide-ratio="1 / 4"
-                :dragging-distance="200"
-                :breakpoints="{ 800: { visibleSlides: 2, slideMultiple: 2 } }">
+        <br/>
+        How to use the application:
 
-            <vueper-slide class="card" key="1" title="Why is skimming useful?">
-                <template v-slot:content>
-                    <div>
-                    ..................
-                    </div>
-                </template>
-            </vueper-slide>
-                <vueper-slide class="card" key="2" title="How to effectively skim">
-                <template v-slot:content>
-                    <div>
-                      .................
-                    </div>
-                </template>
-            </vueper-slide>
-            <vueper-slide class="card" key="3" title="How to use skimming in the application">
-                <template v-slot:content>
-                    <div>
-                        .................
-                    </div>
-                </template>
-            </vueper-slide>
-        </vueper-slides>
+        <img src="/guide/guide2.png"/>
     </div>
 </template>
 

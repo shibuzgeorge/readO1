@@ -1,33 +1,35 @@
 <template>
   <div>
-    <div class="top-right links">
-      <template v-if="authenticated">
-        <router-link :to="{ name: 'home' }">
-          {{ $t('home') }}
-        </router-link>
-      </template>
-      <template v-else>
-        <router-link :to="{ name: 'about' }">
-          {{ $t('about') }}
-        </router-link>
-        <router-link :to="{ name: 'login' }">
-          {{ $t('login') }}
-        </router-link>
-        <router-link :to="{ name: 'register' }">
-          {{ $t('register') }}
-        </router-link>
-      </template>
-    </div>
-
     <div class="text-center">
       <div class="title mb-4">
         {{ title }}
       </div>
+      <div class="nv-subtitle">
+        Read. Speed. Challenge. Engage
+      </div>
+      <p>
 
       <div class="links">
-
       </div>
     </div>
+
+    <div class="main-layout">
+
+        <div>
+          <vueper-slides  class="no-shadow" arrows-outside bullets-outside :slide-ratio="1 / 2" >
+            <vueper-slide key="1" image="/screenshots/library.png"></vueper-slide>
+            <vueper-slide key="2" image="/screenshots/Carousel.png"></vueper-slide>
+            <vueper-slide key="3" image="/guide/guide1.png"></vueper-slide>
+            <vueper-slide key="4" image="/guide/guide2.png"></vueper-slide>
+            <vueper-slide key="5" image="/guide/guide3.png"></vueper-slide>
+            <vueper-slide key="6" image="/guide/guide4.png"></vueper-slide>
+            <vueper-slide key="7" title="Register Now!"></vueper-slide>
+          </vueper-slides>
+        </div>
+
+    </div>
+    <!--//<img src="/guide/guide1.png"/>-->
+
   </div>
 </template>
 
@@ -35,7 +37,7 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  layout: 'basic',
+  layout: 'default',
 
   metaInfo () {
     return { title: this.$t('home') }
@@ -61,4 +63,5 @@ export default {
 .title {
   font-size: 85px;
 }
+.vueperslides__arrow {color: black}
 </style>

@@ -16,21 +16,20 @@
 
         <br/>
         <div v-if="file">
-            <h5 v-if="role==='Student'" style="text-align: center">Attempt Number: {{attempt_num+1}} <div v-if="attempt_num!==0"> <br/>Last time taken to complete: {{last_time_taken}}</div></h5><br/>
-            <div v-if="role==='Student' && timer===undefined" class="d-flex justify-content-center align-items-center">
-
-                <h5>When you're ready click start <button class="btn btn-success" @click="start" v-if="role==='Student'">Start</button></h5>
-
+            <div v-if="role==='Student'" class="d-flex justify-content-between align-content-between">
+                 <button class="btn btn-sm btn-primary" @click="openGuide()" v-if="role==='Student'">Guide</button>
+                <h5>Attempt Number: {{attempt_num+1}}</h5> <div v-if="attempt_num===0">No previous attempts</div><div v-if="attempt_num!==0">Last time taken: {{last_time_taken}}</div>
             </div>
-            <div v-if="role==='Student'" class="d-flex justify-content-center align-items-center">
-                Need tips? - Click here for tutorial tips and guide
-                <button class="btn btn-primary" @click="openGuide()" v-if="role==='Student'">Guide</button>
+
+            <div v-if="role==='Student' && timer===undefined" style="margin-top: 100px; margin-bottom: 70px; margin-right: 80px;" class="d-flex justify-content-center align-items-center">
+                <button class="btn btn-success" @click="start" v-if="role==='Student'">Start</button>
             </div>
+
             <div v-if="timer !== undefined || role==='Admin' || role==='Module Tutor'">
-            <div style="width: 100%; text-align: center;" >
-                <label style="text-align: center;">View PDF: <input type="radio" v-model="selection" value="pdf"></label>
-                <label>Text view: <input type="radio" v-model="selection" value="text"></label>
-                <label>Speed reading: <input type="radio" v-model="selection" value="speedreading"></label>
+            <div style="text-align: center; margin-right: 100px;">
+                <label style="text-align: center;">Skimming: <input type="radio" v-model="selection" value="pdf"></label>
+                <label>Scanning: <input type="radio" v-model="selection" value="text"></label>
+                <label>Speed reading (wpm): <input type="radio" v-model="selection" value="speedreading"></label>
             </div>
 
             <PDFViewer :fileName="fileName" :path="path" v-show="selection === 'pdf'"/>
@@ -61,7 +60,7 @@
         <sweet-modal ref="manageQuiz">
                 <manage-quiz :text_id="text_id" :parent="3"></manage-quiz>
         </sweet-modal>
-        <sweet-modal ref="tutorial" v-on:close="closeGuide()" title="ReadO(1) Guide">
+        <sweet-modal ref="tutorial" v-on:close="closeGuide()" title="ReadO(1) Guide" width="100%">
             <sweet-modal-tab title="Skimming" id="tab1"><skimming></skimming></sweet-modal-tab>
             <sweet-modal-tab title="Scanning" id="tab2"><scanning></scanning></sweet-modal-tab>
             <sweet-modal-tab title="Speed read words per minute" id="tab3"><words-per-minute></words-per-minute></sweet-modal-tab>
