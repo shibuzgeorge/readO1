@@ -1195,4 +1195,31 @@ class QuizTest extends TestCase
             ]);
     }
 
+    /**
+     * A test to download the quiz result pdf quiz not found.
+     * @test
+     * @return void
+     */
+    public function test_download_getResultPDF_quiz_not_found()
+    {
+
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/quiz/getResultPDF/'.rand(9999,10000))
+            ->assertJsonFragment([
+                'Error' => 'Quiz results not found!'
+            ]);
+
+        $this->actingAs($this->moduleTutorUser)
+            ->getJson('/api/quiz/getResultPDF/'.rand(9999,10000))
+            ->assertJsonFragment([
+                'Error' => 'Quiz results not found!'
+            ]);
+
+        $this->actingAs($this->studentUser)
+            ->getJson('/api/quiz/getResultPDF/'.rand(9999,10000))
+            ->assertJsonFragment([
+                'Error' => 'Quiz results not found!'
+            ]);
+    }
+
 }
