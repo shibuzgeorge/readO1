@@ -493,7 +493,7 @@ class QuizTest extends TestCase
      */
     public function test_update_quiz_admin_authorised()
     {
-        $text = Text::whereHas('quizzes')->inRandomOrder()->first();
+        $text = Text::whereHas('quizzes.questions.options')->inRandomOrder()->first();
 
         $original_quiz = Quiz::where('text_id', $text->id)->first();
 
@@ -562,7 +562,7 @@ class QuizTest extends TestCase
      */
     public function test_update_quiz_admin_delete_a_quiz_authorised()
     {
-        $text = Text::whereHas('quizzes')->inRandomOrder()->first();
+        $text = Text::whereHas('quizzes.questions.options')->inRandomOrder()->first();
 
         $original_quiz = Quiz::where('text_id', $text->id)->first();
 
@@ -592,7 +592,7 @@ class QuizTest extends TestCase
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->moduleTutorUser->id);
         })->first()->textbooks()->first()
-            ->texts()->whereHas('quizzes')->first();
+            ->texts()->whereHas('quizzes.questions.options')->first();
 
         $original_quiz = Quiz::where('text_id', $text->id)->first();
 
