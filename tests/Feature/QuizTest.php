@@ -931,8 +931,8 @@ class QuizTest extends TestCase
      */
     public function test_edit_quiz_module_tutor_permission_denied_authorised()
     {
-        $text = Module::has('textbooks.texts.quizzes')->whereDoesntHave('users', function ($query){
-            $query->where('user_id', $this->moduleTutorUser->id);
+        $text = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
+            $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
             ->texts()->inRandomOrder()->first();
 
@@ -1189,7 +1189,8 @@ class QuizTest extends TestCase
 
         $this->test_result_student_authorised($textToUse, $anotherUser);
 
-        $quizScore = UserQuizScore::where('quiz_id', $textToUse->quizzes()->first()->id)->first();
+        $quiz_id = $textToUse->quizzes()->where('text_id',$textToUse->id)->first()->id;
+        $quizScore = UserQuizScore::where('quiz_id', $quiz_id)->first();
 
         $this->actingAs($this->studentUser)
             ->getJson('/api/quiz/getResultPDF/'.$quizScore->id)
