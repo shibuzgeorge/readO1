@@ -890,7 +890,7 @@ class QuizTest extends TestCase
     public function test_edit_quiz_module_tutor_authorised()
     {
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
-            $query->where('user_id', $this->moduleTutorUser->id);
+            $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
             ->texts()->inRandomOrder()->first();
 
