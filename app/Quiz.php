@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Quiz extends Model
 {
     protected $fillable = [
-        'text_id',
+        'text_id', 'max_points'
     ];
 
     /**
