@@ -1189,7 +1189,8 @@ class QuizTest extends TestCase
 
         $this->test_result_student_authorised($textToUse, $anotherUser);
 
-        $quizScore = UserQuizScore::where('quiz_id', $textToUse->quizzes()->first()->id)->first();
+        $quiz_id = $textToUse->quizzes()->where('text_id',$textToUse->id)->first()->id;
+        $quizScore = UserQuizScore::where('quiz_id', $quiz_id)->first();
 
         $this->actingAs($this->studentUser)
             ->getJson('/api/quiz/getResultPDF/'.$quizScore->id)
