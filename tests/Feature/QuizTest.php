@@ -953,13 +953,16 @@ class QuizTest extends TestCase
      */
     public function test_edit_quiz_student_unauthorised()
     {
-        $text = Module::has('textbooks.texts.quizzes.questions.options')->whereHas('users', function ($query){
+        $text = Module::has('textbooks.texts.quizzes')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
             ->texts()->inRandomOrder()->first();
 
+        $textToUse = $text;
+        $this->test_create_quiz_admin_authorised($textToUse);
+
         $this->actingAs($this->studentUser)
-            ->getJson('/api/quiz/edit/'.$text->id)
+            ->getJson('/api/quiz/edit/'.$textToUse->id)
             ->assertStatus(403)
             ->assertJsonFragment(['error' => 'Unauthorized']);
     }
