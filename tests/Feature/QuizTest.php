@@ -811,10 +811,10 @@ class QuizTest extends TestCase
      */
     public function test_getLastAttempt_permission_denied_student_authorised()
     {
-        $text = Module::has('textbooks.texts.quizzes')->whereDoesntHave('users', function ($query){
+        $text = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->whereHas('quizzes')->inRandomOrder()->first();
+            ->texts()->inRandomOrder()->first();
 
         $quiz_id = Quiz::where('text_id', $text->id)->first()->id;
 
