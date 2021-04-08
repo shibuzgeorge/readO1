@@ -816,7 +816,11 @@ class QuizTest extends TestCase
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
             ->texts()->inRandomOrder()->first();
 
-        $quiz_id = Quiz::where('text_id', $text->id)->first()->id;
+        $textToUse = $text;
+        $this->test_create_quiz_admin_authorised($textToUse);
+        $this->test_result_student_authorised($textToUse);
+
+        $quiz_id = Quiz::where('text_id', $textToUse->id)->first()->id;
 
         $this->actingAs($this->studentUser)
             ->getJson('/api/quiz/getAttempt/'.$quiz_id)
@@ -1167,7 +1171,7 @@ class QuizTest extends TestCase
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->whereDoesntHave('quizzes')->inRandomOrder()->first();
+            ->texts()->inRandomOrder()->first();
 
         $textToUse = $text;
         $this->test_create_quiz_admin_authorised($textToUse);
