@@ -956,13 +956,10 @@ class QuizTest extends TestCase
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->whereDoesntHave('quizzes')->inRandomOrder()->first();
-
-        $textToUse = $text;
-        $this->test_create_quiz_admin_authorised($textToUse);
+            ->texts()->inRandomOrder()->first();
 
         $this->actingAs($this->studentUser)
-            ->getJson('/api/quiz/edit/'.$textToUse->id)
+            ->getJson('/api/quiz/edit/'.$text->id)
             ->assertStatus(403)
             ->assertJsonFragment(['error' => 'Unauthorized']);
     }
