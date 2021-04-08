@@ -885,10 +885,12 @@ class QuizTest extends TestCase
      */
     public function test_edit_quiz_module_tutor_authorised()
     {
-        $text = Module::has('textbooks.texts.quizzes.questions.options')->whereHas('users', function ($query){
+        $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->moduleTutorUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
             ->texts()->inRandomOrder()->first();
+
+        $this->test_create_quiz_admin_authorised($text);
 
         $allQuiz = $text->quizzes()->with('questions', 'options')->get()
             ->map(function ($event) {
@@ -1138,14 +1140,15 @@ class QuizTest extends TestCase
         $text = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->whereDoesntHave('quizzes')->inRandomOrder()->first();
+            ->texts()->inRandomOrder()->first();
 
         $textToUse = $text;
         $this->test_create_quiz_admin_authorised($textToUse);
 
         $this->test_result_student_authorised($textToUse);
 
-        $quizScore = UserQuizScore::where('quiz_id', $textToUse->quizzes()->first()->id)->first();
+        $quiz_id = $textToUse->quizzes()->where('text_id',$textToUse->id)->first()->id;
+        $quizScore = UserQuizScore::where('quiz_id', $quiz_id)->first();
 
         $this->actingAs($this->studentUser)
             ->getJson('/api/quiz/getResultPDF/'.$quizScore->id)
