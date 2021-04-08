@@ -19,7 +19,7 @@
                 <tbody><tr>
                     <td class="text-left">Options</td> <td class="text-left">
                     <div v-for="op in allOptions(form.quiz.options, question.id)" class="form-check">
-                    <input type="radio" :name="question.id" :value="op.id" v-model="form.selected[index]">
+                    <input type="radio" :name="question.id" :value="op.id" v-model="form.selected[index]" required>
                         <label>{{op.option}}</label>
                     </div>
                     </td>

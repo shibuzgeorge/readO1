@@ -36,10 +36,28 @@ class QuizController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function show($text_id){
-        $quiz = Quiz::where('text_id', $text_id)->with('questions','options')->inRandomOrder()->first();
-        return response()->json([
-            'quiz' => $quiz,
-        ]);
+
+        $text = Text::find($text_id);
+
+        if($text == null){
+            return response()->json([
+                'Error' => 'Text quiz not found'
+            ]);
+        }
+
+        $checkIfUserHasPermissionToView = $this->checkPermission($text->textbook_id);
+
+        if($checkIfUserHasPermissionToView){
+            $quiz = Quiz::where('text_id', $text_id)->with('questions','options')->inRandomOrder()->first();
+            return response()->json([
+                'quiz' => $quiz,
+            ]);
+        } else{
+            return response()->json([
+                'Error' => 'Permission denied to view the quiz',
+            ]);
+        }
+
     }
 
     /**
@@ -151,17 +169,36 @@ class QuizController extends Controller
      */
     public function getAttempt($quiz_id)
     {
-        $last_attempt = UserQuizScore::whereHas('quiz', function ($query) use($quiz_id) {
-        return $query->where('text_id', Quiz::where('id', $quiz_id)->first()->text_id);
-        })->where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
+        $quiz = Quiz::find($quiz_id);
 
-        if($last_attempt!= null){
+        if($quiz == null){
             return response()->json([
-                'attempt' => $last_attempt->attempt_number,
+                'Error' => 'Quiz not found'
             ]);
-        }else{
-            return response()->json(null);
         }
+
+        $text = Text::find($quiz->text_id);
+
+        $checkIfUserHasPermissionToView = $this->checkPermission($text->textbook_id);
+
+        if($checkIfUserHasPermissionToView){
+            $last_attempt = UserQuizScore::whereHas('quiz', function ($query) use($quiz_id) {
+                return $query->where('text_id', Quiz::where('id', $quiz_id)->first()->text_id);
+            })->where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
+
+            if($last_attempt!= null){
+                return response()->json([
+                    'attempt' => $last_attempt->attempt_number,
+                ]);
+            }else{
+                return response()->json(null);
+            }
+        } else{
+            return response()->json([
+                'Error' => 'Permission denied to get attempt'
+            ]);
+        }
+
     }
 
     /**
@@ -174,7 +211,7 @@ class QuizController extends Controller
      */
     public function manage(Request $request, $text_id)
     {
-        //Collection of quizzes from from
+        //Collection of quizzes from request
         $quizzes = collect(json_decode($request->quizzes));
 
         //Array of quizzesId, questionsId and optionsId
@@ -245,7 +282,7 @@ class QuizController extends Controller
 
             $quiz_ids = $text->quizzes()->get()->pluck('id')->toArray();
             foreach($quiz_ids as $quiz_id){
-                $quiz_object = Question::where('id', $quiz_id)->first();
+                $quiz_object = Quiz::where('id', $quiz_id)->first();
 
                 $quiz_object->max_points = Quiz::where('id', $quiz_id)->with('questions')->get()->max('questions')->pluck('max_points')->sum();
                 $quiz_object->save();
@@ -272,26 +309,41 @@ class QuizController extends Controller
     public function edit($text_id)
     {
         $text = Text::find($text_id);
-        $allQuiz = $text->quizzes()->with('questions','options')->get()
-            ->map(function ($event) {
-            return [
-                'id' => $event->id,
-                'questions' => $event->questions->map(function ($event2) {
-                    return [
-                        'id' => $event2->id,
-                        'question_text' => $event2->question,
-                        'options' =>$event2->options->map(function ($event3) {
-                            return [
-                                'id' => $event3->id,
-                                'option_text' => $event3->option,
-                                'points' => $event3->points
-                            ];})
-                    ];})
-            ];});
 
-        return response()->json([
-            'quizzes' => $allQuiz
-        ]);
+        if($text == null){
+            return response()->json([
+                'Error' => 'Text quiz not found'
+            ]);
+        }
+
+        $checkIfUserHasPermissionToEdit = $this->checkPermission($text->textbook_id);
+
+        if($checkIfUserHasPermissionToEdit) {
+            $allQuiz = $text->quizzes()->with('questions', 'options')->get()
+                ->map(function ($event) {
+                    return [
+                        'id' => $event->id,
+                        'questions' => $event->questions->map(function ($event2) {
+                            return [
+                                'id' => $event2->id,
+                                'question_text' => $event2->question,
+                                'options' => $event2->options->map(function ($event3) {
+                                    return [
+                                        'id' => $event3->id,
+                                        'option_text' => $event3->option,
+                                        'points' => $event3->points
+                                    ];})
+                            ];})
+                    ];});
+            return response()->json([
+                'quizzes' => $allQuiz
+            ]);
+        } else {
+            return response()->json([
+                'Error' => 'Permission denied to edit quiz'
+            ]);
+        }
+
     }
 
     /**
@@ -306,15 +358,22 @@ class QuizController extends Controller
             $last5 = UserQuizScore::with('quiz.text.textbook')->with('user')
                 ->orderBy('id', 'desc')->take(5)->get();
         }else if(Auth::user()->role->name === 'Module Tutor') {
-            $textbooks = Auth::user()->modules()->has('textbooks')->
-            with('textbooks')->get()->pluck('textbooks')->toArray();
-            $textbooks = call_user_func_array('array_merge', $textbooks);
-            $test = collect($textbooks)->pluck('id');
+
+            $moduleTextbooks = Auth::user()->modules()->has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+
+            $extensiveReadingTextbooks = ExtensiveReadingCategory::has('textbooks')->
+            with('textbooks')->get()->pluck('textbooks');
+
+            $textbooks = $moduleTextbooks->merge($extensiveReadingTextbooks);
+            $textbooks = call_user_func_array('array_merge', $textbooks->toArray());
+            $allTextbookIds = collect($textbooks)->pluck('id');
+
             $last5 = UserQuizScore::with('quiz.text.textbook')->with('user')
-                ->whereHas('quiz.text.textbook', function($query) use ($test){
-                    $query->whereIn('id',$test);
-                })
-                ->orderBy('id', 'desc')->take(5)->get();
+                ->whereHas('quiz.text.textbook', function($query) use ($allTextbookIds){
+                    $query->whereIn('id',$allTextbookIds);
+                })->orderBy('id', 'desc')->take(5)->get();
+
         }else{
             $last5 = UserQuizScore::with('quiz.text.textbook')
                 ->where('user_id', auth()->user()->id)
@@ -327,7 +386,7 @@ class QuizController extends Controller
     /**
      *
      * Returns a header for PDF download.
-     * Downloads the PDF of the results based on the quiz_id passed in.
+     * Downloads the PDF of the results based on the quiz_user_score id passed in.
      * Only authorised users can download.
      *
      * @param $id
@@ -335,17 +394,30 @@ class QuizController extends Controller
      */
     public function getResultPDF($id)
     {
-        if(Auth::user()->role->name === 'Admin' ){
-            $quiz = UserQuizScore::where('id', $id)->first();
-        }else{
-            $quiz = UserQuizScore::where('id', $id)->where('user_id', auth()->user()->id)->first();
-        }
+        $quizScore = UserQuizScore::where('id', $id)->first();
 
-        if ($quiz == null) {
+        if ($quizScore == null) {
             return response()->json(['Error' => 'Quiz results not found!']);
         }
 
-            $file_contents = base64_decode($quiz->result);
+        $quiz = Quiz::find($quizScore->quiz_id);
+        $text = Text::find($quiz->text_id);
+
+        $checkIfUserHasPermissionToDownload = $this->checkPermission($text->textbook_id);
+
+        if($checkIfUserHasPermissionToDownload) {
+            if (Auth::user()->role->name === 'Admin' || Auth::user()->role->name === 'Module Tutor') {
+                $quizScore = UserQuizScore::where('id', $id)->first();
+            } else {
+                $quizScore = UserQuizScore::where('id', $id)->where('user_id', auth()->user()->id)->first();
+                if($quizScore == null){
+                    return response()->json([
+                        'Error' => 'Permission denied to download quiz results as you did not complete that quiz'
+                    ]);
+                }
+            }
+
+            $file_contents = base64_decode($quizScore->result);
 
             return response($file_contents)
                 ->header('Cache-Control', 'no-cache private')
@@ -354,6 +426,43 @@ class QuizController extends Controller
                 ->header('Content-Length', strlen($file_contents))
                 ->header('Content-Disposition', 'inline; filename="result.pdf"')
                 ->header('Content-Transfer-Encoding', 'binary');
+        }else{
+            return response()->json([
+                'Error' => 'Permission denied to download quiz results'
+            ]);
+        }
 
+    }
+
+    /**
+     * Returns true or false if current user has the permission to perform an action.
+     * Admins are allowed to have access to anything.
+     * Module Tutors must have a text assigned to them to have access to CRUD.
+     * Students can only view data.
+     *
+     * @param $textbook_id
+     * @return bool
+     *
+     */
+    private function checkPermission($textbook_id)
+    {
+        $module = Auth::user()->modules()->whereHas(
+            'textbooks', function($q) use($textbook_id) {
+            $q->where('textbook_id', $textbook_id);
+        })->first();
+
+        $extensiveReading = ExtensiveReadingCategory::whereHas(
+            'textbooks', function($q) use($textbook_id) {
+            $q->where('textbook_id', $textbook_id);
+        })->first();
+
+        if(Auth::user()->role->name === 'Admin'){
+            return true;
+        } else {
+            if($module !== null || $extensiveReading !== null){
+                return true;
+            }
+        }
+        return false;
     }
 }
