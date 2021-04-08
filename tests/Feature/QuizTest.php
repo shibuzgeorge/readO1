@@ -890,7 +890,7 @@ class QuizTest extends TestCase
     public function test_edit_quiz_module_tutor_authorised()
     {
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
-            $query->where('user_id', $this->moduleTutorUser->id);
+            $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
             ->texts()->inRandomOrder()->first();
 
@@ -953,13 +953,16 @@ class QuizTest extends TestCase
      */
     public function test_edit_quiz_student_unauthorised()
     {
-        $text = Module::has('textbooks.texts.quizzes.questions.options')->whereHas('users', function ($query){
+        $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
         })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+            ->texts()->whereDoesntHave('quizzes')->inRandomOrder()->first();
+
+        $textToUse = $text;
+        $this->test_create_quiz_admin_authorised($textToUse);
 
         $this->actingAs($this->studentUser)
-            ->getJson('/api/quiz/edit/'.$text->id)
+            ->getJson('/api/quiz/edit/'.$textToUse->id)
             ->assertStatus(403)
             ->assertJsonFragment(['error' => 'Unauthorized']);
     }
@@ -1192,6 +1195,33 @@ class QuizTest extends TestCase
             ->getJson('/api/quiz/getResultPDF/'.$quizScore->id)
             ->assertJsonFragment([
                 'Error' => 'Permission denied to download quiz results as you did not complete that quiz'
+            ]);
+    }
+
+    /**
+     * A test to download the quiz result pdf quiz not found.
+     * @test
+     * @return void
+     */
+    public function test_download_getResultPDF_quiz_not_found()
+    {
+
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/quiz/getResultPDF/'.rand(9999,10000))
+            ->assertJsonFragment([
+                'Error' => 'Quiz results not found!'
+            ]);
+
+        $this->actingAs($this->moduleTutorUser)
+            ->getJson('/api/quiz/getResultPDF/'.rand(9999,10000))
+            ->assertJsonFragment([
+                'Error' => 'Quiz results not found!'
+            ]);
+
+        $this->actingAs($this->studentUser)
+            ->getJson('/api/quiz/getResultPDF/'.rand(9999,10000))
+            ->assertJsonFragment([
+                'Error' => 'Quiz results not found!'
             ]);
     }
 
