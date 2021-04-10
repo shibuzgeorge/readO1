@@ -47,7 +47,7 @@ class ModuleTest extends DuskTestCase
         $this->browse(function ($browser) {
             $browser->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->visit(new Module)
                 ->pause(1000)
                 ->createButton()
@@ -68,7 +68,7 @@ class ModuleTest extends DuskTestCase
         $this->browse(function ($browser, $broswer2) {
             $browser->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->visit(new Module)
                 ->pause(1000)
                 ->createButton()
@@ -79,7 +79,7 @@ class ModuleTest extends DuskTestCase
 
             $broswer2->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->visit(new Module)
                 ->type('search', 'Testing')
                 ->assertSee('Testing')

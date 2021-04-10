@@ -24,6 +24,7 @@ class LoginTest extends DuskTestCase
         $this->browse(function ($browser) use ($user) {
             $browser->visit(new Login)
                 ->submit($user->email, 'password')
+                ->pause(2000)
                 ->assertPageIs(Home::class);
         });
     }
@@ -34,6 +35,7 @@ class LoginTest extends DuskTestCase
         $this->browse(function ($browser) {
             $browser->visit(new Login)
                 ->submit('test@test.app', 'password')
+                ->pause(2000)
                 ->assertSee('These credentials do not match our records.');
         });
     }
@@ -46,6 +48,7 @@ class LoginTest extends DuskTestCase
         $this->browse(function ($browser) use ($user) {
             $browser->visit(new Login)
                 ->submit($user->email, 'password')
+                ->pause(2000)
                 ->on(new Home)
                 ->clickLogout()
                 ->assertPageIs(Login::class);

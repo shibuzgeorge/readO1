@@ -48,7 +48,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser) {
             $browser->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 //expands all menus for a admin
                 ->waitFor('#extensive-reading-menu')
                 ->clickLink('Extensive Reading')
@@ -64,6 +64,7 @@ class SideBarMenuTest extends DuskTestCase
                 //checks if these are visible on the side bar menu.
                 ->assertSeeIn('#sidebar-wrapper', 'Dashboard')
                 ->assertSeeIn('#sidebar-wrapper', 'Library')
+                ->assertSeetIn('#sidebar-wrapper', 'Reading Sessions and Quiz Scores')
                 ->assertSeeIn('#sidebar-wrapper', 'Extensive Reading')
                 ->assertSeeIn('#extensive-reading-expanded', 'Home')
                 ->assertSeeIn('#extensive-reading-expanded', 'View all categories')
@@ -97,7 +98,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser) {
             $browser->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 //expands all menus for a module tutor
                 ->waitFor('#extensive-reading-menu')
                 ->clickLink('Extensive Reading')
@@ -111,6 +112,7 @@ class SideBarMenuTest extends DuskTestCase
                 //checks if these are visible on the side bar menu.
                 ->assertSeeIn('#sidebar-wrapper', 'Dashboard')
                 ->assertSeeIn('#sidebar-wrapper', 'Library')
+                ->assertSeetIn('#sidebar-wrapper', 'Reading Sessions and Quiz Scores')
                 ->assertSeeIn('#sidebar-wrapper', 'Extensive Reading')
                 ->assertSeeIn('#extensive-reading-expanded', 'Home')
                 ->assertSeeIn('#extensive-reading-expanded', 'View all categories')
@@ -145,7 +147,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser) {
             $browser->visit(new Login)
                 ->submit($this->studentUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 //expands all menus for a student
                 ->waitFor('#extensive-reading-menu')
                 ->clickLink('Extensive Reading')
@@ -155,6 +157,7 @@ class SideBarMenuTest extends DuskTestCase
                 //checks if these are visible on the side bar menu.
                 ->assertSeeIn('#sidebar-wrapper', 'Dashboard')
                 ->assertSeeIn('#sidebar-wrapper', 'Library')
+                ->assertSeetIn('#sidebar-wrapper', 'Reading Sessions and Quiz Scores')
                 ->assertSeeIn('#sidebar-wrapper', 'Extensive Reading')
                 ->assertSeeIn('#extensive-reading-expanded', 'Home')
                 ->assertSeeIn('#extensive-reading-expanded', 'View all categories')
@@ -188,7 +191,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser) {
             $browser->visit(new Login)
                 ->submit($this->studentUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#modules-menu')
                 ->pause(1000)
                 ->clickLink('Modules')
@@ -213,7 +216,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser) {
             $browser->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#modules-menu')
                 ->clickLink('Modules')
                 ->waitFor('#all-modules-menu')
@@ -244,7 +247,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser ) {
             $browser->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#modules-menu')
                 ->clickLink('Modules')
                 ->waitFor('#all-modules-menu')
@@ -284,7 +287,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser1, $browser2, $browser3) {
             $browser1->visit(new Login)
                 ->submit($this->studentUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#library-menu')
                 ->clickLink('Library')
                 ->pause(5000)
@@ -294,7 +297,7 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser2->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#library-menu')
                 ->clickLink('Library')
                 ->pause(5000)
@@ -304,7 +307,7 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser3->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#library-menu')
                 ->clickLink('Library')
                 ->pause(5000)
@@ -325,7 +328,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser1,$browser2,$browser3) {
             $browser1->visit(new Login)
                 ->submit($this->studentUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#dashboard-menu')
                 ->clickLink('Dashboard')
                 ->pause(1000)
@@ -334,7 +337,7 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser2->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#dashboard-menu')
                 ->clickLink('Dashboard')
                 ->pause(1000)
@@ -343,12 +346,50 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser3->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#dashboard-menu')
                 ->clickLink('Dashboard')
                 ->pause(1000)
                 ->assertPathis('/home')
                 ->assertSeeIn('#title', 'Dashboard');
+        });
+    }
+
+    /**
+     * Checks the reading session and quiz score text and links are working for all Student, Module Tutor and Admins
+     *
+     * @test
+     * @throws \Throwable
+     */
+    public function test_reading_session_quiz_score_menu()
+    {
+        $this->browse(function ($browser1,$browser2,$browser3) {
+            $browser1->visit(new Login)
+                ->submit($this->studentUser->email, 'password')
+                ->pause(2000)
+                ->waitFor('#reading-sessions-quiz-scores-menu')
+                ->clickLink('Reading Sessions and Quiz Scores')
+                ->pause(1000)
+                ->assertPathis('/readingQuizScores')
+                ->assertSeeIn('#title', 'Full list of scores and reading times');
+
+            $browser2->visit(new Login)
+                ->submit($this->moduleTutorUser->email, 'password')
+                ->pause(2000)
+                ->waitFor('#reading-sessions-quiz-scores-menu')
+                ->clickLink('Reading Sessions and Quiz Scores')
+                ->pause(1000)
+                ->assertPathis('/readingQuizScores')
+                ->assertSeeIn('#title', 'Full list of scores and reading times');
+
+            $browser3->visit(new Login)
+                ->submit($this->adminUser->email, 'password')
+                ->pause(2000)
+                ->waitFor('#reading-sessions-quiz-scores-menu')
+                ->clickLink('Reading Sessions and Quiz Scores')
+                ->pause(1000)
+                ->assertPathis('/readingQuizScores')
+                ->assertSeeIn('#title', 'Full list of scores and reading times');
         });
     }
 
@@ -363,7 +404,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser1,$browser2,$browser3) {
             $browser1->visit(new Login)
                 ->submit($this->studentUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#extensive-reading-menu')
                 ->clickLink('Extensive Reading')
                 ->waitFor('#extensive-reading-home-menu')
@@ -380,7 +421,7 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser2->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#extensive-reading-menu')
                 ->clickLink('Extensive Reading')
                 ->waitFor('#extensive-reading-home-menu')
@@ -402,7 +443,7 @@ class SideBarMenuTest extends DuskTestCase
 
             $browser3->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#extensive-reading-menu')
                 ->clickLink('Extensive Reading')
                 ->waitFor('#extensive-reading-home-menu')
@@ -436,7 +477,7 @@ class SideBarMenuTest extends DuskTestCase
             //Module Tutor User
             $browser1->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#textbooks-menu')
                 ->clickLink('Textbooks')
                 ->waitFor('#create-textbook-menu')
@@ -449,7 +490,7 @@ class SideBarMenuTest extends DuskTestCase
             //Admin User
             $browser2->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#textbooks-menu')
                 ->clickLink('Textbooks')
                 ->waitFor('#create-textbook-menu')
@@ -474,7 +515,7 @@ class SideBarMenuTest extends DuskTestCase
             //Module Tutor User
             $browser1->visit(new Login)
                 ->submit($this->moduleTutorUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#texts-menu')
                 ->clickLink('Texts')
                 ->waitFor('#add-a-text-menu')
@@ -487,7 +528,7 @@ class SideBarMenuTest extends DuskTestCase
             //Admin User
             $browser2->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#texts-menu')
                 ->clickLink('Texts')
                 ->waitFor('#add-a-text-menu')
@@ -512,7 +553,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser ) {
             $browser->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#year-groups-menu')
                 ->clickLink('Year Groups')
                 ->waitFor('#title')
@@ -535,7 +576,7 @@ class SideBarMenuTest extends DuskTestCase
         $this->browse(function ($browser ) {
             $browser->visit(new Login)
                 ->submit($this->adminUser->email, 'password')
-                ->pause(1000)
+                ->pause(2000)
                 ->waitFor('#users-menu')
                 ->clickLink('Users')
                 ->waitFor('#view-all-users-menu')
