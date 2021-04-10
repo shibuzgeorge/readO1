@@ -25,6 +25,7 @@ class Module extends Page
     {
         $browser->waitFor('#create', 10)
         ->press('+ Create Module')
+        ->pause(2000)
         ->assertPathis('/module/create');
     }
 
@@ -39,6 +40,7 @@ class Module extends Page
     {
         $browser->waitFor('#yearGroup', 10)
             ->press('+ Add Year Group')
+            ->pause(2000)
             ->assertPathis('/yearGroup');
     }
 
