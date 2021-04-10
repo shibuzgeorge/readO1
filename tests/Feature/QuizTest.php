@@ -813,8 +813,8 @@ class QuizTest extends TestCase
     {
         $text = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $textToUse = $text;
         $this->test_create_quiz_admin_authorised($textToUse);
@@ -891,13 +891,10 @@ class QuizTest extends TestCase
     {
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
-        $textToUse = $text;
-        $this->test_create_quiz_admin_authorised($textToUse);
-
-        $allQuiz = $textToUse->quizzes()->with('questions', 'options')->get()
+        $allQuiz = $text->quizzes()->with('questions', 'options')->get()
             ->map(function ($event) {
                 return [
                     'id' => $event->id,
@@ -918,7 +915,7 @@ class QuizTest extends TestCase
             });
 
         $this->actingAs($this->moduleTutorUser)
-            ->getJson('/api/quiz/edit/'.$textToUse->id)
+            ->getJson('/api/quiz/edit/'.$text->id)
             ->assertSuccessful()
             ->assertJsonFragment(['quizzes' => $allQuiz->toArray()]);
     }
@@ -933,14 +930,11 @@ class QuizTest extends TestCase
     {
         $text = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
-
-        $textToUse = $text;
-        $this->test_create_quiz_admin_authorised($textToUse);
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $this->actingAs($this->moduleTutorUser)
-            ->getJson('/api/quiz/edit/'.$textToUse->id)
+            ->getJson('/api/quiz/edit/'.$text->id)
             ->assertSuccessful()
             ->assertJsonFragment(['Error' => 'Permission denied to edit quiz']);
     }
@@ -1120,8 +1114,8 @@ class QuizTest extends TestCase
     {
         $text = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->moduleTutorUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $textToUse = $text;
         $this->test_create_quiz_admin_authorised($textToUse);
@@ -1147,8 +1141,8 @@ class QuizTest extends TestCase
     {
         $text = Module::has('textbooks.texts')->whereDoesntHave('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $textToUse = $text;
         $this->test_create_quiz_admin_authorised($textToUse);
@@ -1174,11 +1168,12 @@ class QuizTest extends TestCase
     {
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $textToUse = $text;
         $this->test_create_quiz_admin_authorised($textToUse);
+        $quiz_id = $textToUse->quizzes()->where('text_id',$textToUse->id)->first()->id;
 
         $anotherUser = User::whereHas('role', function($q){
             $q->where('name', 'Student');
@@ -1186,7 +1181,6 @@ class QuizTest extends TestCase
 
         $this->test_result_student_authorised($textToUse, $anotherUser);
 
-        $quiz_id = $textToUse->quizzes()->where('text_id',$textToUse->id)->first()->id;
         $quizScore = UserQuizScore::where('quiz_id', $quiz_id)->first();
 
         $this->actingAs($this->studentUser)
