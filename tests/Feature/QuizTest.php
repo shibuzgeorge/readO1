@@ -949,8 +949,8 @@ class QuizTest extends TestCase
     {
         $text = Module::has('textbooks.texts')->whereHas('users', function ($query){
             $query->where('user_id', $this->studentUser->id);
-        })->inRandomOrder()->first()->textbooks()->inRandomOrder()->first()
-            ->texts()->inRandomOrder()->first();
+        })->first()->textbooks()->first()
+            ->texts()->first();
 
         $this->actingAs($this->studentUser)
             ->getJson('/api/quiz/edit/'.$text->id)
