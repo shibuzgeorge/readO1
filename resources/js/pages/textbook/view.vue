@@ -7,7 +7,11 @@
                         Description: {{description}}
                         <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
                     </h5>
-                    <div class="wrapper mt-4" :class="{ 'row': thumbnail!==null }">
+                    <div class="align-items-center" style="text-align: center;">
+                        <h6 v-if="section==='Extensive Reading'">Extensive Reading Category: <router-link :to="{ name: 'extensiveReading.show', params: {id: selected.id} }">{{selected.name}}</router-link></h6>
+                        <h6 v-if="section==='Module'" v-for="module in selected">Module: <router-link :to="{ name: 'module.show', params: {id: module.id} }">{{module.name}} ({{module.module_code}})</router-link> Year: {{module.year.name}}<div class="break"></div></h6>
+                    </div>
+                        <div class="wrapper mt-4" :class="{ 'row': thumbnail!==null }">
                         <div v-if="thumbnail!==null" class="col-sm-5 d-flex justify-content-center">
                         <img  :src="'data:image/png;base64,'+thumbnail" width="300" height="500"/>
                         </div>
@@ -91,6 +95,8 @@
             file: true,
             fileName: '',
             thumbnail: '',
+            section: '',
+            selected: '',
             path: '/lib/pdf/web/viewer.html',
             searchQuery: null,
             sizePage: 9,
@@ -130,6 +136,8 @@
                         this.texts = response.data.texts;
                         this.file = response.data.file;
                         this.thumbnail = response.data.thumbnail;
+                        this.section = response.data.section;
+                        this.selected = response.data.selected;
                     }
 
                 }).catch(error => {

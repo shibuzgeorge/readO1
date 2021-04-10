@@ -208,14 +208,21 @@ class TextbookTest extends TestCase
     }
 
     /**
-     * A test to check data for viewing a textbook with a full textbook file uploaded as a Admin
+     * A test to check data for viewing a textbook for a module with a full textbook file uploaded as a Admin
      *
      * @test
      * @return void
      */
-    public function test_show_a_textbook_with_file_admin_authorised()
+    public function test_show_a_textbook_module_with_file_admin_authorised()
     {
-        $textbook = Textbook::where('file', '!=', null)->inRandomOrder()->first();
+        $textbook = Textbook::has('modules')->where('file', '!=', null)->inRandomOrder()->first();
+
+            $selected = $textbook->modules()->get();
+            foreach ($selected as $sel) {
+                $sel->setAttribute('year', $sel->yearGroup()->first()->toArray());
+
+            }
+        $section = 'Module';
 
         $this->actingAs($this->adminUser)
             ->getJson('/api/textbook/'.$textbook->id)
@@ -224,19 +231,24 @@ class TextbookTest extends TestCase
                 'title' => $textbook->title,
                 'description' => $textbook->description,
                 'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
                 'file' => true
             ]);
     }
 
     /**
-     * A test to check data for viewing a textbook without a full textbook file uploaded as a Admin
+     * A test to check data for viewing a textbook for extensive reading category with a full textbook file uploaded as a Admin
      *
      * @test
      * @return void
      */
-    public function test_show_a_textbook_without_file_admin_authorised()
+    public function test_show_a_textbook_extensive_reading_with_file_admin_authorised()
     {
-        $textbook = Textbook::where('file', null)->inRandomOrder()->first();
+        $textbook = Textbook::has('extensiveReadingCategories')->where('file', '!=', null)->inRandomOrder()->first();
+
+        $selected = $textbook->extensiveReadingCategories()->first();
+        $section = 'Extensive Reading';
 
         $this->actingAs($this->adminUser)
             ->getJson('/api/textbook/'.$textbook->id)
@@ -245,17 +257,74 @@ class TextbookTest extends TestCase
                 'title' => $textbook->title,
                 'description' => $textbook->description,
                 'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
+                'file' => true
+            ]);
+    }
+
+    /**
+     * A test to check data for viewing a textbook for a module without a full textbook file uploaded as a Admin
+     *
+     * @test
+     * @return void
+     */
+    public function test_show_a_textbook_module_without_file_admin_authorised()
+    {
+        $textbook = Textbook::has('modules')->where('file', null)->inRandomOrder()->first();
+
+            $selected = $textbook->modules()->get();
+            foreach ($selected as $sel){
+                $sel->setAttribute('year', $sel->yearGroup()->first()->toArray());
+            }
+            $section = 'Module';
+
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/textbook/'.$textbook->id)
+            ->assertSuccessful()
+            ->assertJson([
+                'title' => $textbook->title,
+                'description' => $textbook->description,
+                'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
                 'file' => false
             ]);
     }
 
     /**
-     * A test to check data for viewing a textbook with a full textbook file uploaded as a Module Tutor
+     * A test to check data for viewing a textbook for extensive reading cateogry without a full textbook file uploaded as a Admin
      *
      * @test
      * @return void
      */
-    public function test_show_a_textbook_with_file_module_tutor_authorised()
+    public function test_show_a_textbook_extensive_reading_without_file_admin_authorised()
+    {
+        $textbook = Textbook::has('extensiveReadingCategories')->where('file', null)->inRandomOrder()->first();
+
+        $selected = $textbook->extensiveReadingCategories()->first();
+        $section = 'Extensive Reading';
+
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/textbook/'.$textbook->id)
+            ->assertSuccessful()
+            ->assertJson([
+                'title' => $textbook->title,
+                'description' => $textbook->description,
+                'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
+                'file' => false
+            ]);
+    }
+
+    /**
+     * A test to check data for viewing a textbook for a module with a full textbook file uploaded as a Module Tutor
+     *
+     * @test
+     * @return void
+     */
+    public function test_show_a_textbook_module_with_file_module_tutor_authorised()
     {
         $textbook_ids = Textbook::has('modules')->where('file','!=', null)->pluck('id')->toArray();
         $textbook = $this->moduleTutorUser->modules()->has('textbooks')->with('textbooks')
@@ -263,6 +332,18 @@ class TextbookTest extends TestCase
         $q->whereIn('textbook_id', $textbook_ids);})->inRandomOrder()->first()
             ->textbooks()->where('file', '!=', null)->inRandomOrder()->first();
 
+            $textbook_id = $textbook->id;
+            $selected = $this->moduleTutorUser->modules()->whereHas(
+                'textbooks', function($q) use($textbook_id) {
+                $q->where('textbook_id', $textbook_id);
+            })->whereHas('users', function($q) {
+                $q->where('user_id', $this->moduleTutorUser->id);
+            })->get();
+            foreach ($selected as $sel){
+                $sel->setAttribute('year', $sel->yearGroup()->first()->toArray());
+            }
+            $section = 'Module';
+
         $this->actingAs($this->moduleTutorUser)
             ->getJson('/api/textbook/'.$textbook->id)
             ->assertSuccessful()
@@ -270,17 +351,45 @@ class TextbookTest extends TestCase
                 'title' => $textbook->title,
                 'description' => $textbook->description,
                 'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
                 'file' => true
             ]);
     }
 
     /**
-     * A test to check data for viewing a textbook without a full textbook file uploaded as a Module Tutor
+     * A test to check data for viewing a textbook for extensive reading category with a full textbook file uploaded as a Module Tutor
      *
      * @test
      * @return void
      */
-    public function test_show_a_textbook_without_file_module_tutor_authorised()
+    public function test_show_a_textbook_extensive_reading_with_file_module_tutor_authorised()
+    {
+        $textbook = Textbook::has('extensiveReadingCategories')->where('file','!=', null)->inRandomOrder()->first();
+
+        $selected = $textbook->extensiveReadingCategories()->first();
+        $section = 'Extensive Reading';
+
+        $this->actingAs($this->moduleTutorUser)
+            ->getJson('/api/textbook/'.$textbook->id)
+            ->assertSuccessful()
+            ->assertJson([
+                'title' => $textbook->title,
+                'description' => $textbook->description,
+                'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
+                'file' => true
+            ]);
+    }
+
+    /**
+     * A test to check data for viewing a textbook for a module without a full textbook file uploaded as a Module Tutor
+     *
+     * @test
+     * @return void
+     */
+    public function test_show_a_textbook_module_without_file_module_tutor_authorised()
     {
         $textbook_ids = Textbook::has('modules')->where('file', null)->pluck('id')->toArray();
         $textbook = $this->moduleTutorUser->modules()->has('textbooks')->with('textbooks')
@@ -288,6 +397,18 @@ class TextbookTest extends TestCase
                 $q->whereIn('textbook_id', $textbook_ids);})->inRandomOrder()->first()
             ->textbooks()->where('file', null)->inRandomOrder()->first();
 
+            $textbook_id = $textbook->id;
+            $selected = $this->moduleTutorUser->modules()->whereHas(
+                'textbooks', function($q) use($textbook_id) {
+                $q->where('textbook_id', $textbook_id);
+            })->whereHas('users', function($q) {
+                $q->where('user_id', $this->moduleTutorUser->id);
+            })->get();
+            foreach ($selected as $sel){
+                $sel->setAttribute('year', $sel->yearGroup()->first()->toArray());
+            }
+            $section = 'Module';
+
         $this->actingAs($this->moduleTutorUser)
             ->getJson('/api/textbook/'.$textbook->id)
             ->assertSuccessful()
@@ -295,17 +416,45 @@ class TextbookTest extends TestCase
                 'title' => $textbook->title,
                 'description' => $textbook->description,
                 'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
                 'file' => false
             ]);
     }
 
     /**
-     * A test to check data for viewing a textbook with a full textbook file uploaded as a Student
+     * A test to check data for viewing a textbook for extensive reading category without a full textbook file uploaded as a Module Tutor
      *
      * @test
      * @return void
      */
-    public function test_show_a_textbook_with_file_student_authorised()
+    public function test_show_a_textbook_extensive_reading_without_file_module_tutor_authorised()
+    {
+        $textbook = Textbook::has('extensiveReadingCategories')->where('file', null)->inRandomOrder()->first();
+
+        $selected = $textbook->extensiveReadingCategories()->first();
+        $section = 'Extensive Reading';
+
+        $this->actingAs($this->moduleTutorUser)
+            ->getJson('/api/textbook/'.$textbook->id)
+            ->assertSuccessful()
+            ->assertJson([
+                'title' => $textbook->title,
+                'description' => $textbook->description,
+                'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
+                'file' => false
+            ]);
+    }
+
+    /**
+     * A test to check data for viewing a textbook for a module with a full textbook file uploaded as a Student
+     *
+     * @test
+     * @return void
+     */
+    public function test_show_a_textbook_module_with_file_student_authorised()
     {
         $textbook_ids = Textbook::has('modules')->where('file','!=', null)->pluck('id')->toArray();
         $textbook = $this->studentUser->modules()->has('textbooks')->with('textbooks')
@@ -313,6 +462,23 @@ class TextbookTest extends TestCase
                 $q->whereIn('textbook_id', $textbook_ids);})->inRandomOrder()->first()
             ->textbooks()->where('file','!=', null)->inRandomOrder()->first();
 
+        if($textbook->extensiveReadingCategories()->count()>0){
+            $selected = $textbook->extensiveReadingCategories()->first();
+            $section = 'Extensive Reading';
+        }else{
+            $textbook_id = $textbook->id;
+            $selected = $this->studentUser->modules()->whereHas(
+                'textbooks', function($q) use($textbook_id) {
+                $q->where('textbook_id', $textbook_id);
+            })->whereHas('users', function($q) {
+                $q->where('user_id', $this->studentUser->id);
+            })->get();
+            foreach ($selected as $sel){
+                $sel->setAttribute('year', $sel->yearGroup()->first()->toArray());
+            }
+            $section = 'Module';
+        }
+
         $this->actingAs($this->studentUser)
             ->getJson('/api/textbook/'.$textbook->id)
             ->assertSuccessful()
@@ -320,17 +486,45 @@ class TextbookTest extends TestCase
                 'title' => $textbook->title,
                 'description' => $textbook->description,
                 'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
                 'file' => true
             ]);
     }
 
     /**
-     * A test to check data for viewing a textbook without a full textbook file uploaded as a Student
+     * A test to check data for viewing a textbook for extensive reading category with a full textbook file uploaded as a Student
      *
      * @test
      * @return void
      */
-    public function test_show_a_textbook_without_file_student_authorised()
+    public function test_show_a_textbook_extensive_reading_with_file_student_authorised()
+    {
+        $textbook = Textbook::has('extensiveReadingCategories')->where('file','!=', null)->inRandomOrder()->first();
+
+        $selected = $textbook->extensiveReadingCategories()->first();
+        $section = 'Extensive Reading';
+
+        $this->actingAs($this->studentUser)
+            ->getJson('/api/textbook/'.$textbook->id)
+            ->assertSuccessful()
+            ->assertJson([
+                'title' => $textbook->title,
+                'description' => $textbook->description,
+                'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
+                'file' => true
+            ]);
+    }
+
+    /**
+     * A test to check data for viewing a textbook for a module without a full textbook file uploaded as a Student
+     *
+     * @test
+     * @return void
+     */
+    public function test_show_a_textbook_module_without_file_student_authorised()
     {
         $textbook_ids = Textbook::has('modules')->where('file', null)->pluck('id')->toArray();
         $textbook = $this->studentUser->modules()->has('textbooks')->with('textbooks')
@@ -338,6 +532,23 @@ class TextbookTest extends TestCase
                 $q->whereIn('textbook_id', $textbook_ids);})->inRandomOrder()->first()
             ->textbooks()->where('file', null)->inRandomOrder()->first();
 
+        if($textbook->extensiveReadingCategories()->count()>0){
+            $selected = $textbook->extensiveReadingCategories()->first();
+            $section = 'Extensive Reading';
+        }else{
+            $textbook_id = $textbook->id;
+            $selected = $this->studentUser->modules()->whereHas(
+                'textbooks', function($q) use($textbook_id) {
+                $q->where('textbook_id', $textbook_id);
+            })->whereHas('users', function($q) {
+                $q->where('user_id', $this->studentUser->id);
+            })->get();
+            foreach ($selected as $sel){
+                $sel->setAttribute('year', $sel->yearGroup()->first()->toArray());
+            }
+            $section = 'Module';
+        }
+
         $this->actingAs($this->studentUser)
             ->getJson('/api/textbook/'.$textbook->id)
             ->assertSuccessful()
@@ -345,6 +556,34 @@ class TextbookTest extends TestCase
                 'title' => $textbook->title,
                 'description' => $textbook->description,
                 'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
+                'file' => false
+            ]);
+    }
+
+    /**
+     * A test to check data for viewing a textbook for extensive reading category with a full textbook file uploaded as a Student
+     *
+     * @test
+     * @return void
+     */
+    public function test_show_a_textbook_extensive_reading_without_file_student_authorised()
+    {
+        $textbook = Textbook::has('extensiveReadingCategories')->where('file', null)->inRandomOrder()->first();
+
+        $selected = $textbook->extensiveReadingCategories()->first();
+        $section = 'Extensive Reading';
+
+        $this->actingAs($this->studentUser)
+            ->getJson('/api/textbook/'.$textbook->id)
+            ->assertSuccessful()
+            ->assertJson([
+                'title' => $textbook->title,
+                'description' => $textbook->description,
+                'texts' => $textbook->texts()->get()->toArray(),
+                'section' =>  $section,
+                'selected' => $selected->toArray(),
                 'file' => false
             ]);
     }

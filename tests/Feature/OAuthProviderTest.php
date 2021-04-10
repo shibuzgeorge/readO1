@@ -123,6 +123,40 @@ class OAuthProviderTest extends TestCase
             ->assertStatus(400);
     }
 
+    /**
+     * A test to check if OAuth user name is null and attempts to get it from the first part of the email.
+     * @test
+     */
+    public function create_user_with_name_null_return_token(){
+
+        $userData = [ 'id' => '123',
+            'email' => 'testnameisnull@example.com',
+            'token' => 'access-token',
+            'refreshToken' => 'refresh-token'
+        ];
+        $this->mockSocialite('github', $userData);
+
+        $this->withoutExceptionHandling();
+
+        $this->get('/api/oauth/github/callback')
+            ->assertText('token')
+            ->assertSuccessful();
+
+        $this->assertDatabaseHas('users', [
+            'name' => 'testnameisnull',
+            'email' => 'testnameisnull@example.com',
+            'role_id' => Role::where('name', 'Student')->first()->id
+        ]);
+
+        $this->assertDatabaseHas('oauth_providers', [
+            'user_id' => User::orderBy('id', 'desc')->first()->id,
+            'provider' => 'github',
+            'provider_user_id' => '123',
+            'access_token' => 'access-token',
+            'refresh_token' => 'refresh-token',
+        ]);
+    }
+
     protected function mockSocialite($provider, $user = null)
     {
         $mock = Socialite::shouldReceive('stateless')
