@@ -111,23 +111,37 @@ class TextbookController extends Controller
 
             if ($checkIfUserHasPermissionToView) {
                 $texts = $textbook->texts()->get();
-                if ($textbook->file != null) {
-                    return response()->json([
-                        'title' => $textbook->title,
-                        'description' => $textbook->description,
-                        'texts' => $texts,
-                        'thumbnail' => $textbook->thumbnail,
-                        'file' => true
-                    ]);
-                } else {
-                    return response()->json([
-                        'title' => $textbook->title,
-                        'description' => $textbook->description,
-                        'texts' => $texts,
-                        'thumbnail' => $textbook->thumbnail,
-                        'file' => false
-                    ]);
+
+                if($textbook->extensiveReadingCategories()->count()>0){
+                    $selected = $textbook->extensiveReadingCategories()->first();
+                    $section = 'Extensive Reading';
+                }else{
+                    $selected = $textbook->modules()->get();
+
+                    if(Auth::user()->role->name !== 'Admin'){
+
+                        $selected = auth()->user()->modules()->whereHas(
+                            'textbooks', function($q) use($textbook_id) {
+                            $q->where('textbook_id', $textbook_id);
+                        })->whereHas('users', function($q) {
+                            $q->where('user_id', auth()->user()->id);
+                        })->get();
+                    }
+                    foreach ($selected as $sel){
+                        $sel->setAttribute('year', $sel->yearGroup()->first());
+                    }
+
+                    $section = 'Module';
                 }
+                    return response()->json([
+                        'title' => $textbook->title,
+                        'description' => $textbook->description,
+                        'texts' => $texts,
+                        'section' =>  $section,
+                        'selected' => $selected,
+                        'thumbnail' => $textbook->thumbnail,
+                        'file' => ($textbook->file != null ? true : false)
+                    ]);
             } else {
                 return response()->json(['Error' => 'Permission denied to view textbook!']);
             }
