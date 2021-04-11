@@ -19,7 +19,7 @@
                 </div>
 
                 <div v-show="section==='module'">Choose module(s) <button @click="section=''" type="button" class="float-right btn btn-sm btn-warning">Go back X</button>
-                    <multiselect v-model="form.selected" :options="modules"
+                    <multiselect v-model="form.selected" :options="modules" :custom-label="moduleWithCodeAndYear"
                                  track-by="name" label="name"
                                  :multiple="true"
                                  :close-on-select="false">
@@ -45,7 +45,7 @@
                 <input class="form-control" :disabled="!thumbnailOn" type="file" :class="{ 'is-invalid': form.errors.has('thumbnail') }" id="thumbnail" ref="thumbnail" v-on:change="handleThumbnailUpload()"/><br/>
                 <has-error :form="form" field="thumbnail" />
             </div>
-            <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
+            <sweet-modal ref="success" v-on:close="navigate()" icon="success">
                 Successfully Uploaded
             </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">
@@ -107,6 +107,13 @@
             handleThumbnailUpload(){
                 this.form.thumbnail = this.$refs.thumbnail.files[0];
             },
+            navigate(){
+                if (this.section === 'extensiveReading'){
+                    this.$router.push({name: 'extensiveReading.show', params: {id: this.form.selected.id}})
+                } else{
+                    this.$router.push({name: 'module.show', params: {id: this.form.selected[0].id}})
+                }
+            },
             async submit() {
 
                 this.form.busy = true;
@@ -136,10 +143,13 @@
                         this.$refs.success.open();
                     })
                     .catch(error => {
-                        this.form.selected = JSON.parse(this.form.selected)
+                        this.form.selected = JSON.parse(this.form.selected);
                         console.log(error.response)
                     });
             },
+            moduleWithCodeAndYear({ name, module_code, year_group}) {
+                return `(${module_code}) ${name} - Year: ${year_group.name}`
+            }
 
         }
 

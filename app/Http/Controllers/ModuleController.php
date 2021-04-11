@@ -214,7 +214,7 @@ class ModuleController extends Controller
      */
     public function show($module_id)
     {
-        $m = Module::find($module_id);
+        $m = Module::with('yearGroup')->find($module_id);
 
         if($m == null) {
             return response()->json(['Error' => 'Module not found!']);
@@ -227,6 +227,7 @@ class ModuleController extends Controller
                 return response()->json([
                     'name' => $m->name,
                     'code' => $m->module_code,
+                    'year' => $m->yearGroup()->first()->name,
                     'textbooks' => $textbook
                 ]);
             }
@@ -239,6 +240,7 @@ class ModuleController extends Controller
                 return response()->json([
                     'name' => $m->name,
                     'code' => $m->module_code,
+                    'year' => $m->yearGroup()->first()->name,
                     'textbooks' => $textbook
                 ]);
             }

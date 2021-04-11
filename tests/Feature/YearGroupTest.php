@@ -36,10 +36,47 @@ class YearGroupTest extends TestCase
      * A test to check data for index page authorised by logging in as an Admin.
      *
      */
-    public function test_index_page_authorised(){
-        $year_groups = YearGroup::all()->toArray();
+    public function test_index_page_admin_authorised()
+    {
+        $year_groups = YearGroup::has('module')->get()->toArray();
 
         $this->actingAs($this->adminUser)
+            ->getJson('/api/yearGroup')
+            ->assertJson($year_groups)
+            ->assertStatus(200);
+    }
+
+    /**
+     * A test to check data for index page authorised by logging in as an Module Tutor.
+     *
+     */
+    public function test_index_page_module_tutor_authorised()
+    {
+        $module_ids = $this->moduleTutorUser->modules()->get()->pluck('id');
+        $year_groups = YearGroup::
+        whereHas('module', function ($query) use ($module_ids){
+            $query->whereIn('modules.id', $module_ids);
+        })->get()->toArray();
+
+        $this->actingAs($this->moduleTutorUser)
+            ->getJson('/api/yearGroup')
+            ->assertJson($year_groups)
+            ->assertStatus(200);
+    }
+
+    /**
+     * A test to check data for index page authorised by logging in as an Student.
+     *
+     */
+    public function test_index_page_student_authorised()
+    {
+        $module_ids = $this->studentUser->modules()->get()->pluck('id');
+        $year_groups = YearGroup::
+        whereHas('module', function ($query) use ($module_ids){
+            $query->whereIn('modules.id', $module_ids);
+        })->get()->toArray();
+
+        $this->actingAs($this->studentUser)
             ->getJson('/api/yearGroup')
             ->assertJson($year_groups)
             ->assertStatus(200);
@@ -89,7 +126,7 @@ class YearGroupTest extends TestCase
     }
 
     /**
-     * A test to check the data for the modules for a particular year group
+     * A test to check the data for the modules for a particular year group with textbooks
      *
      * @test
      * @return void
@@ -112,6 +149,35 @@ class YearGroupTest extends TestCase
 
         $this->actingAs($this->moduleTutorUser)
             ->getJson('/api/yearGroup/getModulesForYearGroup/'.$year_group->id)
+            ->assertJson($module_tutor['modules']->toArray())
+            ->assertStatus(200);
+
+    }
+
+    /**
+     * A test to check the data for getting all modules for a particular year group with or without textbook
+     *
+     * @test
+     * @return void
+     */
+    public function test_get_all_modules_for_year_group()
+    {
+        $year_group = YearGroup::has('module')->inRandomOrder()->first();
+        $admin = [
+            'modules' => $year_group->module()->get()
+        ];
+        $module_ids = $this->moduleTutorUser->modules()->get()->pluck('id');
+        $module_tutor = [
+            'modules' => $modules = $year_group->module()->whereIn('modules.id', $module_ids)->get()
+        ];
+
+        $this->actingAs($this->adminUser)
+            ->getJson('/api/yearGroup/getAllModulesForYearGroup/'.$year_group->id)
+            ->assertJson($admin['modules']->toArray())
+            ->assertStatus(200);
+
+        $this->actingAs($this->moduleTutorUser)
+            ->getJson('/api/yearGroup/getAllModulesForYearGroup/'.$year_group->id)
             ->assertJson($module_tutor['modules']->toArray())
             ->assertStatus(200);
 

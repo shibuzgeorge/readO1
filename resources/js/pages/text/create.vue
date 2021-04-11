@@ -35,7 +35,7 @@
 
                 <div v-if="isModuleLoaded" v-show="section==='module'">
                     Choose module <button @click="goBack('yearGroup')" type="button" class="float-right btn btn-sm btn-warning">Go back X</button>
-                    <multiselect v-model="form.selected" @input="selectModuleTextbook()" :options="modules"
+                    <multiselect v-model="form.selected" @input="selectModuleTextbook()" :options="modules" :custom-label="moduleWithCode"
                                  track-by="name" label="name"
                                  :close-on-select="true">
                     </multiselect>
@@ -73,7 +73,7 @@
                 <input class="form-control" type="file" id="file"  :class="{ 'is-invalid': form.errors.has('file') }" ref="file" v-on:change="handleFileUpload()"/>
                 <has-error :form="form" field="file" /><br/>
             </div>
-            <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
+            <sweet-modal ref="success" v-on:close="$router.push({name: 'textbook.show', params: {id: form.selected.id}})" icon="success">
                 Successfully Uploaded
             </sweet-modal>
             <v-button class="form-control" :loading="form.busy" type="success">
@@ -143,7 +143,7 @@
             selectModuleTextbook(){
                 this.section = 'moduleTextbook';
                 this.moduleTextbooks = this.form.selected.textbooks;
-                this.selectedOption.push('Module: ' + this.form.selected.name);
+                this.selectedOption.push('Module: ('+this.form.selected.module_code+') ' + this.form.selected.name);
                 this.form.selected = [];
             },
             selectExtensiveReadingTextbook(){
@@ -155,6 +155,7 @@
             goBack(section){
                 this.section = section;
                 this.selectedOption.pop();
+                this.form.selected = [];
 
             },
             handleFileUpload(){
@@ -185,6 +186,9 @@
                     .catch(error => {
                         console.log(error.response)
                     });
+            },
+            moduleWithCode ({ name, module_code }) {
+                return `(${module_code}) ${name}`
             }
         }
 

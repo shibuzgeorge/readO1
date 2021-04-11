@@ -198,7 +198,7 @@ class TextbookController extends Controller
                     $selected = $textbook->extensiveReadingCategories()->first();
                     $section = 'extensiveReading';
                 }else{
-                    $selected = $textbook->modules()->get();
+                    $selected = $textbook->modules()->with('yearGroup')->get();
                     $section = 'module';
                 }
                 return response()->json([

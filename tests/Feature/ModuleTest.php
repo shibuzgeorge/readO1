@@ -1238,6 +1238,7 @@ class ModuleTest extends TestCase
                 [
                     'name' => $randomModule->name,
                     'code' => $randomModule->module_code,
+                    'year' => $randomModule->yearGroup()->first()->name,
                     'textbooks' => $randomModule->textbooks()->get()->toArray()
                 ]
             )
@@ -1251,6 +1252,7 @@ class ModuleTest extends TestCase
                 [
                     'name' => $randomModule->name,
                     'code' => $randomModule->module_code,
+                    'year' => $randomModule->yearGroup()->first()->name,
                     'textbooks' => $randomModule->textbooks()->get()->toArray()
                 ]
             )
@@ -1264,6 +1266,7 @@ class ModuleTest extends TestCase
                 [
                     'name' => $randomModule->name,
                     'code' => $randomModule->module_code,
+                    'year' => $randomModule->yearGroup()->first()->name,
                     'textbooks' => $randomModule->textbooks()->get()->toArray()
                 ]
             )
