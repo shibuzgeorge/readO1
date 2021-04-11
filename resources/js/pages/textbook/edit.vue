@@ -21,7 +21,7 @@
                 </div>
 
                 <div v-show="section==='module'">Choose module(s) <button @click="section=''" type="button" class="float-right btn btn-sm btn-warning">Change section X</button>
-                    <multiselect v-model="form.selected" :options="modules"
+                    <multiselect v-model="form.selected" :options="modules" :custom-label="moduleWithCodeAndYear"
                                  track-by="name" label="name"
                                  :multiple="true"
                                  :close-on-select="false">
@@ -139,7 +139,7 @@
                 //handle error
                 console.log(response);
             });
-            let self = this
+            let self = this;
 
             axios.get(`/api/textbook/${this.$route.params.id}/edit`)
                 .then(response => {
@@ -167,7 +167,7 @@
                     }
                 }).catch(function (response) {
                 //handle error
-                self.$router.push({name: 'home'})
+                self.$router.push({name: 'home'});
 
                 console.log(response);
             });
@@ -215,6 +215,9 @@
                     .catch(error => {
                         console.log(error.response)
                     });
+            },
+            moduleWithCodeAndYear({ name, module_code, year_group}) {
+                return `(${module_code}) ${name} - Year: ${year_group.name}`
             }
         }
 

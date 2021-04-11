@@ -36,6 +36,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::resource('/textbook', 'TextbookController');
     Route::get('textbook/pdf/{textbook_id}', 'TextbookController@pdf');
 
+    Route::get('/yearGroup/getAllModulesForYearGroup/{year_group_id}', 'YearGroupController@getAllModulesForYearGroup');
     Route::get('/yearGroup/getModulesForYearGroup/{year_group_id}', 'YearGroupController@getModulesForYearGroup');
     Route::resource('/yearGroup', 'YearGroupController');
 

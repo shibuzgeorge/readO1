@@ -37,7 +37,7 @@
 
                     <div v-if="isModuleLoaded" v-show="section==='module'">
                         Choose module <button @click="goBack('yearGroup')" type="button" class="float-right btn btn-sm btn-warning">Go back X</button>
-                        <multiselect v-model="form.selected" @input="selectModuleTextbook()" :options="modules"
+                        <multiselect v-model="form.selected" @input="selectModuleTextbook()" :options="modules" :custom-label="moduleWithCode"
                                      track-by="name" label="name"
                                      :close-on-select="true">
                         </multiselect>
@@ -143,7 +143,7 @@
         }),
 
         created() {
-            let self = this
+            let self = this;
             axios.get(`/api/text/${this.$route.params.id}/edit`)
                 .then(response => {
                     if(response.data.Error !== undefined){
@@ -170,7 +170,7 @@
                             });
                             this.selectedOption.push('Year: ' + this.year_group.name);
                             this.selectedModule = response.data.selectedModule;
-                            this.selectedOption.push('Module: '+ this.selectedModule.name);
+                            this.selectedOption.push('Module: ('+this.selectedModule.module_code+') ' + this.selectedModule.name);
                             this.moduleTextbooks = this.selectedModule.textbooks;
                         }else{
                             this.selectedExtensiveReadingCategory = response.data.selectedExtensiveReadingCategory;
@@ -207,7 +207,7 @@
             selectModuleTextbook(){
                 this.section = 'moduleTextbook';
                 this.moduleTextbooks = this.form.selected.textbooks;
-                this.selectedOption.push('Module: ' + this.form.selected.name);
+                this.selectedOption.push('Module: ('+this.form.selected.module_code+') ' + this.form.selected.name);
                 this.form.selected = [];
             },
             selectExtensiveReadingTextbook(){
@@ -252,6 +252,9 @@
                     .catch(error => {
                         console.log(error.response)
                     });
+            },
+            moduleWithCode ({ name, module_code }) {
+                return `(${module_code}) ${name}`
             }
         }
 

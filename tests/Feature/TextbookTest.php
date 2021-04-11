@@ -724,7 +724,7 @@ class TextbookTest extends TestCase
             ->assertJson([
                 'title' => $textbook->title,
                 'description' => $textbook->description,
-                'selected' => $textbook->modules()->get()->toArray(),
+                'selected' => $textbook->modules()->with('yearGroup')->get()->toArray(),
                 'section' => 'module'
             ]);
     }
@@ -766,7 +766,7 @@ class TextbookTest extends TestCase
             ->assertJson([
                 'title' => $textbook->title,
                 'description' => $textbook->description,
-                'selected' => $textbook->modules()->get()->toArray(),
+                'selected' => $textbook->modules()->with('yearGroup')->get()->toArray(),
                 'section' => 'module'
             ]);
     }

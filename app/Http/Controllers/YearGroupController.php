@@ -22,7 +22,19 @@ class YearGroupController extends Controller
      */
     public function index()
     {
-        $year_groups = YearGroup::all();
+        $user = Auth::user();
+        $user_role = $user->role->name;
+
+        if($user_role === 'Admin'){
+            $year_groups = YearGroup::has('module')->get();
+        }else{
+            $module_ids = $user->modules()->get()->pluck('id');
+            $year_groups = YearGroup::
+            whereHas('module', function ($query) use ($module_ids){
+                $query->whereIn('modules.id', $module_ids);
+            })->get();
+        }
+
         return response()->json($year_groups);
     }
 
@@ -39,7 +51,7 @@ class YearGroupController extends Controller
     }
 
     /**
-     * Returns all modules for a particular year group
+     * Returns all modules with textbooks for a particular year group
      *
      * @param $year_group_id
      * @return \Illuminate\Http\JsonResponse
@@ -55,6 +67,27 @@ class YearGroupController extends Controller
             $module_ids = $user->modules()->get()->pluck('id');
             $year = YearGroup::findOrFail($year_group_id);
             $modules = $year->module()->whereIn('modules.id', $module_ids)->has('textbooks')->with('textbooks')->get();
+        }
+        return response()->json($modules);
+    }
+
+    /**
+     * Returns all modules with or without textbooks for a particular year group
+     *
+     * @param $year_group_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllModulesForYearGroup($year_group_id)
+    {
+        $user = Auth::user();
+        $user_role = $user->role;
+        if($user_role->name === 'Admin'){
+            $yearGroup = YearGroup::findOrFail($year_group_id);
+            $modules = $yearGroup->module()->get();
+        } else{
+            $module_ids = $user->modules()->get()->pluck('id');
+            $year = YearGroup::findOrFail($year_group_id);
+            $modules = $year->module()->whereIn('modules.id', $module_ids)->get();
         }
         return response()->json($modules);
     }
