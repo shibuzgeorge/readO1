@@ -17,7 +17,7 @@
                 Add
             </v-button>
         </form>
-        <sweet-modal ref="success" v-on:close="$router.go($router.currentRoute)" icon="success">
+        <sweet-modal ref="success" v-on:close="refreshData" icon="success">
             {{successMessage}}
         </sweet-modal>
 
@@ -40,8 +40,8 @@
                 </h6>
                 <li class="mt-2" v-for="year in current_year_groups">
                     {{year.name}}
-                    <a @click="edit(year.id, year.name)"><button type="button" class="btn btn-primary btn-sm">Edit</button></a>
-                    <a @click="del(year.id, year.name)"><button type="button" class="btn btn-warning btn-sm">Delete</button></a>
+                    <a @click="del(year.id, year.name)"><button type="button" style="float: right;" class="btn btn-warning btn-sm">Delete</button></a>
+                    <a @click="edit(year.id, year.name)"><button type="button" style="float: right;" class="btn btn-primary btn-sm">Edit</button></a>
 
                 </li>
             </card>
@@ -72,16 +72,20 @@
 
         }),
         created(){
-            axios.get('/api/yearGroup')
-                .then(response => {
-                    this.current_year_groups = response.data;
-                    this.isLoaded = true;
-                }).catch(function (response) {
-                //handle error
-                console.log(response);
-            });
+            this.refreshData();
         },
         methods: {
+            refreshData(){
+                this.isLoaded = false;
+                axios.get('/api/yearGroup')
+                    .then(response => {
+                        this.current_year_groups = response.data;
+                        this.isLoaded = true;
+                    }).catch(function (response) {
+                    //handle error
+                    console.log(response);
+                });
+            },
             async submit() {
                 await this.form.post('/api/yearGroup')
                     .then(response => {
@@ -109,6 +113,7 @@
                     });
             },
             async del(id, name) {
+                let self = this;
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "Do you really want to delete the year group - ("+name+") ?\n" +
@@ -126,7 +131,7 @@
                             'The year group has been deleted.',
                             'success'
                         ).then(function () {
-                            window.location.reload();
+                            self.refreshData();
                         });
                     }
                 });

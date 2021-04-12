@@ -103,20 +103,24 @@
             }
         },
         created() {
-
-            axios.get('api/textbook/')
-                .then(response => {
-                    this.isLoaded = true;
-                    this.textbooks = response.data.textbooks
-                    this.modules = response.data.modules
-                    this.extensiveReadingCategories = response.data.extensiveReadingCategories
-
-                }).catch(error => {
-                console.log(error.response)
-            });
+            this.refreshData();
         },
         methods: {
+            refreshData(){
+                this.isLoaded = false;
+                axios.get('api/textbook/')
+                    .then(response => {
+                        this.isLoaded = true;
+                        this.textbooks = response.data.textbooks
+                        this.modules = response.data.modules
+                        this.extensiveReadingCategories = response.data.extensiveReadingCategories
+
+                    }).catch(error => {
+                    console.log(error.response)
+                });
+            },
             async del(data) {
+                let self = this;
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "Do you really want to delete the textbook?",
@@ -133,7 +137,7 @@
                             'success'
                         );
                         axios.delete(`/api/textbook/${data}`).then(response => {
-                            window.location.reload();
+                            self.refreshData();
                         })
                     }
                 });

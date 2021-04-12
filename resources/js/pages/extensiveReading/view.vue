@@ -19,7 +19,7 @@
             </h1>
             <div class="row justify-content-center">
 
-                <div v-for="textbook in textbooksPaginated" class="card col-sm-3 ml-4 mt-4 align-items-center">
+                <div v-for="textbook in textbooksPaginated" class="card col-sm-5 ml-4 mt-4">
                     <div class="card-body" :class="{ 'row': textbook.thumbnail!==null }">
                         <div v-if="textbook.thumbnail!==null" class="col-sm-5 d-flex justify-content-center">
                             <img :src="'data:image/png;base64,'+textbook.thumbnail" width="150" height="200"/>
@@ -32,7 +32,7 @@
                             <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
                                 <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
                             </router-link>
-                            <button type="button" @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'"  class="card-link">Delete</button><br/>
+                            <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
                         </div>
                     </div>
                 </div>

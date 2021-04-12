@@ -2,17 +2,16 @@
     <div v-if="isLoaded" class="text-center">
         <div class="flexbox">
             <div class="flex-item">
-                <router-link v-show="role==='Admin'" :to="{ name: 'category.create' }">
-                    <button class="btn btn-success" v-if="role==='Admin'">+ Category</button>
+                <router-link :to="{ name: 'extensiveReading.index' }">
+                    <button class="btn btn-primary">Category Home</button>
                 </router-link>
-
             </div>
             <div class="flex-item">
                 <h1 id="title">Extensive Reading Categories</h1>
             </div>
             <div class="flex-item">
-                <router-link v-show="role==='Admin'" :to="{ name: 'yearGroup' }">
-                    <button class="btn btn-success" v-if="role==='Admin'">+ Assign module tutors</button>
+                <router-link v-show="role==='Admin' || role==='Module Tutor'" :to="{ name: 'extensiveReading.create' }">
+                    <button class="btn btn-success" v-if="role==='Admin' || role==='Module Tutor'">+ Category</button>
                 </router-link>
             </div>
         </div>
@@ -37,7 +36,7 @@
                     <router-link :to="{ name: 'extensiveReading.edit', params: {id: category.id} }">
                         <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
                     </router-link>
-                        <a @click="del(category.id)" v-show="role==='Admin'" href="delete" class="card-link">Delete</a><br/>
+                        <a @click="del(category.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
                 </div>
             </div>
         </div><br/>
@@ -85,18 +84,23 @@
             }
         },
         created() {
-            let self = this;
-            axios.get('/api/extensiveReading/categories')
-                .then(response => {
-                    this.isLoaded = true;
-                    this.categories = response.data;
-                }).catch(function (response) {
-                //handle error
-                console.log(response);
-            });
+            this.refreshData();
+
         },
         methods: {
+            refreshData(){
+                this.isLoaded = false;
+                axios.get('/api/extensiveReading/categories')
+                    .then(response => {
+                        this.categories = response.data;
+                        this.isLoaded = true;
+                    }).catch(function (response) {
+                    //handle error
+                    console.log(response);
+                });
+            },
             async del(data) {
+                let self = this;
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "Do you really want to delete the category?\n" +
@@ -114,7 +118,7 @@
                             'The category has been deleted.',
                             'success'
                         ).then(function () {
-                            window.location.reload();
+                            self.refreshData();
                         });
                     }
                 })

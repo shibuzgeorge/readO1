@@ -162,6 +162,7 @@ class TextController extends Controller
                     return response()->json([
                         'title' => $text->title,
                         'description' => $text->description,
+                        'textbook' => $text->textbook()->first(),
                         'text' => $pdftext,
                     ]);
             } else {

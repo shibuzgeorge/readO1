@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\ExtensiveReadingCategory;
+use App\Module;
 use App\Option;
 use App\Question;
 use App\Quiz;
@@ -96,7 +97,41 @@ class QuizController extends Controller
                 ];})[0]);
 
         $attempt_number = $request->input('attempt_num');
-        $pdf = PDF::loadView('quiz_result_template', compact('quiz', 'totalPointsCollected', 'selectedOptions', 'attempt_number'));
+        $extensiveReadingCat = $quiz_object->first()->text()->first()->textbook()->first()->extensiveReadingCategories()->first();
+
+        if($extensiveReadingCat !=null){
+            $extensiveReadingArray = [
+                'category' => $extensiveReadingCat->name,
+                'textbook' => $quiz_object->first()->text()->first()->textbook()->first()->title,
+                'text' => $quiz_object->first()->text()->first()->title
+            ];
+            $area = $extensiveReadingArray;
+            $section = 'Extensive Reading';
+        } else{
+            $textbook_id = $quiz_object->first()->text()->first()->textbook()->first()->id;
+            $modules = auth()->user()->modules()->whereHas(
+                'textbooks', function($q) use($textbook_id) {
+                $q->where('textbook_id', $textbook_id);
+            })->whereHas('users', function($q) {
+                $q->where('user_id', auth()->user()->id);
+            })->get();
+
+            $moduleText = [];
+            foreach($modules as $module){
+                array_push($moduleText, '('.$module->module_code.') ' . $module->name);
+            }
+
+            $moduleArray = [
+                'module' => implode(", ", $moduleText),
+                'textbook' => $quiz_object->first()->text()->first()->textbook()->first()->title,
+                'text' => $quiz_object->first()->text()->first()->title
+            ];
+            $area = $moduleArray;
+            $section = 'Module';
+        }
+
+        $pdf = PDF::loadView('quiz_result_template',
+            compact('quiz', 'totalPointsCollected', 'selectedOptions', 'attempt_number', 'section', 'area'));
         $pdf->save('quiz_result.pdf');
         $base64 = base64_encode(file_get_contents('quiz_result.pdf'));
         File::delete('quiz_result.pdf');

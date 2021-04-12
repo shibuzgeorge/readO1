@@ -74,8 +74,15 @@
                     Update the text [Format - PDF only]
                     <input class="form-control" type="file" id="file"  :class="{ 'is-invalid': form.errors.has('file') }" ref="file" v-on:change="handleFileUpload()"/>
                     <has-error :form="form" field="file" /><br/>
-                <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
+                Click here to edit quiz: <a @click="manageQuiz()"><button type="button" class="btn btn-primary">Edit Quiz</button></a><br/><br/>
+                <sweet-modal ref="success" icon="success">
                     {{successMessage}}
+                </sweet-modal>
+                <sweet-modal ref="successUpdated" v-on:close="$router.go(-1)" icon="success">
+                    {{successMessage}}
+                </sweet-modal>
+                <sweet-modal ref="manageQuiz">
+                    <manage-quiz :text_id="text_id" :parent="3"></manage-quiz>
                 </sweet-modal>
                 <v-button class="form-control" :loading="form.busy" type="success">
                     Update
@@ -101,12 +108,14 @@
     import axios from 'axios'
     import Form from 'vform'
     import PDFViewer from '~/components/PDFViewer';
+    import ManageQuiz from "../../components/ManageQuiz";
 
     export default {
         middleware: 'admin_plus_module_tutor',
         name: "edit",
         components:{
             PDFViewer,
+            ManageQuiz
         },
         data: () => ({
             isLoaded: false,
@@ -138,6 +147,7 @@
             selectedExtensiveReadingCategory: [],
             selectedModule: [],
             moduleTextbooks: [],
+            text_id: '',
             extensiveReadingCategories: [],
 
         }),
@@ -189,6 +199,10 @@
             });
         },
         methods: {
+            manageQuiz(){
+                this.text_id = parseInt(this.$route.params.id);
+                this.$refs.manageQuiz.open();
+            },
             selectModule(){
                 this.isModuleLoaded = false;
                 this.section = 'module';
@@ -247,7 +261,7 @@
                     .then(response => {
                         this.form.busy = false;
                         this.successMessage = response.data.Success;
-                        this.$refs.success.open();
+                        this.$refs.successUpdated.open();
                     })
                     .catch(error => {
                         console.log(error.response)

@@ -709,7 +709,7 @@ class QuizTest extends TestCase
      * @param null $changeStudent
      * @return void
      */
-     public function test_result_student_authorised($changeText = null, $changeStudent = null)
+     public function test_result_student_module_authorised($changeText = null, $changeStudent = null)
      {
          Notification::fake();
 
@@ -757,6 +757,62 @@ class QuizTest extends TestCase
 
      }
 
+    /**
+     *
+     * A test to get the result of the quiz of extensive reading category as a Student.
+     * Parameter to choose a text to put a result in.
+     * @test
+     * @return void
+     */
+    public function test_result_student_extensive_reading_category_authorised()
+    {
+        Notification::fake();
+
+        $text = ExtensiveReadingCategory::has('textbooks.texts')->first()->textbooks()->first()->texts()->first();
+
+        $this->test_create_quiz_admin_authorised($text);
+
+        $text = ExtensiveReadingCategory::has('textbooks.texts.quizzes.questions.options')->first()->textbooks()->first()
+            ->texts()->whereHas('quizzes')->first();
+
+        $quiz_object = Quiz::where('text_id', $text->id)->first();
+
+        $selectedOptionsIds = [];
+        $points = [];
+
+        foreach ($quiz_object->questions()->get() as $question){
+            $selectedO = $question->options()->inRandomOrder()->first();
+            array_push($selectedOptionsIds, $selectedO->id);
+            array_push($points, $selectedO->points);
+        }
+
+        $array = [
+            'selected' => json_encode($selectedOptionsIds),
+            'quiz_id' => $quiz_object->id,
+            'attempt_num' => 2
+        ];
+
+        $totalPointsCollected = array_sum($points);
+
+        $this->actingAs($this->studentUser)
+            ->postJson('/api/quiz/result', $array)
+            ->assertStatus(200)
+            ->assertJsonFragment([
+                'totalPointsCollected' => $totalPointsCollected,
+                'user_score_id' => UserQuizScore::orderBy('id', 'desc')->first()->id
+            ]);
+
+        $this->assertDatabaseHas('user_quiz_score', [
+            'user_id' => $this->studentUser->id,
+            'quiz_id' => $quiz_object->id,
+            'attempt_number' => 2,
+            'score' => $totalPointsCollected
+        ]);
+
+        Notification::assertSentTo($this->studentUser, QuizResult::class);
+
+    }
+
      /**
       * A test to get the last attempt of a quiz for a text for a Student.
       *
@@ -765,7 +821,7 @@ class QuizTest extends TestCase
       */
      public function test_getLastAttempt_student_authorised()
      {
-         $this->test_result_student_authorised();
+         $this->test_result_student_module_authorised();
 
          $text = Module::has('textbooks.texts.quizzes')->whereHas('users', function ($query){
              $query->where('user_id', $this->studentUser->id);
@@ -818,7 +874,7 @@ class QuizTest extends TestCase
 
         $textToUse = $text;
         $this->test_create_quiz_admin_authorised($textToUse);
-        $this->test_result_student_authorised($textToUse);
+        $this->test_result_student_module_authorised($textToUse);
 
         $quiz_id = Quiz::where('text_id', $textToUse->id)->first()->id;
 
@@ -1040,7 +1096,7 @@ class QuizTest extends TestCase
      */
     public function test_download_getResultPDF_admin()
     {
-        $this->test_result_student_authorised();
+        $this->test_result_student_module_authorised();
 
         $quizScore = UserQuizScore::inRandomOrder()->first();
 
@@ -1064,7 +1120,7 @@ class QuizTest extends TestCase
      */
     public function test_download_getResultPDF_module_tutor()
     {
-        $this->test_result_student_authorised();
+        $this->test_result_student_module_authorised();
 
         $quizScore = UserQuizScore::where('user_id', $this->studentUser->id)->first();
 
@@ -1088,7 +1144,7 @@ class QuizTest extends TestCase
      */
     public function test_download_getResultPDF_student()
     {
-        $this->test_result_student_authorised();
+        $this->test_result_student_module_authorised();
 
         $quizScore = UserQuizScore::where('user_id', $this->studentUser->id)->first();
 
@@ -1120,7 +1176,7 @@ class QuizTest extends TestCase
         $textToUse = $text;
         $this->test_create_quiz_admin_authorised($textToUse);
 
-        $this->test_result_student_authorised($textToUse);
+        $this->test_result_student_module_authorised($textToUse);
 
         $quiz_id = $textToUse->quizzes()->where('text_id',$textToUse->id)->first()->id;
         $quizScore = UserQuizScore::where('quiz_id', $quiz_id)->first();
@@ -1147,7 +1203,7 @@ class QuizTest extends TestCase
         $textToUse = $text;
         $this->test_create_quiz_admin_authorised($textToUse);
 
-        $this->test_result_student_authorised($textToUse);
+        $this->test_result_student_module_authorised($textToUse);
 
         $quiz_id = $textToUse->quizzes()->where('text_id',$textToUse->id)->first()->id;
         $quizScore = UserQuizScore::where('quiz_id', $quiz_id)->first();
@@ -1179,7 +1235,7 @@ class QuizTest extends TestCase
             $q->where('name', 'Student');
         })->where('id', '!=', $this->studentUser->id)->first();
 
-        $this->test_result_student_authorised($textToUse, $anotherUser);
+        $this->test_result_student_module_authorised($textToUse, $anotherUser);
 
         $quizScore = UserQuizScore::where('quiz_id', $quiz_id)->first();
 
