@@ -1,7 +1,9 @@
 <template>
     <card v-if="isLoaded">
         <h5 class="card-header">
-            <div id="title" class="d-flex justify-content-between align-items-center">Title: {{title}}
+            <div id="title" class="d-flex justify-content-between align-items-center">
+                Title: {{title}}
+               <div>Textbook: <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">{{textbook.title}}</router-link></div>
                 <button @click="$router.go(-1)" type="button" class="btn btn-sm btn-primary">Back</button>
             </div>
             <br/>
@@ -116,6 +118,7 @@
             errorMessage: '',
             text: '',
             file: true,
+            textbook: '',
             selection: 'pdf',
             path: '/lib/pdf/web/viewer.html',
             successMessage: '',
@@ -136,6 +139,7 @@
                     }else{
                         this.isLoaded = true;
                         this.title = response.data.title;
+                        this.textbook = response.data.textbook;
                         this.description = response.data.description;
                         if(response.data.text !== undefined){
                             this.text = atob(response.data.text);

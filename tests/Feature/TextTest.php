@@ -688,6 +688,7 @@ class TextTest extends TestCase
             ->assertJson([
                 'title' => $text->title,
                 'description' => $text->description,
+                'textbook' => $text->textbook()->first()->toArray(),
                 'text' => $pdftext
             ]);
     }
@@ -722,6 +723,7 @@ class TextTest extends TestCase
             ->assertJson([
                 'title' => $text->title,
                 'description' => $text->description,
+                'textbook' => $text->textbook()->first()->toArray(),
                 'text' => $pdftext
             ]);
     }
@@ -756,6 +758,7 @@ class TextTest extends TestCase
             ->assertJson([
                 'title' => $text->title,
                 'description' => $text->description,
+                'textbook' => $text->textbook()->first()->toArray(),
                 'text' => $pdftext
             ]);
     }

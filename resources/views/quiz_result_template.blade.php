@@ -18,6 +18,9 @@
     <div class="text-center">
                 <h1 class="jumbotron-heading">You scored: {{ $totalPointsCollected }} out of {{$quiz['max_points']}}</h1>
                 <h1>{{number_format($totalPointsCollected/$quiz['max_points'], 3) * 100}}%</h1>
+                <b>@if($section === 'Extensive Reading') Extensive Reading Category: {{$area['category']}} @else Module: {{$area['module']}} @endif </b><br/>
+                <b>Textbook: {{$area['textbook']}} </b><br/>
+                <b>Text: {{$area['text']}} </b><br/><br/>
                 <b>Date: {{Carbon\Carbon::now()->timezone('Europe/London')->format('l jS \\of F Y H:i:s')}}</b><br/>
                 <b>Attempt Number: {{$attempt_number}}</b>
     </div>

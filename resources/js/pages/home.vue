@@ -43,7 +43,7 @@
         <div class="row">
             <div class="col-md-6">
                 Reading Sessions
-                <table class="table">
+                <table class="table table-responsive">
                     <thead>
                     <tr>
                         <th v-if="role==='Admin' || role==='Module Tutor'" scope="col">User</th>
@@ -74,7 +74,7 @@
             </div>
             <div class="col-md-6">
                 Quiz Attempts
-                <table class="table">
+                <table class="table table-responsive">
                     <thead>
                     <tr>
                         <th v-if="role==='Admin' || role==='Module Tutor'" scope="col">User</th>

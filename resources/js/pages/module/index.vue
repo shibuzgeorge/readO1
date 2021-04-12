@@ -113,23 +113,7 @@
             }
         },
         created() {
-            let self = this;
-            axios.get('/api/yearGroup/')
-                .then(response => {
-                    this.year_groups = response.data;
-                }).catch(function (response) {
-                //handle error
-                console.log(response);
-            });
-            axios.get('/api/module/')
-                .then(response => {
-                    this.isLoaded = true;
-                    this.modules = response.data;
-                }).catch(function (response) {
-                //handle error
-                console.log(response);
-            });
-
+            this.refreshData()
         },
         mounted: function () {
             this.$nextTick(function () {
@@ -143,7 +127,26 @@
             })
         },
         methods: {
+            refreshData(){
+                this.isLoaded = false;
+                axios.get('/api/yearGroup/')
+                    .then(response => {
+                        this.year_groups = response.data;
+                    }).catch(function (response) {
+                    //handle error
+                    console.log(response);
+                });
+                axios.get('/api/module/')
+                    .then(response => {
+                        this.isLoaded = true;
+                        this.modules = response.data;
+                    }).catch(function (response) {
+                    //handle error
+                    console.log(response);
+                });
+            },
             async del(data) {
+                let self = this;
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "Do you really want to delete the module?\n" +
@@ -161,7 +164,8 @@
                             'The module has been deleted.',
                             'success'
                         ).then(function () {
-                            window.location.reload();
+                            self.filterYear = 'Filter by year...';
+                            self.refreshData();
                         });
                     }
                 })

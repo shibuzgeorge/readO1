@@ -15,7 +15,7 @@
                 </option>
             </select>
             </div>
-            <table class="table">
+            <table class="table table-responsive">
                 <thead>
                 <tr>
                     <th scope="col" v-if="role==='Admin' || role==='Module Tutor'">Student</th>
@@ -59,7 +59,7 @@
                     </option>
                 </select>
             </div>
-            <table class="table">
+            <table class="table table-responsive">
                 <thead>
                 <tr>
                     <th scope="col" v-if="role==='Admin' || role==='Module Tutor'">Student</th>

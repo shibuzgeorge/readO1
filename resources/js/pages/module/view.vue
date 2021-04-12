@@ -19,20 +19,22 @@
             </h1>
             <div class="row justify-content-center">
 
-                <div v-for="textbook in textbooksPaginated" class="card col-sm-3 ml-4 mt-4 align-items-center">
-                <div class="card-body">
-                    <img v-if="textbook.thumbnail!==null" :src="'data:image/png;base64,'+textbook.thumbnail" width="150" height="200"/>
-                    <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
-                    <h5 class="card-title">{{textbook.title}}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
-                    </router-link>
-                    <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
-                        <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
-                    </router-link>
-
-                    <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
-
-                </div>
+                <div v-for="textbook in textbooksPaginated" class="card col-sm-5 ml-4 mt-4">
+                    <div class="card-body" :class="{ 'row': textbook.thumbnail!==null }">
+                        <div v-if="textbook.thumbnail!==null" class="col-sm-5 d-flex justify-content-center">
+                            <img :src="'data:image/png;base64,'+textbook.thumbnail" width="150" height="200"/>
+                        </div>
+                        <div :class="{ 'col-sm-7': textbook.thumbnail!==null }">
+                            <router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">
+                                <h5 class="card-title">{{textbook.title}}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>
+                            </router-link>
+                            <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
+                                <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
+                            </router-link>
+                            <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
+                        </div>
+                    </div>
             </div>
             </div><br/>
             <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
@@ -80,26 +82,30 @@
             }
         },
         created() {
-
-            axios.get(`/api/module/${this.$route.params.id}`)
-                .then(response => {
-                    if(response.data.Error !== undefined){
-                        this.errorMessage = response.data.Error;
-                        this.$refs.error.open();
-                    }else {
-                        this.isLoaded = true;
-                        this.name = response.data.name;
-                        this.module_code = response.data.code;
-                        this.module_year = response.data.year;
-                        this.textbooks = response.data.textbooks;
-                    }
-
-                }).catch(error => {
-                this.$router.go(-1)
-            });
+            this.refreshData();
         },
         methods: {
+            refreshData(){
+                this.isLoaded = false;
+                axios.get(`/api/module/${this.$route.params.id}`)
+                    .then(response => {
+                        if(response.data.Error !== undefined){
+                            this.errorMessage = response.data.Error;
+                            this.$refs.error.open();
+                        }else {
+                            this.isLoaded = true;
+                            this.name = response.data.name;
+                            this.module_code = response.data.code;
+                            this.module_year = response.data.year;
+                            this.textbooks = response.data.textbooks;
+                        }
+
+                    }).catch(error => {
+                    this.$router.go(-1)
+                });
+            },
             async del(data) {
+                let self = this;
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "Do you really want to delete the textbook?",
@@ -116,7 +122,7 @@
                             'success'
                         );
                         axios.delete(`/api/textbook/${data}`).then(response => {
-                            window.location.reload();
+                            self.refreshData();
                         })
                     }
                 });

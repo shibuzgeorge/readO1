@@ -123,29 +123,34 @@
             PDFViewer,
         },
         created() {
-            this.fileName =`/api/textbook/pdf/${this.$route.params.id}`;
-            axios.get(`/api/textbook/${this.$route.params.id}`)
-                .then(response => {
-                    if(response.data.Error !== undefined){
-                        this.errorMessage = response.data.Error;
-                        this.$refs.error.open();
-                    }else {
-                        this.isLoaded = true;
-                        this.title = response.data.title;
-                        this.description = response.data.description;
-                        this.texts = response.data.texts;
-                        this.file = response.data.file;
-                        this.thumbnail = response.data.thumbnail;
-                        this.section = response.data.section;
-                        this.selected = response.data.selected;
-                    }
-
-                }).catch(error => {
-                this.$router.go(-1)
-            });
+            this.refreshData();
         },
         methods: {
+            refreshData(){
+                this.isLoaded = false;
+                this.fileName =`/api/textbook/pdf/${this.$route.params.id}`;
+                axios.get(`/api/textbook/${this.$route.params.id}`)
+                    .then(response => {
+                        if(response.data.Error !== undefined){
+                            this.errorMessage = response.data.Error;
+                            this.$refs.error.open();
+                        }else {
+                            this.isLoaded = true;
+                            this.title = response.data.title;
+                            this.description = response.data.description;
+                            this.texts = response.data.texts;
+                            this.file = response.data.file;
+                            this.thumbnail = response.data.thumbnail;
+                            this.section = response.data.section;
+                            this.selected = response.data.selected;
+                        }
+
+                    }).catch(error => {
+                    this.$router.go(-1)
+                });
+            },
             async del(data) {
+                let self = this;
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "Do you really want to delete the text?",
@@ -162,7 +167,7 @@
                             'success'
                         );
                         axios.delete(`/api/text/${data}`).then(response => {
-                            window.location.reload();
+                            self.refreshData();
                         })
                     }
                 });

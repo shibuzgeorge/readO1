@@ -36,7 +36,10 @@
 
                     </div>
                     <hr>
-                        <section>
+                    <div v-if="category.textbooks.length === 0">
+                        No textbooks for this category
+                    </div>
+                        <section v-if="category.textbooks.length !== 0">
                             <vueper-slides
                                     class="no-shadow"
                                     :visible-slides="2"
@@ -61,30 +64,14 @@
                                                 <router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">
                                                     <a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>
                                                 </router-link>
-                                                <a @click="del(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
+                                                <a @click="delTextbook(textbook.id)" v-show="role==='Admin' || role==='Module Tutor'" href="#" class="card-link">Delete</a><br/>
                                             </div>
                                         </div>
                                     </template>
                                 </vueper-slide>
                             </vueper-slides>
-
-                                            <!--<div v-if="category.textbooks.length > 0" v-for="textbook in category.textbooks" class="col-md-4 mb-3 card">-->
-                                                <!--<div class="card-body">-->
-                                                    <!--<router-link :to="{ name: 'textbook.show', params: {id: textbook.id} }">-->
-                                                        <!--<h5 class="card-title">{{textbook.title}}</h5>-->
-                                                        <!--<h6 class="card-subtitle mb-2 text-muted">{{textbook.description }}</h6>-->
-                                                    <!--</router-link>-->
-                                                    <!--<router-link :to="{ name: 'textbook.edit', params: {id: textbook.id} }">-->
-                                                        <!--<a v-show="role==='Admin' || role==='Module Tutor'" href="edit" class="card-link">Edit</a>-->
-                                                    <!--</router-link>-->
-                                                <!--</div>-->
-                                            <!--</div>-->
-
                         </section>
-
-                    <div v-if="category.textbooks.length === 0">
-                        No textbooks for this category
-                    </div><hr>
+                    <hr>
             </div><br/>
             <paginate style="display: flex; justify-content: center;" :items="resultQuery" :pageSize="sizePage" @changePage="onChangePage"></paginate>
         </div>
@@ -132,6 +119,7 @@
         },
         methods: {
             refreshData(){
+                this.isLoaded = false;
                 axios.get(`/api/extensiveReading`)
                     .then(response => {
                         this.categories = response.data;
@@ -154,6 +142,30 @@
                 }).then(function (result) {
                     if (result.value) {
                         axios.delete(`/api/extensiveReading/${data}`);
+                        Swal.fire(
+                            'Deleted!',
+                            'The category has been deleted.',
+                            'success'
+                        ).then(function () {
+                            self.refreshData();
+                        });
+                    }
+                })
+            },
+            async delTextbook(data) {
+                let self = this;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you really want to delete the textbook?\n" +
+                    "      If there is texts inside, that will get deleted also",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                }).then(function (result) {
+                    if (result.value) {
+                        axios.delete(`/api/textbook/${data}`);
                         Swal.fire(
                             'Deleted!',
                             'The category has been deleted.',
