@@ -12,7 +12,7 @@
         <br/>
         How to use the application:
 
-        <img src="/guide/guide3.png"/>
+        <img src="/guide/guide3.png" class="img-fluid"/>
 
     </div>
 </template>
