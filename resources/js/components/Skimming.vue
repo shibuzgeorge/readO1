@@ -15,7 +15,7 @@
         <br/>
         How to use the application:
 
-        <img src="/guide/guide2.png"/>
+        <img src="/guide/guide2.png" class="img-fluid"/>
     </div>
 </template>
 
