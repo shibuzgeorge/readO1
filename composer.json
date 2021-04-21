@@ -1,5 +1,5 @@
 {
-    "name": "ReadO1",
+    "name": "shibuzgeorge/readO1",
     "description": "A library management system with speed reading strategies",
     "keywords": ["speed", "reading", "laravel", "vue"],
     "license": "MIT",
