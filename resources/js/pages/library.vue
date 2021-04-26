@@ -11,7 +11,7 @@
             <select class="form-control col-lg-3 ml-2" v-model="filterByModule" v-on:change="resetExtensiveReadingCategoryFilter()">
                 <option>Filter by module...</option>
                 <option v-for="module in modules" :value="module.id" :key="module.id">
-                    {{ module.name }}
+                    ({{module.module_code}}) {{ module.name }}
                 </option>
             </select>
 

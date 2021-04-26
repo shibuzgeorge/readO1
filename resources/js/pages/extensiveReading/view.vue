@@ -81,25 +81,29 @@
             }
         },
         created() {
-
-            axios.get(`/api/extensiveReading/${this.$route.params.id}`)
-                .then(response => {
-                    if(response.data.Error !== undefined){
-                        this.errorMessage = response.data.Error;
-                        this.$refs.error.open();
-                    }else {
-                        this.isLoaded = true;
-                        this.name = response.data.name;
-                        this.description = response.data.description;
-                        this.textbooks = response.data.textbooks;
-                    }
-
-                }).catch(error => {
-                this.$router.go(-1)
-            });
+            this.refreshData();
         },
         methods: {
+            refreshData(){
+                this.isLoaded = false;
+                axios.get(`/api/extensiveReading/${this.$route.params.id}`)
+                    .then(response => {
+                        if(response.data.Error !== undefined){
+                            this.errorMessage = response.data.Error;
+                            this.$refs.error.open();
+                        }else {
+                            this.isLoaded = true;
+                            this.name = response.data.name;
+                            this.description = response.data.description;
+                            this.textbooks = response.data.textbooks;
+                        }
+
+                    }).catch(error => {
+                    this.$router.go(-1)
+                });
+            },
             async del(data) {
+                let self = this;
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "Do you really want to delete the textbook?",
@@ -115,8 +119,8 @@
                             'The textbook has been deleted.',
                             'success'
                         );
-                        axios.delete(`/api/extensiveReading/${data}`).then(response => {
-                            window.location.reload();
+                        axios.delete(`/api/textbook/${data}`).then(response => {
+                            self.refreshData();
                         })
                     }
                 });

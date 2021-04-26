@@ -168,7 +168,7 @@
                         axios.delete(`/api/textbook/${data}`);
                         Swal.fire(
                             'Deleted!',
-                            'The category has been deleted.',
+                            'The textbook has been deleted.',
                             'success'
                         ).then(function () {
                             self.refreshData();

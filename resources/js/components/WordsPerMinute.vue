@@ -9,7 +9,7 @@
         <br/>
         How to use the application:
 
-        <img src="/guide/guide4.png"/>
+        <img src="/guide/guide4.png" class="img-fluid"/>
 
     </div>
 </template>

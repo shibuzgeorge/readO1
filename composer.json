@@ -1,7 +1,7 @@
 {
-    "name": "cretueusebiu/laravel-vue-spa",
-    "description": "A Laravel-Vue SPA starter project template.",
-    "keywords": ["spa", "laravel", "vue"],
+    "name": "shibuzgeorge/reado1",
+    "description": "A library management system with speed reading strategies",
+    "keywords": ["speed", "reading", "laravel", "vue"],
     "license": "MIT",
     "type": "project",
     "require": {

@@ -23,8 +23,8 @@
 
             <sweet-modal ref="success" v-on:close="$router.go(-1)" icon="success">
                 Successfully created a new user!<br/>
-                The new user will receive an email to verify their account receive
-                a rest password link in which they can reset their password to access their account.
+                The new user will receive an email to verify their account and receive
+                a reset password link in which they can reset their password to access their account.
             </sweet-modal>
         </form>
     </card>
